@@ -1,2 +1,7 @@
 __pycache__/
 *.pyc
+
+# backups sync_common/sync_repo make when a real file already sits where
+# a symlink/merged file needs to go -- always regenerable, never intended
+# to be committed (see _backup_path() in scripts/lib.py)
+*.bak-*
