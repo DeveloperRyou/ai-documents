@@ -1,0 +1,26 @@
+# ai-documents repo.yaml
+#
+# Registers which local repos should have CLAUDE.md / .claude (or any other
+# doc) symlinked into them. The parser (scripts/lib.py) understands only
+# this exact restricted shape -- keep new entries in this form:
+#
+#   anchor: <path>               # optional, defaults to ~/.local/share/ai-documents
+#   repos:
+#     - name: <unique-key>       # must match a folder under docs/<name>/
+#       path: <absolute path>    # target repo on disk ("~" is expanded)
+#       docs:
+#         - CLAUDE.md            # each entry is a top-level file/dir name
+#         - .claude              # under docs/<name>/, symlinked whole into
+#                                 # <path>/<entry>
+#
+# One line per field, no inline comments after a value, no flow-style
+# ([a, b]) lists. See README.md for the full workflow.
+
+anchor: ~/.local/share/ai-documents
+
+repos:
+  # - name: portfolio
+  #   path: ~/Develop/developerryou/portfolio
+  #   docs:
+  #     - CLAUDE.md
+  #     - .claude
