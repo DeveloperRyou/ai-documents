@@ -1,0 +1,1 @@
+/home/ryou/.local/share/ai-documents/projects/ai-documents/CLAUDE.md

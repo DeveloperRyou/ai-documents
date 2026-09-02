@@ -1,26 +1,30 @@
 # ai-documents repo.yaml
 #
-# Registers which local repos should have CLAUDE.md / .claude (or any other
-# doc) symlinked into them. The parser (scripts/lib.py) understands only
-# this exact restricted shape -- keep new entries in this form:
+# Registers which repos this manages, by git remote -- not by local path.
+# install.sh scans search_paths for a clone whose git remote matches, and
+# caches the result in <anchor>/path.json (gitignored, machine-specific).
 #
-#   anchor: <path>               # optional, defaults to ~/.local/share/ai-documents
+#   anchor: <path>                 # optional, defaults to ~/.local/share/ai-documents
+#   search_paths:                  # required, at least one entry
+#     - <dir to scan for clones>
 #   repos:
-#     - name: <unique-key>       # must match a folder under docs/<name>/
-#       path: <absolute path>    # target repo on disk ("~" is expanded)
-#       docs:
-#         - CLAUDE.md            # each entry is a top-level file/dir name
-#         - .claude              # under docs/<name>/, symlinked whole into
-#                                 # <path>/<entry>
+#     - name: <unique-key>         # must match a folder under projects/<name>/
+#       remote: <git remote url>   # matched against any of that repo's
+#                                   # `git remote -v` entries (any remote name)
+#       path: <absolute path>      # optional manual override, skips scanning
 #
 # One line per field, no inline comments after a value, no flow-style
-# ([a, b]) lists. See README.md for the full workflow.
+# ([a, b]) lists. See README.md for the full workflow, and
+# projects/README.md for the projects/_common/ convention.
 
 anchor: ~/.local/share/ai-documents
 
+search_paths:
+  - ~/Develop
+
 repos:
-  # - name: portfolio
-  #   path: ~/Develop/developerryou/portfolio
-  #   docs:
-  #     - CLAUDE.md
-  #     - .claude
+  - name: portfolio
+    remote: https://github.com/DeveloperRyou/portfolio.git
+
+  - name: ai-documents
+    remote: https://github.com/DeveloperRyou/ai-documents.git
