@@ -6,5 +6,19 @@
     "feature-dev@claude-plugins-official": true,
     "security-guidance@claude-plugins-official": true,
     "superpowers@claude-plugins-official": true
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/opt/ai-documents/checkout/update.sh",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
   }
 }
