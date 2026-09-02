@@ -2,9 +2,12 @@
 #
 # Registers which repos this manages, by git remote -- not by local path.
 # install.sh scans search_paths for a clone whose git remote matches, and
-# caches the result in <anchor>/path.json (gitignored, machine-specific).
+# caches the result in <anchor>/path.json (machine-specific, lives
+# outside this repo entirely).
 #
-#   anchor: <path>                 # optional, defaults to ~/.local/share/ai-documents
+#   anchor: <path>                 # optional, defaults to /opt/ai-documents
+#                                   # (a plain user-owned dir -- see README.md
+#                                   # for the one-time `sudo` setup this needs)
 #   search_paths:                  # required, at least one entry
 #     - <dir to scan for clones>
 #   repos:
@@ -17,7 +20,7 @@
 # ([a, b]) lists. See README.md for the full workflow, and
 # projects/README.md for the projects/_common/ convention.
 
-anchor: ~/.local/share/ai-documents
+anchor: /opt/ai-documents
 
 search_paths:
   - ~/Develop

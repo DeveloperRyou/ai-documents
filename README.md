@@ -20,23 +20,34 @@ This repo can be cloned to different paths on different machines. If each
 target repo's symlink pointed straight at wherever `ai-documents` happened
 to be checked out, moving or re-cloning it would break every link it made.
 
-So `install.sh` first makes sure a stable **anchor** path (default
-`~/.local/share/ai-documents`, configurable via `anchor:` in `repo.yaml`)
-is a symlink to this checkout, and every per-repo symlink points through
-the anchor instead of straight at this checkout. Before that, every file
-under `projects/_common/` is mirrored into each repo's `projects/<name>/`
-folder, so the top-level walk that follows picks it up automatically:
+So `install.sh` first makes sure a stable **anchor** directory (default
+`/opt/ai-documents`, configurable via `anchor:` in `repo.yaml`) exists and
+contains a `checkout` symlink pointing at this checkout; every per-repo
+symlink then points through `anchor/checkout` instead of straight at this
+checkout. Before that, every file under `projects/_common/` is mirrored
+into each repo's `projects/<name>/` folder, so the top-level walk that
+follows picks it up automatically:
 
 ```
 projects/_common/CLAUDE.md
   → (mirrored)   projects/portfolio/CLAUDE.md
-  → (anchor hop) ~/.local/share/ai-documents/projects/portfolio/CLAUDE.md
+  → (anchor hop) /opt/ai-documents/checkout/projects/portfolio/CLAUDE.md
   → (repo hop)   <portfolio path>/CLAUDE.md
 ```
 
 Re-cloning `ai-documents` somewhere else and re-running `install.sh` only
-repoints the anchor (one symlink); nothing in the managed repos needs to
+repoints `checkout` (one symlink); nothing in the managed repos needs to
 change. See `projects/README.md` for the `_common/` mirroring rules.
+
+`/opt` itself is root-owned, so a plain symlink can't live directly
+inside it -- a normal user could never repoint it later. `anchor_dir`
+(e.g. `/opt/ai-documents`) is instead a **plain directory** handed to the
+current user once: the first time `install.sh` finds it missing, it runs
+`sudo mkdir` + `sudo chown` itself (you'll get sudo's normal password
+prompt). Every run after that is a completely unprivileged file
+operation on `anchor_dir/checkout`. Point `anchor:` at something already
+user-writable (e.g. under `~`) in `repo.yaml` to skip the sudo step
+entirely.
 
 ## Usage
 

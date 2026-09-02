@@ -11,9 +11,10 @@ import json
 import os
 import re
 import shutil
+import subprocess
 from pathlib import Path
 
-DEFAULT_ANCHOR = "~/.local/share/ai-documents"
+DEFAULT_ANCHOR = "/opt/ai-documents"
 
 # Directory names never descended into while scanning search_paths.
 PRUNE_DIR_NAMES = {
@@ -193,7 +194,7 @@ def save_path_cache(anchor_dir: Path, resolved: dict) -> None:
     cache_file.write_text(json.dumps(resolved, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
 
-def resolve_paths(config: dict, anchor_dir: Path) -> dict[str, Path | None]:
+def resolve_paths(config: dict, anchor_dir: Path, dry_run: bool = False) -> dict[str, Path | None]:
     """Resolve every repo's local path, refreshing anchor_dir/path.json.
 
     Explicit `path:` overrides win outright. Otherwise, a cached path is
@@ -234,7 +235,10 @@ def resolve_paths(config: dict, anchor_dir: Path) -> dict[str, Path | None]:
             resolved[name] = None
             print(f"  [warn] {name}: no local clone found for {entry['remote']} under {config['search_paths']}")
 
-    save_path_cache(anchor_dir, fresh_cache)
+    if dry_run:
+        print(f"[dry-run] would write {anchor_dir / PATH_CACHE_NAME}")
+    else:
+        save_path_cache(anchor_dir, fresh_cache)
     return resolved
 
 
@@ -317,12 +321,13 @@ def sync_common(config: dict, ai_documents_root: Path, dry_run: bool = False) ->
     return managed
 
 
-def update_git_exclude(ai_documents_root: Path, managed_paths: list[str], dry_run: bool = False) -> None:
-    """Keep projects/_common/-derived symlinks out of git tracking via the
-    per-clone `.git/info/exclude` (not `.gitignore`, which is committed and
-    shared -- these paths are local-machine bookkeeping, not repo content).
+def update_git_exclude(repo_dir: Path, managed_paths: list[str], dry_run: bool = False) -> None:
+    """Keep projects/_common/-derived symlinks out of this repo's own git
+    tracking via its per-clone `.git/info/exclude` (not `.gitignore`,
+    which is committed and shared -- these paths are local-machine
+    bookkeeping regenerated on every run, not repo content).
     """
-    git_dir = ai_documents_root / ".git"
+    git_dir = repo_dir / ".git"
     if not git_dir.is_dir():
         return
     exclude_file = git_dir / "info" / "exclude"
@@ -355,66 +360,110 @@ def update_git_exclude(ai_documents_root: Path, managed_paths: list[str], dry_ru
 # projects/<name>/ -> target repo (second hop, via the anchor)
 # ---------------------------------------------------------------------------
 
-def project_entries(anchor: Path, repo_name: str) -> list[str]:
-    project_dir = anchor / "projects" / repo_name
+def project_entries(checkout: Path, repo_name: str) -> list[str]:
+    project_dir = checkout / "projects" / repo_name
     if not project_dir.is_dir():
         return []
     return sorted(p.name for p in project_dir.iterdir() if p.name != ".gitkeep")
 
 
-def sync_repo(anchor: Path, repo_name: str, repo_path: Path, dry_run: bool = False) -> None:
-    entries = project_entries(anchor, repo_name)
+def sync_repo(checkout: Path, repo_name: str, repo_path: Path, dry_run: bool = False) -> None:
+    entries = project_entries(checkout, repo_name)
     if not entries:
         print(f"  [skip] no files under projects/{repo_name}/ to link")
         return
     for doc in entries:
-        source = anchor / "projects" / repo_name / doc
+        source = checkout / "projects" / repo_name / doc
         target = repo_path / doc
         link_with_backup(source, target, dry_run=dry_run, prefix="  ")
 
 
-def ensure_anchor(anchor_str: str, target: Path, dry_run: bool = False) -> Path:
-    """Make sure `anchor_str` is a symlink pointing at `target`.
+def anchor_checkout(anchor_dir: Path) -> Path:
+    return anchor_dir / "checkout"
 
-    This is the second-hop symlink's anchor: wherever ai-documents is
-    actually checked out, `anchor` always points to it. Per-repo symlinks
-    then point through `anchor`, not straight at `target`, so re-cloning
-    ai-documents elsewhere only requires re-running install (which just
-    repoints this one link) instead of touching every managed repo.
+
+def _sudo_provision_anchor(anchor_dir: Path) -> None:
+    """One-time, interactive: create anchor_dir (under root-owned /opt by
+    default) and hand ownership to the current user, so every later run
+    can manage `anchor_dir/checkout` without sudo. Prompts via sudo's own
+    password prompt -- only runs when anchor_dir doesn't exist yet.
     """
-    anchor = Path(anchor_str).expanduser()
-
-    if anchor.is_symlink():
-        current = anchor.resolve()
-        if current == target:
-            return anchor
-        if dry_run:
-            print(f"[dry-run] would repoint anchor {anchor} -> {target} (was -> {current})")
-            return anchor
-        anchor.unlink()
-        anchor.symlink_to(target, target_is_directory=True)
-        print(f"repointed anchor {anchor} -> {target} (was -> {current})")
-        return anchor
-
-    if anchor.exists():
+    print(f"one-time setup: creating {anchor_dir} (needs sudo)")
+    uid, gid = os.getuid(), os.getgid()
+    try:
+        subprocess.run(["sudo", "mkdir", "-p", str(anchor_dir)], check=True)
+        subprocess.run(["sudo", "chown", f"{uid}:{gid}", str(anchor_dir)], check=True)
+    except (subprocess.CalledProcessError, FileNotFoundError) as e:
         raise ConfigError(
-            f"anchor path {anchor} already exists and is not a symlink -- "
-            "move or remove it manually, then re-run"
+            f"failed to create {anchor_dir} via sudo -- create it manually, then re-run:\n"
+            f'  sudo mkdir -p "{anchor_dir}" && sudo chown "$(whoami)":"$(whoami)" "{anchor_dir}"'
+        ) from e
+
+
+def ensure_anchor(anchor_dir: Path, target: Path, dry_run: bool = False) -> Path:
+    """Make sure `anchor_dir/checkout` is a symlink pointing at `target`,
+    returning that symlink's path.
+
+    `anchor_dir` itself (default /opt/ai-documents) is a plain, user-owned
+    directory -- NOT a symlink -- because its parent (/opt) is root-owned
+    and a normal user can never repoint an entry living directly inside
+    it. Putting one more level of indirection (`checkout`) inside a
+    directory the user does own sidesteps that: only the one-time setup
+    below needs privilege, every later repoint is a normal file op.
+
+    `checkout` is the second-hop symlink's target: wherever ai-documents
+    is actually checked out, `checkout` always points to it. Per-repo
+    symlinks point through `checkout`, not straight at `target`, so
+    re-cloning ai-documents elsewhere only requires re-running install
+    (which just repoints this one link) instead of touching every
+    managed repo.
+    """
+    if not anchor_dir.exists():
+        if dry_run:
+            print(f"[dry-run] would create {anchor_dir} (one-time, via sudo)")
+        else:
+            try:
+                anchor_dir.mkdir(parents=True)
+            except PermissionError:
+                _sudo_provision_anchor(anchor_dir)
+    elif not os.access(anchor_dir, os.W_OK):
+        raise ConfigError(
+            f"{anchor_dir} exists but isn't writable by you -- run this once, then re-run:\n"
+            f'  sudo chown "$(whoami)":"$(whoami)" "{anchor_dir}"'
+        )
+
+    checkout = anchor_checkout(anchor_dir)
+
+    if checkout.is_symlink():
+        current = checkout.resolve()
+        if current == target:
+            return checkout
+        if dry_run:
+            print(f"[dry-run] would repoint {checkout} -> {target} (was -> {current})")
+            return checkout
+        checkout.unlink()
+        checkout.symlink_to(target, target_is_directory=True)
+        print(f"repointed {checkout} -> {target} (was -> {current})")
+        return checkout
+
+    if checkout.exists():
+        raise ConfigError(
+            f"{checkout} already exists and is not a symlink -- move or remove it manually, then re-run"
         )
 
     if dry_run:
-        print(f"[dry-run] would create anchor {anchor} -> {target}")
-        return anchor
+        print(f"[dry-run] would create {checkout} -> {target}")
+        return checkout
 
-    anchor.parent.mkdir(parents=True, exist_ok=True)
-    anchor.symlink_to(target, target_is_directory=True)
-    print(f"created anchor {anchor} -> {target}")
-    return anchor
+    checkout.symlink_to(target, target_is_directory=True)
+    print(f"created {checkout} -> {target}")
+    return checkout
 
 
 def install(config: dict, only: str | None = None, dry_run: bool = False) -> None:
     target = repo_root()
-    anchor = ensure_anchor(config["anchor"], target, dry_run=dry_run)
+    anchor_dir = Path(config["anchor"]).expanduser()
+    checkout = ensure_anchor(anchor_dir, target, dry_run=dry_run)
 
     print("syncing projects/_common/ ...")
     managed = sync_common(config, target, dry_run=dry_run)
@@ -431,7 +480,7 @@ def install(config: dict, only: str | None = None, dry_run: bool = False) -> Non
         return
 
     print("resolving repo paths...")
-    resolved = resolve_paths(config, anchor)
+    resolved = resolve_paths(config, anchor_dir, dry_run=dry_run)
 
     for entry in repos:
         name = entry["name"]
@@ -442,4 +491,4 @@ def install(config: dict, only: str | None = None, dry_run: bool = False) -> Non
         if not repo_path.is_dir():
             print(f"  [skip] path does not exist: {repo_path}")
             continue
-        sync_repo(anchor, name, repo_path, dry_run=dry_run)
+        sync_repo(checkout, name, repo_path, dry_run=dry_run)

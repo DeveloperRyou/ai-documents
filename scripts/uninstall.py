@@ -23,8 +23,9 @@ def main() -> int:
         print(f"error: {e}", file=sys.stderr)
         return 1
 
-    anchor = Path(config["anchor"]).expanduser()
-    resolved = lib.resolve_paths(config, anchor)
+    anchor_dir = Path(config["anchor"]).expanduser()
+    checkout = lib.anchor_checkout(anchor_dir)
+    resolved = lib.resolve_paths(config, anchor_dir)
 
     repos = config["repos"]
     if args.only:
@@ -40,14 +41,14 @@ def main() -> int:
             print(f"{name}: unresolved, nothing to unlink")
             continue
         print(f"{name} ({repo_path})")
-        for doc in lib.project_entries(anchor, name):
+        for doc in lib.project_entries(checkout, name):
             target = repo_path / doc
             if not target.is_symlink():
                 print(f"  [skip] {target}: not a symlink")
                 continue
             resolved_target = target.resolve()
             try:
-                resolved_target.relative_to((anchor / "projects" / name).resolve())
+                resolved_target.relative_to((checkout / "projects" / name).resolve())
             except ValueError:
                 print(f"  [skip] {target}: doesn't point into this tool's anchor, leaving alone")
                 continue
