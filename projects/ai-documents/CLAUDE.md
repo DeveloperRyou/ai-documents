@@ -1,5 +1,12 @@
 # ai-documents
 
+@.claude/RULES.md
+
+## Workflow
+
+- Commit and push directly to `main` -- no feature branches or PRs for
+  this repo.
+
 This is the repo that manages itself: it registers other repos'
 `CLAUDE.md`/`.claude` (and its own, via this file) and symlinks them in
 by remote, not by hardcoded path.

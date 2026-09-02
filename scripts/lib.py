@@ -27,6 +27,11 @@ PATH_CACHE_NAME = "path.json"
 GIT_EXCLUDE_BEGIN = "# >>> ai-documents: common-derived symlinks (auto-generated, do not edit) >>>"
 GIT_EXCLUDE_END = "# <<< ai-documents: common-derived symlinks <<<"
 
+# _common/ files whose per-repo copy is JSON-merged instead of symlinked
+# straight through, when a matching *.override.json sits next to them
+# under projects/<name>/ -- see merge_json_files() / sync_common().
+MERGE_JSON_FILENAMES = {"settings.json"}
+
 
 class ConfigError(RuntimeError):
     pass
@@ -258,6 +263,74 @@ def _backup_path(target: Path) -> Path:
     return target.with_name(f"{target.name}.bak-{stamp}")
 
 
+def deep_merge(base, override):
+    """Recursively merge `override` onto `base`, returning a new value.
+
+    dict values merge key-by-key; list values are concatenated (base
+    items first) with exact duplicates dropped; anything else -- scalars,
+    or a type mismatch between base/override -- and `override` wins
+    outright.
+    """
+    if not isinstance(base, dict) or not isinstance(override, dict):
+        return override
+    merged = dict(base)
+    for key, value in override.items():
+        existing = merged.get(key)
+        if isinstance(existing, dict) and isinstance(value, dict):
+            merged[key] = deep_merge(existing, value)
+        elif isinstance(existing, list) and isinstance(value, list):
+            combined = list(existing)
+            combined += [item for item in value if item not in combined]
+            merged[key] = combined
+        else:
+            merged[key] = value
+    return merged
+
+
+def merge_json_files(base_path: Path, override_path: Path) -> str:
+    """Deep-merge `override_path`'s JSON onto `base_path`'s (base may be
+    absent), returning the merged document serialized with a trailing
+    newline."""
+    base = json.loads(base_path.read_text(encoding="utf-8")) if base_path.is_file() else {}
+    override = json.loads(override_path.read_text(encoding="utf-8"))
+    merged = deep_merge(base, override)
+    return json.dumps(merged, indent=2, ensure_ascii=False, sort_keys=True) + "\n"
+
+
+def write_with_backup(content: str, target: Path, dry_run: bool = False, prefix: str = "  ") -> None:
+    """Like link_with_backup, but writes generated text content instead
+    of creating a symlink -- used for the merged JSON files sync_common
+    produces. A pre-existing symlink is replaced outright (it's just a
+    stale plain mirror from before an override existed); a pre-existing
+    real file is backed up only if its content actually differs."""
+    if target.is_symlink():
+        if dry_run:
+            print(f"{prefix}[dry-run] would replace symlink {target} with generated file")
+            return
+        target.unlink()
+    elif target.exists():
+        try:
+            if target.read_text(encoding="utf-8") == content:
+                print(f"{prefix}[ok]   {target}")
+                return
+        except OSError:
+            pass
+        backup = _backup_path(target)
+        if dry_run:
+            print(f"{prefix}[dry-run] would back up {target} -> {backup}, then write generated file")
+            return
+        shutil.move(str(target), str(backup))
+        print(f"{prefix}[backup] {target} -> {backup}")
+
+    if dry_run:
+        print(f"{prefix}[dry-run] would write generated file -> {target}")
+        return
+
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(content, encoding="utf-8")
+    print(f"{prefix}[merge] {target}")
+
+
 def link_with_backup(source: Path, target: Path, dry_run: bool = False, prefix: str = "  ") -> None:
     if target.is_symlink():
         if target.resolve() == source.resolve():
@@ -294,6 +367,13 @@ def sync_common(config: dict, ai_documents_root: Path, dry_run: bool = False) ->
     structure with real directories (never symlinking a whole folder from
     _common, only individual files).
 
+    A file named in MERGE_JSON_FILENAMES (currently just settings.json) is
+    special-cased: if projects/<name>/ already has a sibling
+    `<stem>.override.json` at that same path (a real, repo-specific file
+    the user maintains by hand), the two are deep-merged (see
+    merge_json_files) and the result is written as a real file instead of
+    symlinked, so repo-specific settings survive alongside _common's.
+
     Returns the ai-documents-relative paths that were created/refreshed,
     so the caller can keep them out of git tracking (see update_git_exclude).
     """
@@ -316,6 +396,15 @@ def sync_common(config: dict, ai_documents_root: Path, dry_run: bool = False) ->
         for rel in common_files:
             source = common_dir / rel
             target = project_dir / rel
+
+            if rel.name in MERGE_JSON_FILENAMES:
+                override = target.with_name(f"{target.stem}.override{target.suffix}")
+                if override.is_file():
+                    merged = merge_json_files(source, override)
+                    write_with_backup(merged, target, dry_run=dry_run, prefix="  [common] ")
+                    managed.append(str(target.relative_to(ai_documents_root)))
+                    continue
+
             link_with_backup(source, target, dry_run=dry_run, prefix="  [common] ")
             managed.append(str(target.relative_to(ai_documents_root)))
     return managed

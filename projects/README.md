@@ -32,6 +32,38 @@ path, `_common` still wins: the real file is backed up to
 Put anything you don't want a repo to inherit from `_common` at a
 different path instead.
 
+### `_common/CLAUDE.md` content -> `.claude/RULES.md` + an import line
+
+A repo's own `CLAUDE.md` (`projects/<name>/CLAUDE.md`) is *not* something
+`_common` can safely also provide under that same filename -- it would
+just overwrite each repo's actual project-specific content on the next
+sync. Instead, shared rules live in `projects/_common/.claude/RULES.md`
+(mirrored like any other `_common` file), and each repo's own `CLAUDE.md`
+pulls it in with a one-line import near the top:
+
+```
+@.claude/RULES.md
+```
+
+Add that line to any new repo's `projects/<name>/CLAUDE.md` when you
+create it.
+
+### `settings.json` merging
+
+`.claude/settings.json` has the same problem as `CLAUDE.md`: if
+`_common` provides one, a repo can't also keep its own real
+`.claude/settings.json` at that path -- there's only one file there. So
+`settings.json` (matched by filename, wherever it appears under
+`_common`) is special-cased in `sync_common`: if
+`projects/<name>/.claude/settings.override.json` exists (a real,
+repo-specific file you maintain by hand in this repo), it's deep-merged
+onto `_common`'s `settings.json` -- object keys merge recursively, list
+values are concatenated with duplicates dropped, scalars are overridden
+-- and the result is written as a real generated
+`projects/<name>/.claude/settings.json` (git-excluded like the rest of
+`_common`'s mirrored output). No override file present -> plain symlink,
+same as everything else.
+
 ## `<repo-name>/` (per-repo)
 
 `install.sh` walks the **top level** of `projects/<repo-name>/` (which by

@@ -1,5 +1,7 @@
 # portfolio
 
+@.claude/RULES.md
+
 Personal blog (developerryou.pages.dev), migrated from Next.js to Astro
 using the AstroPaper theme. Deployed on Cloudflare Pages.
 
