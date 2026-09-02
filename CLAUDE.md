@@ -1,1 +1,1 @@
-/home/ryou/.local/share/ai-documents/projects/ai-documents/CLAUDE.md
+/opt/ai-documents/checkout/projects/ai-documents/CLAUDE.md
