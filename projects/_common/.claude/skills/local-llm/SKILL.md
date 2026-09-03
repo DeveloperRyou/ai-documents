@@ -25,9 +25,9 @@ Both are thin routers: they call `scripts/run.py`, which does nothing but talk t
 1. [Ollama](https://ollama.com) installed and running (`ollama serve`, or as a system service -- check with `ollama list`).
 2. A coding model pulled:
    ```
-   ollama pull qwen2.5-coder:7b
+   ollama pull qwen3.5:9b
    ```
-   `scripts/models.json` ships with `coder`/`reviewer` aliases pointing at `qwen2.5-coder:7b`. If you already have a different model pulled locally, edit the `tag` fields there instead of pulling a new one -- any general-purpose model works, just less well-suited to code than a dedicated coder model.
+   `scripts/models.json` ships with `coder`/`reviewer` aliases pointing at `qwen3.5:9b`. If you already have a different model pulled locally, edit the `tag` fields there instead of pulling a new one -- any general-purpose model works, just less well-suited to code than a dedicated coder model.
 
 ## Quick Reference
 

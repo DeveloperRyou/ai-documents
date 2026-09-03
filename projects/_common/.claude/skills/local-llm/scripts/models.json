@@ -4,13 +4,13 @@
   "request_timeout": 300,
   "models": {
     "coder": {
-      "tag": "qwen2.5-coder:7b",
+      "tag": "qwen3.5:9b",
       "think": false,
       "num_ctx": 16384,
       "temperature": 0.4
     },
     "reviewer": {
-      "tag": "qwen2.5-coder:7b",
+      "tag": "qwen3.5:9b",
       "think": false,
       "num_ctx": 16384,
       "temperature": 0.1
