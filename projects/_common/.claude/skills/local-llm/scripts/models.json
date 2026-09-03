@@ -1,0 +1,19 @@
+{
+  "_comment": "Model aliases for run.py. Pure infra config -- prompts/roles live in .claude/agents/*.prompt.txt, not here. If the 'tag' below isn't pulled on this machine, either `ollama pull` it or edit 'tag' to point at whatever coding-capable model you do have (`ollama list`).",
+  "ollama_host": "http://localhost:11434",
+  "request_timeout": 300,
+  "models": {
+    "coder": {
+      "tag": "qwen2.5-coder:7b",
+      "think": false,
+      "num_ctx": 16384,
+      "temperature": 0.4
+    },
+    "reviewer": {
+      "tag": "qwen2.5-coder:7b",
+      "think": false,
+      "num_ctx": 16384,
+      "temperature": 0.1
+    }
+  }
+}
