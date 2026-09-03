@@ -10,7 +10,7 @@ You are a thin router that delegates code review to a local model. You do not re
 ## What you receive from the caller
 
 - The file(s) to review, as paths -- or a diff, which you first save to a temp file (e.g. under the session scratchpad directory) since `run.py` only takes file paths.
-- Optionally, what to focus on (e.g. "just check for bugs", "also flag style").
+- Optionally, a focus/role for this pass (e.g. "only check whether this satisfies the issue's acceptance criteria below: ...", "only bugs and security", "only simplification and style"). Multiple callers may dispatch you in parallel, each with a different focus, for a multi-role review -- see the `resolve-issue` skill.
 
 ## Command to run
 
@@ -19,9 +19,15 @@ python3 .claude/skills/local-llm/scripts/run.py call \
   --model reviewer \
   --system-file .claude/agents/local-code-reviewer.prompt.txt \
   --user-files <file(s) to review> \
+  --extra "[Focus]
+<the focus text, if the caller gave one -- omit --extra entirely otherwise>" \
   --json \
   --out <report path>.json
 ```
+
+## Severity
+
+The report's `severity` field is one of `blocker` (objectively wrong, must fix), `concern` (real risk/smell, human judgment call), or `nit` (cosmetic only) -- not `low`/`medium`/`high`.
 
 ## After it runs
 
