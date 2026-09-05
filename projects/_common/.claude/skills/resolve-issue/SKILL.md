@@ -96,6 +96,22 @@ and go back to step 3, scoped to just those.
 report the remaining blockers and what's been tried, and ask the user how
 to proceed instead of continuing to spin.
 
+**Exception: a blocker that contradicts evidence you already hold.** The
+reviewer is a 7-9B local model working from a diff alone -- it can't run
+a build or a browser. If you (the coordinator) already have direct,
+reproducible verification of the actual behavior (e.g. you ran the app
+and inspected it, checked compiled/built output, ran a test) and a
+blocker's stated mechanism directly contradicts that evidence, don't feed
+it back into another local-coder round on faith. First re-run your own
+verification once to make sure it wasn't stale or the wrong branch/state.
+If it still holds, treat the blocker as a false positive: skip the round,
+and instead of silently dropping it, put the finding, why it's a false
+positive, and the concrete evidence that overrides it in the PR body
+(the "Known non-blocking items" section from step 7) so a human reviewer
+can double check the call. Do not use this to wave away findings you
+haven't actually gone and re-verified -- it's for confirmed contradictions
+with hard evidence, not for findings you'd merely prefer weren't blockers.
+
 ### 6. Verify
 
 Run whatever the repo already uses to check itself (tests, build, lint --
@@ -128,3 +144,8 @@ part.
   more rounds.
 - **Treating `concern`/`nit` as blocking.** Only `blocker` gates the loop.
   Carry the rest forward in the PR body for a human to weigh in on.
+- **Spinning local-coder rounds against a false-positive blocker.** If a
+  blocker's stated mechanism is directly contradicted by verification you
+  already ran (build output, live app behavior), re-verify once and, if it
+  holds, override with the evidence documented in the PR instead of
+  looping -- see the round-cap exception above.
