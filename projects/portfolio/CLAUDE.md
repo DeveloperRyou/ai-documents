@@ -16,6 +16,15 @@ using the AstroPaper theme. Deployed on Cloudflare Pages.
   an eslint error, not a warning.
 - No test suite in this repo.
 
+## Workflow
+
+- After opening a PR (or otherwise finishing a visual/UI change), start
+  the dev server (`npm run dev`) on the PR's branch and leave it running
+  on port 4321, without waiting to be asked -- the user checks changes
+  there before merging. If a server from an earlier branch is already
+  running, stop it first (`npx astro dev stop`) so 4321 reflects the
+  current branch.
+
 ## Architecture
 
 - Content lives in `src/content/posts/*.md` and `src/content/pages/*.md`
