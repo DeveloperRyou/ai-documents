@@ -9,3 +9,7 @@
   then follow `ai-documents`'s own modification rule (commit and push
   straight to `main`, no branch/PR) and re-run `install.sh`/`update.sh`
   to propagate the change back here.
+- After finishing a task (a code change, an investigation, anything the
+  user asked for), give the final report to the user in Korean, kept
+  brief -- what changed and what's next, not a restatement of the whole
+  session.
