@@ -33,6 +33,16 @@ using the AstroPaper theme. Deployed on Cloudflare Pages.
   Astro's static i18n does **not** auto-duplicate routes per locale, every
   route under `src/pages/` is physically duplicated under `src/pages/ko/`
   and `src/pages/ja/` -- keep all three in sync when adding a new route.
+- Because routes are physically duplicated per locale, any component or
+  script that has no locale-specific text belongs in `src/components/`
+  (shared across all three locale trees), not copy-pasted into each
+  locale's route folder -- e.g. `src/components/post/` holds the post
+  detail page's sub-components (`EditPost`, `ShareLinks`,
+  `AdjacentPostNav`, `BackButton`, `BackToTopButton`) and
+  `ArticleEnhancements` (the scroll-progress/heading-links/code-copy/
+  lightbox client script). Only markup that actually differs per locale
+  (translated strings, a `getStaticPaths` hardcoded to that locale) should
+  live inside a locale-specific page file.
 - Locale-suffixed content files use hyphens (`about-ko.md`, not
   `about.ko.md`): Astro's content-collection loader slugs filenames with
   github-slugger, which strips periods, so a dot-suffixed filename would
