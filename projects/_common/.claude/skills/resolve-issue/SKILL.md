@@ -22,7 +22,7 @@ work directly and use `/code-review` instead of this pipeline.
 
 ```
 1. Intake      -- read the issue, confirm scope, find affected files
-2. Branch      -- create a working branch (unless repo convention says otherwise)
+2. Branch      -- create an isolated worktree + branch (unless repo convention says otherwise)
 3. Fix         -- MANDATORY: dispatch local-coder for each affected file
 4. Review      -- MANDATORY: dispatch local-code-reviewer 3x in parallel (multi-role)
 5. Aggregate   -- scripts/aggregate_review.py merges the 3 reports, gates on blockers
@@ -42,13 +42,28 @@ every review round. Locate the affected file(s) with Explore/Grep. If the
 issue is too vague to produce concrete acceptance criteria from, stop and
 ask rather than guessing at scope.
 
-### 2. Branch
+### 2. Branch (in an isolated worktree)
 
 Check the target repo's own `CLAUDE.md`/`RULES.md` for its workflow
 convention first -- follow it if it says something specific (e.g. commit
-straight to main, no PR). Otherwise create `fix/issue-<number>-<slug>` and
-work there. Branch creation is local and reversible; no need to pause for
-confirmation.
+straight to main, no PR). Otherwise the branch name is
+`fix/issue-<number>-<slug>`.
+
+Do the work in a **separate git worktree**, not the repo's shared
+checkout -- `git worktree add <path> -b fix/issue-<number>-<slug>` (use
+`superpowers:using-git-worktrees` if it's available for the mechanics).
+The shared checkout is frequently mid-flight on something else entirely
+-- a different feature on another branch, or just uncommitted edits
+sitting in the working directory -- and `git status` can't tell those
+apart from what this loop produces once both are unstaged in the same
+tree. That ambiguity is exactly what risks a wrong file getting swept
+into step 7's commit, or (worse) discarded by a careless `git checkout
+--`/`reset --hard` later in the loop. A dedicated worktree makes this
+loop's `git status` only ever show what this loop touched. Creating and
+removing a worktree is local and reversible; no need to pause for
+confirmation. Remove it (`git worktree remove <path>`) once the PR is
+open and merged; leave it in place if the loop stops early so the state
+stays inspectable.
 
 ### 3. Fix (mandatory local-coder dispatch)
 
@@ -149,3 +164,9 @@ part.
   already ran (build output, live app behavior), re-verify once and, if it
   holds, override with the evidence documented in the PR instead of
   looping -- see the round-cap exception above.
+- **Branching inside the repo's shared checkout instead of an isolated
+  worktree.** Whatever unrelated work is mid-flight there (another
+  branch, uncommitted edits) shows up in your `git status` indistinguishably
+  from this loop's own changes, risking a stray file getting committed or,
+  worse, destroyed by a later destructive git command. Always
+  `git worktree add` a fresh directory for the issue branch.
