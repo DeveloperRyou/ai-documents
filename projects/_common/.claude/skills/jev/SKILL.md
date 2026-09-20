@@ -61,14 +61,25 @@ python3 .claude/skills/jev/scripts/run.py call \
     --out <decision>.json
 ```
 
-`questions.json` maps a key to a typed question, e.g.:
+`questions.json` maps a key to a typed question. All three types can
+be mixed in one call. Field names, response shape, and a worked
+example for each type are in its own reference file -- read the one
+you need before writing `questions.json`, since each has different
+required fields and gotchas:
+
+| Type | Purpose | Answer fields | Reference |
+|---|---|---|---|
+| `noul` | probability a yes/no statement is true | `noul` (0..1) -- **no `confidence`** | `reference/noul.md` |
+| `choice` | pick 1 of up to 255 options | `choice`, `probabilities`, `confidence` | `reference/choice.md` |
+| `score` | position on a 2-10 level ordered rubric | `score`, `legend`, `probabilities`, `confidence` | `reference/score.md` |
+
+Minimal mixed example:
 
 ```json
 {
   "is_risky": {
     "type": "noul",
-    "instructions": "Does this change touch auth or payments code?",
-    "criteria": { "true": "Touches auth/payments", "false": "Does not" }
+    "instructions": "Does this change touch auth or payments code?"
   },
   "route_to": {
     "type": "choice",
@@ -80,9 +91,6 @@ python3 .claude/skills/jev/scripts/run.py call \
   }
 }
 ```
-
-The response's `answers.<key>` carries `noul` (0..1), `choice` +
-`probabilities`, or `score`, depending on the question's `type`.
 
 ## Implementation
 
@@ -101,6 +109,9 @@ each time.
 - **Treating `choice`/`score` as certain.** These are probabilities,
   not verdicts -- check `probabilities`/thresholds before acting on a
   borderline call instead of trusting the top pick blindly.
+- **Reading `.confidence` off a `noul` answer.** Only `choice` and
+  `score` carry `confidence`; `noul` answers are just `{ type, noul }`
+  -- code that assumes every answer has `.confidence` breaks on it.
 - **Sending sensitive `state`.** This is a third-party API call, not a
   local one -- see Privacy above.
 - **Forgetting `OPENROUTER_API_KEY`.** `run.py` exits immediately with
