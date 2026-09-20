@@ -11,7 +11,9 @@ endpoint and returns whatever `answers` comes back, unparsed. Which
 questions to ask, and what to do with the calibrated probabilities, is
 entirely up to the caller.
 
-Requires OPENROUTER_API_KEY in the environment.
+Requires OPENROUTER_API_KEY, either already exported or in a
+.env file next to this script (see .env.example) -- never committed,
+loaded fresh on every call.
 
 Examples:
   run.py call --model jev \
@@ -31,6 +33,26 @@ import urllib.request
 
 BASE_DIR = pathlib.Path(__file__).resolve().parent
 CONFIG_PATH = BASE_DIR / "models.json"
+DOTENV_PATH = BASE_DIR / ".env"
+
+
+def load_dotenv(path):
+    """Minimal KEY=VALUE loader -- stdlib only, no python-dotenv
+    dependency. Doesn't override a variable already set in the real
+    environment, so an exported OPENROUTER_API_KEY still wins."""
+    if not path.exists():
+        return
+    for lineno, raw_line in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
+        line = raw_line.strip()
+        if not line or line.startswith("#"):
+            continue
+        if "=" not in line:
+            print(f"warning: {path}:{lineno}: not KEY=VALUE, skipping", file=sys.stderr)
+            continue
+        key, _, value = line.partition("=")
+        key = key.strip()
+        value = value.strip().strip('"').strip("'")
+        os.environ.setdefault(key, value)
 
 
 def load_config():
@@ -92,9 +114,13 @@ def cmd_call(args, config):
         )
         sys.exit(1)
 
+    load_dotenv(DOTENV_PATH)
     api_key = os.environ.get("OPENROUTER_API_KEY")
     if not api_key:
-        print("error: OPENROUTER_API_KEY is not set in the environment", file=sys.stderr)
+        print(
+            f"error: OPENROUTER_API_KEY is not set (export it, or put it in {DOTENV_PATH})",
+            file=sys.stderr,
+        )
         sys.exit(1)
 
     state = read_text_or_file(args.state_text, args.state_file, "state")

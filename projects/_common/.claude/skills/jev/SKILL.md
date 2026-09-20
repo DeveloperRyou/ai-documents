@@ -38,8 +38,11 @@ role/prompt knowledge in whatever calls it.
 
 ## Prerequisites
 
-1. An OpenRouter API key with `OPENROUTER_API_KEY` set in the
-   environment (never store it in `scripts/models.json`).
+1. An OpenRouter API key. Either export `OPENROUTER_API_KEY` in the
+   shell, or copy `scripts/.env.example` to `scripts/.env` and fill it
+   in there -- `run.py` loads `.env` automatically on every call.
+   `.env` is gitignored repo-wide and never committed; an already-
+   exported `OPENROUTER_API_KEY` always takes precedence over it.
 2. `scripts/models.json` ships with a `jev` alias pointing at
    `~typesafe/jev-latest` (always the latest model in the Jev family).
 
