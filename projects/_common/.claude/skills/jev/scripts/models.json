@@ -1,0 +1,10 @@
+{
+  "_comment": "Model aliases for run.py. Pure infra config -- which questions to ask, and what to do with the answers, is entirely up to the caller. Requires OPENROUTER_API_KEY in the environment; never store the key here.",
+  "openrouter_host": "https://openrouter.ai/api",
+  "request_timeout": 60,
+  "models": {
+    "jev": {
+      "model": "~typesafe/jev-latest"
+    }
+  }
+}
