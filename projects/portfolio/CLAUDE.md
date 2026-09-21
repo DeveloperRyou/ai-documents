@@ -79,3 +79,20 @@ using the AstroPaper theme. Deployed on Cloudflare Pages.
   a hover affordance if it actually navigates somewhere). Each section is
   skipped entirely (not rendered with an empty heading) when its array is
   absent or empty, so an in-progress/empty category just doesn't show up.
+- Site-wide theme tokens live in `src/styles/theme.css` (`--background`,
+  `--accent`, etc., re-exposed to Tailwind v4 via `@theme inline` as
+  `--color-*` so e.g. `bg-accent` works) -- most are redefined per
+  `[data-theme="light"]`/`[data-theme="dark"]`. Never hand-pick a hex for
+  new UI (an earlier chip used arbitrary `amber-900`/`slate-800` and
+  became unreadable against the dark theme's background); add a token to
+  `theme.css` instead, sourced from a real palette, not eyeballed.
+  Category/tag-style colors (`--chip-blue`, `--chip-brown` + their
+  `-foreground` pair, currently used by the About page's "Company"/
+  "Project" `Chip`) come from Radix Colors' `blue`/`brown` scales, step 9
+  ("solid" -- https://www.radix-ui.com/colors, npm `@radix-ui/colors`):
+  Radix tunes step 9 to the same hex in both its light and dark scales and
+  pairs it with white text in its own solid-badge recipe, so these two
+  live under a plain `:root` block with no dark override -- one value
+  already has enough contrast against both this site's backgrounds. Pull
+  more colors from the same two scales (steps 1-12) if another category
+  color is needed later, rather than picking a new hex by eye.
