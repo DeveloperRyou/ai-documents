@@ -96,3 +96,14 @@ using the AstroPaper theme. Deployed on Cloudflare Pages.
   already has enough contrast against both this site's backgrounds. Pull
   more colors from the same two scales (steps 1-12) if another category
   color is needed later, rather than picking a new hex by eye.
+- `src/pages/styleguide.astro` is a living, Storybook-style reference of
+  the site's tokens and components (colors, fonts, buttons, chips, cards,
+  timeline) -- open it after touching any of those instead of eyeballing
+  contrast on a real page. It's a dev tool, not reader content, so on
+  purpose it's a single page, not triplicated under `ko`/`ja`, and it's
+  linked only from the bottom of `Sidebar.astro` (not the main nav). Keep
+  it caption-free: no explanatory prose under a section heading ("Defined
+  in X", "src/components/Y.astro", usage notes) -- just the live rendered
+  example. A label is only added where it'd otherwise be ambiguous which
+  example is which (e.g. the per-font-specimen tags), never to explain
+  rationale or point at source files.
