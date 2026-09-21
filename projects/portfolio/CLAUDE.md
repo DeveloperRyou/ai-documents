@@ -15,6 +15,11 @@ using the AstroPaper theme. Deployed on Cloudflare Pages.
 - `npm run lint` / `npm run format` -- eslint / prettier; `no-console` is
   an eslint error, not a warning.
 - No test suite in this repo.
+- If you edit `content.config.ts` (collection schema) while `astro dev` is
+  already running, the server can go on serving a stale content store even
+  after it logs "Synced content" -- a renamed/new frontmatter field
+  silently not showing up is this, not a code bug. Fix with
+  `npx astro dev stop && rm -rf .astro && npm run dev`.
 
 ## Workflow
 
@@ -60,3 +65,17 @@ using the AstroPaper theme. Deployed on Cloudflare Pages.
   `image().or(z.string())` in `content.config.ts` eagerly resolves
   `public/`-relative strings through Astro's image pipeline and throws.
   Use `coverImage` (plain string) for card thumbnails instead.
+- The About page (`about*.md` in the `pages` collection) keeps its
+  career/education/activities/outsourcing history as structured frontmatter
+  arrays (`career`, `education`, `activities`, `outsourcing` -- see the
+  `timelineEntry`/`projectCardEntry` schemas in `content.config.ts`), not
+  markdown prose -- markdown in the body is only the free-text intro.
+  `src/pages/about.astro` (and its `ko`/`ja` copies) render each array
+  through a dedicated `src/components/about/` component instead of
+  `<Content />`: `Timeline` for career/education (date-column + border-row
+  list), `Cards` for plain facts like activities (static, no hover -- it
+  goes nowhere on click), `ProjectCards` for outsourcing (thumbnail +
+  `link`, the only one styled hoverable/clickable, since a card only earns
+  a hover affordance if it actually navigates somewhere). Each section is
+  skipped entirely (not rendered with an empty heading) when its array is
+  absent or empty, so an in-progress/empty category just doesn't show up.
