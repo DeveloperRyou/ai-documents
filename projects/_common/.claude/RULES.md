@@ -9,10 +9,22 @@
   then follow `ai-documents`'s own modification rule (commit and push
   straight to `main`, no branch/PR) and re-run `install.sh`/`update.sh`
   to propagate the change back here.
-- After finishing a task (a code change, an investigation, anything the
-  user asked for), give the final report to the user in Korean, kept
-  brief -- what changed and what's next, not a restatement of the whole
-  session.
+- Output format (output tokens are the priciest; the user reads only
+  the final report, and details already live in the PR/commit/issue):
+  - Between tool calls, work silently. Write a line only when a finding
+    changes the plan, or as a one-line status when asked for one.
+  - Final report: Korean, at most ~6 short lines, in this order -- the
+    result in one line; what the user must check or decide; the next
+    step. Link only what the user opens next (the PR, not also the
+    issue it closes).
+  - Leave out of chat: restating the request or decisions the user
+    already made; a list of passed checks (say "lint/build 통과" in one
+    phrase); file-by-file changes; tool hiccups already recovered from;
+    cleanup trivia; reviewer false positives. Verification evidence and
+    design detail go in the PR body -- point to it, don't repeat it.
+  - Still say, in one line, anything unresolved or skipped that changes
+    what the user should do (a failing check, an unverified path, an
+    assumption they didn't approve).
 - Session size is the main cost driver: every turn re-reads the whole
   history, so a 500k-token session pays ~500k tokens per tool call. When
   the user starts unrelated work, or context passes ~200k tokens (the
