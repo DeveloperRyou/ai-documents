@@ -29,6 +29,12 @@ using the AstroPaper theme. Deployed on Cloudflare Pages.
   there before merging. If a server from an earlier branch is already
   running, stop it first (`npx astro dev stop`) so 4321 reflects the
   current branch.
+- Drafting, reviewing, or translating a post under `src/content/posts/`
+  follows `docs/writing-guide.md` (topics, templates, voice, AI-tell
+  checklist, frontmatter, and the ko draft -> review ->
+  `/humanize-scan` + `/humanize-korean` -> en/ja translation flow) --
+  read it first, every time. One post = one GitHub issue labelled
+  `writing`.
 
 ## Architecture
 
