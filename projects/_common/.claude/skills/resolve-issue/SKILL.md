@@ -1,15 +1,15 @@
 ---
 name: resolve-issue
-description: Use when asked to resolve, fix, or close out a specific GitHub issue end-to-end (implementation through PR). Drives a mandatory fix / multi-role-review / fix loop through the local-coder and local-code-reviewer subagents until no blocker-severity findings remain, then opens the PR.
+description: Use when asked to resolve, fix, or close out a specific GitHub issue end-to-end (implementation through PR). Drives a fix / local multi-role review / fix loop -- the review is a single direct `local-llm` `run.py review` call, gated on its exit code -- until no blocker-severity findings remain, then opens the PR.
 ---
 
 # Resolve GitHub issue
 
-Turns a GitHub issue into a merged-ready PR by cycling a local model through
-implementation and review, instead of the coordinator writing and grading its
-own work. The whole point is that the fix and the review are **not**
-judgment calls the coordinator can skip -- both are mandatory pipeline
-steps, every iteration, until the review comes back clean.
+Turns a GitHub issue into a merge-ready PR through a fix / review loop.
+The coordinator makes the fix directly; the review is a local model's
+multi-role pass, so the coordinator isn't grading its own work alone.
+The review is **not** a judgment call the coordinator can skip -- it's a
+mandatory step every iteration, until it comes back clean.
 
 **REQUIRED SUB-SKILL:** Use `gh` for the GitHub CLI invocations below.
 
@@ -23,13 +23,12 @@ work directly and use `/code-review` instead of this pipeline.
 ```
 1. Intake      -- read the issue, confirm scope, find affected files
 2. Branch      -- create an isolated worktree + branch (unless repo convention says otherwise)
-3. Fix         -- MANDATORY: dispatch local-coder for each affected file
-4. Review      -- MANDATORY: dispatch local-code-reviewer 3x in parallel (multi-role)
-5. Aggregate   -- scripts/aggregate_review.py merges the 3 reports, gates on blockers
-6. Blockers?   -- yes: feed them back into step 3, repeat (cap: 4 rounds)
+3. Fix         -- edit directly (Edit; sed/codemod for mechanical replacements)
+4. Review      -- MANDATORY: one `run.py review` call (3 roles in parallel, merged, exit-code gated)
+5. Blockers?   -- yes: fix them (step 3), repeat (cap: 4 rounds)
                -- no: continue
-7. Verify      -- run the repo's own tests/build/lint if any exist
-8. Commit, push, open PR -- carry forward remaining concerns/nits in the PR body
+6. Verify      -- run the repo's own tests/build/lint if any exist
+7. Commit, push, open PR -- carry forward remaining concerns/nits in the PR body
 ```
 
 ### 1. Intake
@@ -65,47 +64,41 @@ confirmation. Remove it (`git worktree remove <path>`) once the PR is
 open and merged; leave it in place if the loop stops early so the state
 stays inspectable.
 
-### 3. Fix (mandatory local-coder dispatch)
+### 3. Fix (directly)
 
-For each affected file, dispatch `local-coder` (subagent_type
-`"local-coder"`) -- not written directly by the coordinator. Give it:
+Make the change yourself with Edit. For a mechanical replacement across
+files (a class prefix, a renamed import), use `sed`/a codemod and check
+the result with `git diff --stat` + a grep -- not a model rewriting whole
+files. The `local-llm` coder is only for drafting a genuinely **new**
+file from scratch (see that skill); describing an edit to it costs about
+as much as making it and adds a verification pass.
 
-- The file's **current** full contents (read it first -- on a later round
-  this must be the already-partially-fixed version, not the original).
-- The issue's Why/What/Acceptance Criteria (or title/body if unstructured).
-- On round 2+: the specific `blocker` entries from the last merged review
-  that concern this file, verbatim, as the thing to fix -- not a vague
-  "improve this."
+On round 2+, fix exactly the `blocker` lines the last review printed --
+not a vague "improve this."
 
-Independent files can be dispatched in parallel (multiple `Agent` calls in
-one message). local-coder writes straight to the target file; there's
-nothing further to apply.
-
-### 4. Review (mandatory multi-role local-code-reviewer dispatch)
-
-Dispatch `local-code-reviewer` **three times, in parallel**, on the same
-changed file(s), each with a different `[Focus]`:
-
-| Role | Focus text |
-|---|---|
-| `spec` | "Only check whether this change actually satisfies the issue's acceptance criteria below, nothing else:\n<criteria verbatim>" |
-| `correctness` | "Only bugs, edge cases, and security issues." |
-| `simplicity` | "Only unnecessary complexity, duplication, and style/convention mismatches with the rest of the file." |
-
-Save each JSON report to the scratchpad directory (e.g.
-`review_spec.json`, `review_correctness.json`, `review_simplicity.json`).
-
-### 5. Aggregate and gate
+### 4. Review (mandatory, one direct call)
 
 ```
-python3 .claude/skills/resolve-issue/scripts/aggregate_review.py \
-  spec=<review_spec.json> correctness=<review_correctness.json> simplicity=<review_simplicity.json> \
-  --out <scratchpad>/merged_review.json
+git diff main... > <scratchpad>/round<N>.diff
+python3 .claude/skills/local-llm/scripts/run.py review \
+  --files <scratchpad>/round<N>.diff \
+  --role spec="Only check whether this change satisfies these acceptance criteria, nothing else:
+<criteria verbatim>" \
+  --role correctness --role simplicity \
+  --context "<issue title/why; anything already verified by build/browser>" \
+  --out-dir <scratchpad>/review_r<N>
 ```
 
-Exit code 0 means zero `blocker` findings -- proceed to step 7. Exit code 1
-means blockers remain -- read `merged_review.json`'s `issues.blocker` list
-and go back to step 3, scoped to just those.
+Run it in the **foreground** with Bash -- no Agent/subagent wrapper, no
+background job to wait on. It runs the three roles in parallel, writes
+`<role>.json` + `merged.json`, prints one summary line plus one line per
+blocker, and exits 0 (no blockers) or 1 (blockers remain). Read
+`merged.json` only if you need a concern/nit for the PR body.
+
+### 5. Gate on blockers
+
+Exit 0: proceed to step 6. Exit 1: go back to step 3, scoped to the
+printed blockers.
 
 **Round cap: 4.** If blockers still remain after 4 rounds, stop the loop,
 report the remaining blockers and what's been tried, and ask the user how
@@ -117,7 +110,7 @@ a build or a browser. If you (the coordinator) already have direct,
 reproducible verification of the actual behavior (e.g. you ran the app
 and inspected it, checked compiled/built output, ran a test) and a
 blocker's stated mechanism directly contradicts that evidence, don't feed
-it back into another local-coder round on faith. First re-run your own
+it back into another fix round on faith. First re-run your own
 verification once to make sure it wasn't stale or the wrong branch/state.
 If it still holds, treat the blocker as a false positive: skip the round,
 and instead of silently dropping it, put the finding, why it's a false
@@ -150,16 +143,20 @@ part.
 - **Skipping the multi-role split and running one generic review pass.**
   A single call splits attention across bug/security/style/spec at once and
   is measurably weaker at each than three calls each told to focus on one
-  lens. Always three parallel calls, not one.
-- **Feeding round 2 the original file instead of the round-1 fix.** local-coder
-  has no memory between dispatches -- if you don't pass the current state,
-  it redrafts from scratch and can undo the previous round's fix.
+  lens. `run.py review` defaults to all three -- don't narrow it to one.
+- **Dispatching subagents to call the local model.** Each one costs a
+  full Claude context plus a "still waiting" turn to collect it; in past
+  runs that overhead outweighed what the local model saved. One
+  foreground Bash call.
+- **Routing a mechanical edit through a model.** A `sm:` -> `lg:` swap
+  across four files took seven local-coder dispatches once; `sed` does
+  it in one command.
 - **Letting the loop run past 4 rounds "because it's close."** That's the
   local model not converging -- escalate to the user instead of burning
   more rounds.
 - **Treating `concern`/`nit` as blocking.** Only `blocker` gates the loop.
   Carry the rest forward in the PR body for a human to weigh in on.
-- **Spinning local-coder rounds against a false-positive blocker.** If a
+- **Spinning fix rounds against a false-positive blocker.** If a
   blocker's stated mechanism is directly contradicted by verification you
   already ran (build output, live app behavior), re-verify once and, if it
   holds, override with the evidence documented in the PR instead of

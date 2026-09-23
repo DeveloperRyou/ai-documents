@@ -19,6 +19,18 @@
           }
         ]
       }
+    ],
+    "UserPromptSubmit": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/context-watch.py\"",
+            "timeout": 10
+          }
+        ]
+      }
     ]
   }
 }

@@ -407,7 +407,33 @@ def sync_common(config: dict, ai_documents_root: Path, dry_run: bool = False) ->
 
             link_with_backup(source, target, dry_run=dry_run, prefix="  [common] ")
             managed.append(str(target.relative_to(ai_documents_root)))
+        prune_stale_common_links(project_dir, common_dir, dry_run=dry_run)
     return managed
+
+
+def prune_stale_common_links(project_dir: Path, common_dir: Path, dry_run: bool = False) -> None:
+    """Remove mirrored symlinks whose _common source was deleted or moved.
+
+    Without this, deleting a file from _common leaves a dangling symlink
+    in every projects/<name>/ (e.g. a removed agent definition that
+    Claude Code still tries to load).
+    """
+    if not project_dir.is_dir():
+        return
+    common_resolved = common_dir.resolve()
+    for link in project_dir.rglob("*"):
+        if not link.is_symlink() or link.exists():
+            continue
+        target = Path(os.readlink(link))
+        if not target.is_absolute():
+            target = link.parent / target
+        if common_resolved not in Path(os.path.normpath(target)).parents:
+            continue
+        if dry_run:
+            print(f"[dry-run] would remove stale common link {link}")
+        else:
+            link.unlink()
+            print(f"  [common] [pruned] {link}")
 
 
 def update_git_exclude(repo_dir: Path, managed_paths: list[str], dry_run: bool = False) -> None:

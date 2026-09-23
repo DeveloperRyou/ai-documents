@@ -1,6 +1,6 @@
 ---
 name: jev
-description: Use when a step needs a narrow, typed decision rather than free text -- a yes/no, a pick from a fixed set of options, or a position on a rubric -- e.g. routing a task to the right skill/agent, gating an action on risk, or scoring severity. Calls TypeSafe's Jev model through OpenRouter's Decisions API and returns calibrated probabilities your code branches on. Requires OPENROUTER_API_KEY; sends `state` to a third-party API, unlike the on-device local-llm skill.
+description: Use when a script, hook, or CI job (not the conversation itself) needs a narrow, typed decision -- a yes/no, a pick from a fixed set of options, or a position on a rubric -- e.g. auto-labelling issues or gating an automated action on risk. Calls TypeSafe's Jev model through OpenRouter's Decisions API and returns calibrated probabilities code branches on. Requires OPENROUTER_API_KEY; sends `state` to a third-party API, unlike the on-device local-llm skill.
 ---
 
 # Jev (typed decisions)
@@ -99,13 +99,16 @@ Minimal mixed example:
 
 Call `scripts/run.py` directly (via Bash) with a `state` and a
 `questions.json` describing what you need decided, then branch on the
-returned probabilities in your own logic. There's no dedicated
-subagent yet -- unlike `local-coder`/`local-code-reviewer`, no single
-fixed question set has emerged as a repeated pattern. If one does
-(e.g. a severity-scoring step reused across the review pipeline),
-wrap it in a thin-router subagent the same way `local-llm` wraps
-Ollama, so the coordinator doesn't need to know the question shape
-each time.
+returned probabilities in your own logic.
+
+Jev earns its keep **outside** the conversation -- inside a script,
+hook, or CI job that needs a calibrated branch without a Claude turn
+(e.g. auto-labelling issues in GitHub Actions). Inside a conversation,
+a decision you can make yourself costs more through Jev: you write the
+state and questions, then read the answer back. Don't wrap it in a
+subagent either. For on-device classification where privacy matters
+(e.g. anything built from the user's prompts), prefer the `local-llm`
+`classifier` alias -- see `.claude/hooks/context-watch.py`.
 
 ## Common Mistakes
 

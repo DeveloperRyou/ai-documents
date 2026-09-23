@@ -25,3 +25,11 @@ by remote, not by hardcoded path.
 - Symlinks are two-hop by design: `<repo>/CLAUDE.md` -> anchor -> this
   checkout, so re-cloning `ai-documents` elsewhere only means re-running
   `install.sh` to repoint the anchor -- nothing in managed repos changes.
+
+# Compact instructions
+
+When compacting, keep: current branch/worktree, open PR and issue
+numbers, every design or scope decision the user stated (verbatim where
+short), what's done and verified, and the next step. Drop: screenshots
+and image descriptions, command/build/log output, file contents and
+diffs (re-derivable with git), and superseded attempts.

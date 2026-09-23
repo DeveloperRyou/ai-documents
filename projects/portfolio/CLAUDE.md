@@ -107,3 +107,11 @@ using the AstroPaper theme. Deployed on Cloudflare Pages.
   example. A label is only added where it'd otherwise be ambiguous which
   example is which (e.g. the per-font-specimen tags), never to explain
   rationale or point at source files.
+
+# Compact instructions
+
+When compacting, keep: current branch/worktree, open PR and issue
+numbers, every design or scope decision the user stated (verbatim where
+short), what's done and verified, and the next step. Drop: screenshots
+and image descriptions, command/build/log output, file contents and
+diffs (re-derivable with git), and superseded attempts.
