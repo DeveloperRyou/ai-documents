@@ -86,16 +86,26 @@ using the AstroPaper theme. Deployed on Cloudflare Pages.
   new UI (an earlier chip used arbitrary `amber-900`/`slate-800` and
   became unreadable against the dark theme's background); add a token to
   `theme.css` instead, sourced from a real palette, not eyeballed.
+  Base tokens (`--background`, `--foreground`, `--muted*`, `--border*`,
+  `--accent*`) are Radix Colors' `slate` (neutrals) and `blue` (accent)
+  scales (https://www.radix-ui.com/colors, npm `@radix-ui/colors`), each
+  hex annotated with its step in `theme.css` -- light values from the
+  light scale, dark values from the dark scale, using Radix's step roles
+  (1 background, 3 subtle surface, 6 border, 8 hovered border, 11
+  secondary text / text-safe accent, 12 primary text).
   Category/tag-style colors (`--chip-blue`, `--chip-brown` + their
   `-foreground` pair, currently used by the About page's "Company"/
-  "Project" `Chip`) come from Radix Colors' `blue`/`brown` scales, step 9
-  ("solid" -- https://www.radix-ui.com/colors, npm `@radix-ui/colors`):
-  Radix tunes step 9 to the same hex in both its light and dark scales and
-  pairs it with white text in its own solid-badge recipe, so these two
-  live under a plain `:root` block with no dark override -- one value
-  already has enough contrast against both this site's backgrounds. Pull
-  more colors from the same two scales (steps 1-12) if another category
-  color is needed later, rather than picking a new hex by eye.
+  "Project" `Chip`) come from the light `blue`/`brown` scales, step 11,
+  with white text: step 9 ("solid") was tried first but white on it is
+  only ~3.3:1, below WCAG AA for small text. White-on-chip contrast
+  doesn't depend on the page, so these live under a plain `:root` block
+  with no dark override. Pull more colors from the same scales if
+  another category color is needed later, rather than picking a new hex
+  by eye -- and check white-text contrast before using a lighter step.
+  Hover affordances stay neutral: a clickable card steps its border up
+  from `--border` to `--border-strong` (Radix Themes' Card "surface"
+  recipe) -- no accent-colored border, colored/foreground shadow, or
+  lift.
 - `src/pages/styleguide.astro` is a living, Storybook-style reference of
   the site's tokens and components (colors, fonts, buttons, chips, cards,
   timeline) -- open it after touching any of those instead of eyeballing
