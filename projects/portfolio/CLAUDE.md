@@ -2,8 +2,8 @@
 
 @.claude/RULES.md
 
-Personal blog (developerryou.pages.dev), migrated from Next.js to Astro
-using the AstroPaper theme. Deployed on Cloudflare Pages.
+Personal blog (https://portfolio.developerryou.workers.dev/), migrated from Next.js to Astro
+using the AstroPaper theme. Deployed on Cloudflare Workers (static assets, `wrangler.jsonc`).
 
 ## Commands
 
