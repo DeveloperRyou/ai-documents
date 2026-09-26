@@ -31,3 +31,6 @@ repos:
 
   - name: ai-documents
     remote: https://github.com/DeveloperRyou/ai-documents.git
+
+  - name: cncf-practice
+    remote: https://github.com/DeveloperRyou/cncf-practice.git
