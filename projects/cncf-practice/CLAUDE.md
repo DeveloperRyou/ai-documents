@@ -43,4 +43,6 @@ Rules that are easy to get wrong:
   kept outside the repo, then `grade.sh` must score 100; and `grade.sh`
   against an untouched `setup.sh` state must score ~0. Delete the
   scratch cluster afterwards.
-- After grading, update `ckad/README.md` (score table + topic coverage).
+- Exam results are personal and gitignored (answers, `finished.json`,
+  `grade.json`, `attempts/`, `result.md`); never commit them. Update
+  `ckad/README.md` (round list + topic coverage) when writing a round.
