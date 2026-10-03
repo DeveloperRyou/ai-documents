@@ -27,7 +27,9 @@ round, every time. The user's stated requirements, verbatim in spirit:
 - The agent writes the exam, the user solves it and submits, the agent
   grades it.
 - killer.sh format (hands-on in a real cluster), difficulty medium-hard,
-  5 questions per round.
+  3-4 questions per round
+  (~30 minutes, 2-3 concepts per question; hard concepts spread across
+  rounds, and earlier misses retested).
 - One directory per certification (`ckad/`), one directory per round
   inside it (`ckad/round-01/`, ...), so each round feels like a mock exam.
 
