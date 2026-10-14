@@ -1,7 +1,8 @@
 # AGENTS.md — TCTP (Tactical Command Training Program, 실 개발)
 
-분대 단위 직접 지휘 전술 시뮬. 첫 제품 = **분대**. 소대 지휘는 이후 단계 (POC 에서 구현할 것이 더 많다고 판단).
-POC 는 `poc/` 에 보관만 한다. **POC 코드를 import 하지 말 것** — 필요한 것은 옮겨 와서 다듬는다 (설계 근거는 `docs/DESIGN.md`, 현재 코드 구조는 `docs/ARCHITECTURE.md`).
+분대 단위 직접 지휘 전술 시뮬. 첫 제품 = **분대**. 소대 지휘는 이후 단계.
+설계는 `docs/DESIGN.md`, 현재 코드 구조는 `docs/ARCHITECTURE.md`.
+`poc/` 는 종료된 POC 보관소다. **import 하지 말 것** — 필요하면 옮겨 와서 다듬는다 (기록은 `docs/POC.md`).
 
 ## 명령어
 ```bash
@@ -24,7 +25,7 @@ npm run fetch-map -- <id> <남> <서> <북> <동> [이름]   # content/maps/<id>
 - 현재 지도는 `content/maps/rasdorf.json` 하나로 고정, `content/scenarios/` 는 비어 있고 분대 편성은 클라이언트·headless 에 임시 하드코딩.
 - `CLAUDE.md`, `AGENTS.md`, `docs/`, `.claude/` 는 ai-documents 레포(`projects/tctp/`)를 가리키는 심볼릭 링크다. 수정은 링크를 따라가 그쪽 레포에서 커밋·푸시한다.
 
-## 원칙 (POC 에서 확정된 것)
+## 원칙
 - **결정성**: 시드 RNG(`rng.ts`)만 쓴다 (`Math.random()` 금지). 시간은 정수 `tick` (1틱 = 0.1초). 같은 지도·시드·명령 기록 → 같은 `stateHash`.
 - **명령은 데이터**: 플레이어·AI 모두 `Command` 를 내고, 시뮬은 틱 시작 때 적용한다. 리플레이·사후검토·버그 재현은 명령 기록(`TimedCommand[]`)으로 한다.
 - **같은 사람 객체**: 아군·적 모두 `Soldier`. 진영과 장비만 다르다. 적 AI 도 플레이어와 같은 `Command` 만 쓴다.
