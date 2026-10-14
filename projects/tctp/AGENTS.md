@@ -8,6 +8,8 @@ POC 는 `poc/` 에 보관만 한다. **POC 코드를 import 하지 말 것** —
 npm run dev          # 클라이언트 http://localhost:5175 (?seed=7)
 npm run check        # typecheck + lint(Biome) + test(Vitest). 커밋 전 통과시킬 것
 npm run format       # Biome 자동 수정
+npm run build        # 클라이언트 빌드 (CI 는 check + build)
+npx vitest run packages/sim/src/world.test.ts   # 테스트 파일 하나 (-t "<이름>" 으로 골라 돌리기)
 npm run headless -- 1 --n 10 --sec 120
 npm run fetch-map -- <id> <남> <서> <북> <동> [이름]   # content/maps/<id>.json (--from-cache, --no-elev)
 ```
@@ -18,6 +20,9 @@ npm run fetch-map -- <id> <남> <서> <북> <동> [이름]   # content/maps/<id>
 - `packages/client`: 입력 → `Command` → 고정 틱 루프 → 그리기. 그리기는 상태를 읽기만 한다.
 - `packages/tools`: Node 전용 도구. `content/` 를 읽고 쓴다.
 - `content/maps/raw/` 는 OSM·고도 원본 캐시 (git 제외).
+- 틱 흐름: 상태는 `step(world, cmds)`(`sim/src/world.ts`) 안에서만 바뀌고, 명령은 `applyCommand`(`command.ts`)로 들어간다. 클라이언트는 틱마다 낸 명령을 `commandLog` 에 쌓은 뒤 `step` 을 부른다. 테스트·headless 는 `runReplay` + `stateHash`(`replay.ts`)로 결정성을 비교한다.
+- 현재 지도는 `content/maps/rasdorf.json` 하나로 고정, `content/scenarios/` 는 비어 있고 분대 편성은 클라이언트·headless 에 임시 하드코딩.
+- `CLAUDE.md`, `AGENTS.md`, `docs/`, `.claude/` 는 ai-documents 레포(`projects/tctp/`)를 가리키는 심볼릭 링크다. 수정은 링크를 따라가 그쪽 레포에서 커밋·푸시한다.
 
 ## 원칙 (POC 에서 확정된 것)
 - **결정성**: 시드 RNG(`rng.ts`)만 쓴다 (`Math.random()` 금지). 시간은 정수 `tick` (1틱 = 0.1초). 같은 지도·시드·명령 기록 → 같은 `stateHash`.
@@ -33,4 +38,5 @@ npm run fetch-map -- <id> <남> <서> <북> <동> [이름]   # content/maps/<id>
 ## 작업 방식
 - 사용자가 요청한 범위만 바꾼다. 특히 요청 밖 UI 변경 금지 — 제안만 한다.
 - 시뮬 규칙을 바꾸면 테스트를 추가하고, 밸런스에 영향이 있으면 headless 로 전후를 비교해 보고한다.
-- 커밋은 사용자가 요청할 때만.
+- 개인 개발이다. 브랜치·PR 없이 작업 단위가 끝나면 (`npm run check` 통과 후) `main` 에 바로 커밋한다.
+- 코드를 커밋할 때마다 `docs/`·`AGENTS.md`·`README.md` 를 최신화해야 하는지 판단하고, 필요하면 같은 작업에서 고친다 (`docs/`·`AGENTS.md` 는 ai-documents 쪽에 커밋).
