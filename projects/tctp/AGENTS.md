@@ -6,12 +6,12 @@
 
 ## 명령어
 ```bash
-npm run dev          # 클라이언트 http://localhost:5175 (?seed=7, ?view=2d|iso|split)
+npm run dev          # 클라이언트 http://localhost:5175 — 메뉴. 게임 직행 ?scenario=bd1-react-to-contact (&seed=7 &view=2d|iso|split &truth=1)
 npm run check        # typecheck + lint(Biome) + test(Vitest). 커밋 전 통과시킬 것
 npm run format       # Biome 자동 수정
 npm run build        # 클라이언트 빌드 (CI 는 check + build)
 npx vitest run packages/sim/src/world.test.ts   # 테스트 파일 하나 (-t "<이름>" 으로 골라 돌리기)
-npm run headless -- 1 --n 10 --sec 120
+npm run headless -- 1 --n 10 --sec 120 [--scenario id]
 npm run fetch-map -- <id> <남> <서> <북> <동> [이름]   # content/maps/<id>.json (--from-cache, --no-elev)
 ```
 
@@ -22,7 +22,8 @@ npm run fetch-map -- <id> <남> <서> <북> <동> [이름]   # content/maps/<id>
 - `packages/tools`: Node 전용 도구. `content/` 를 읽고 쓴다.
 - `content/maps/raw/` 는 OSM·고도 원본 캐시 (git 제외).
 - 틱 흐름: 상태는 `step(world, cmds)`(`sim/src/world.ts`) 안에서만 바뀌고, 명령은 `applyCommand`(`command.ts`)로 들어간다. 클라이언트는 틱마다 낸 명령을 `commandLog` 에 쌓은 뒤 `step` 을 부른다. 테스트·headless 는 `runReplay` + `stateHash`(`replay.ts`)로 결정성을 비교한다.
-- 현재 지도는 `content/maps/rasdorf.json` 하나로 고정, `content/scenarios/` 는 비어 있고 분대 편성은 클라이언트·headless 에 임시 하드코딩.
+- 콘텐츠: `content/campaign.json`(과정 사다리) → `scenarios/*.json` → `orgs/*.json`(편제) → `equipment.json`(화기·탄약). 병사는 `buildSoldiers`(`scenario.ts`)로 편제에서 세운다. 지도는 `rasdorf.json` 하나.
+- 정보 안개: `World.contacts`(진영별 아는 적, `vision.ts`) → `snapshot` 이 거른다. 렌더러에 실제 적 위치를 넘기지 말 것 (`?truth=1` 디버그만).
 - `CLAUDE.md`, `AGENTS.md`, `docs/`, `.claude/` 는 ai-documents 레포(`projects/tctp/`)를 가리키는 심볼릭 링크다. 수정은 링크를 따라가 그쪽 레포에서 커밋·푸시한다.
 
 ## 원칙
