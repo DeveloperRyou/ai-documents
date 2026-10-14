@@ -1,7 +1,7 @@
 # AGENTS.md — TCTP (Tactical Command Training Program, 실 개발)
 
 분대 단위 직접 지휘 전술 시뮬. 첫 제품 = **분대**. 소대 지휘는 이후 단계.
-설계는 `docs/DESIGN.md`, 현재 코드 구조는 `docs/ARCHITECTURE.md`.
+설계는 `docs/DESIGN.md`, 현재 코드 구조는 `docs/ARCHITECTURE.md`, 객체 정의는 `docs/objects/`.
 `poc/` 는 종료된 POC 보관소다. **import 하지 말 것** — 필요하면 옮겨 와서 다듬는다 (기록은 `docs/POC.md`).
 
 ## 명령어
@@ -41,4 +41,4 @@ npm run fetch-map -- <id> <남> <서> <북> <동> [이름]   # content/maps/<id>
 - 사용자가 요청한 범위만 바꾼다. 특히 요청 밖 UI 변경 금지 — 제안만 한다.
 - 시뮬 규칙을 바꾸면 테스트를 추가하고, 밸런스에 영향이 있으면 headless 로 전후를 비교해 보고한다.
 - 개인 개발이다. 브랜치·PR 없이 작업 단위가 끝나면 (`npm run check` 통과 후) `main` 에 바로 커밋한다.
-- 코드를 커밋할 때마다 `docs/`·`AGENTS.md`·`README.md` 를 최신화해야 하는지 판단하고, 필요하면 같은 작업에서 고친다 (`docs/`·`AGENTS.md` 는 ai-documents 쪽에 커밋).
+- 코드를 커밋할 때마다 `docs/`(객체 필드를 바꾸면 `docs/objects/` 도)·`AGENTS.md`·`README.md` 를 최신화해야 하는지 판단하고, 필요하면 같은 작업에서 고친다 (`docs/`·`AGENTS.md` 는 ai-documents 쪽에 커밋).
