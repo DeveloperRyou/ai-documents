@@ -70,6 +70,7 @@ step(world, commands)
 | `main.ts` | 진입점. 임시 편성, 입력 → `Command`, `Session` 진행, HUD. 렌더러는 인터페이스로만 쓴다 |
 | `renderer.ts` | `Renderer` 인터페이스: `setMap`·`resize`·`draw(RenderView)`, 화면 ↔ 지도(`screenToMap`·`pickSoldier`), 시점(`lookAt`·`pan`·`zoomAt`). 카메라·투영은 구현이 가진다 |
 | `canvas2d.ts` | `Canvas2DRenderer`: 지금 쓰는 2D 탑뷰 구현. `Snapshot` 만 읽는다 |
+| `iso25d.ts` | `Iso25DRenderer`: 2.5D 등각 투영 POC. 고도 격자로 지형·지물·병사를 들고 건물은 고정 높이로 세운다. 가림 처리는 묶음별 먼 것부터 그리기뿐이다 |
 | `camera.ts` | 2D 탑뷰용 지도 미터 ↔ 화면 픽셀 변환, 커서 기준 확대 |
 
 ```
@@ -84,6 +85,7 @@ requestAnimationFrame:
 - 조작: 좌클릭 = 분대 선택 (한 명을 누르면 같은 분대 전원), 우클릭 = 이동, 휠 = 확대, 가운데 드래그 = 지도 이동, Space = 일시정지.
 - `commandLog` 는 리플레이·버그 재현용으로 쌓기만 하고, 아직 저장하거나 내보내지는 않는다.
 - 시드는 URL `?seed=` 로 받는다 (기본 1).
+- 렌더러는 URL `?view=` 로 고른다: `2d` (기본), `iso` (2.5D POC), `split` (둘을 나란히, 같은 세션·선택을 공유).
 - 정보 안개는 아직 없다. 지금은 모든 병사를 그린다.
 
 ## 도구 (`packages/tools/src`)
