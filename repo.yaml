@@ -34,3 +34,6 @@ repos:
 
   - name: cncf-practice
     remote: https://github.com/DeveloperRyou/cncf-practice.git
+
+  - name: tctp
+    remote: https://github.com/DeveloperRyou/tctp.git
