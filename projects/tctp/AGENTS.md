@@ -1,7 +1,7 @@
 # AGENTS.md — TCTP (Tactical Command Training Program, 실 개발)
 
 분대 단위 직접 지휘 전술 시뮬. 첫 제품 = **분대**. 소대 지휘는 이후 단계 (POC 에서 구현할 것이 더 많다고 판단).
-POC 는 `poc/` 에 보관만 한다. **POC 코드를 import 하지 말 것** — 필요한 것은 옮겨 와서 다듬는다 (설계 근거는 `docs/DESIGN.md`).
+POC 는 `poc/` 에 보관만 한다. **POC 코드를 import 하지 말 것** — 필요한 것은 옮겨 와서 다듬는다 (설계 근거는 `docs/DESIGN.md`, 현재 코드 구조는 `docs/ARCHITECTURE.md`).
 
 ## 명령어
 ```bash
