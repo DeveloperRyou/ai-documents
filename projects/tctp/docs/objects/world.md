@@ -38,12 +38,12 @@
 | `stop` | `ids` | 행동을 비운다 |
 | `posture` | `ids`, `posture` | 자세 바꾸기 (`stand`·`crouch`·`prone`) |
 | `fire` | `ids`, `target`, `slot?` | 아는 적 한 명을 조준사격 (`FIRE_ORDER.aimed`: 화기 조준 시간을 다 쓰고 한 발씩) |
-| `suppress` | `ids`, `x`, `y`, `slot?` | 지점을 제압사격 (`FIRE_ORDER.suppress`: 조준 1/4, 화기 점사 발 수, 둘레 6m 쓸어 쏨). 곡사 화기는 다 조준해 한 점에 |
+| `suppress` | `ids`, `x`, `y`, `slot?` | 지점을 제압사격 (`FIRE_ORDER.suppress`: 조준 1/4, 화기 점사 발 수, 둘레 4m 쓸어 쏨). 곡사 화기는 다 조준해 한 점에 |
 | `reload` | `ids`, `slot?` | 재장전 (더 채울 탄이 없으면 무시) |
 
 `slot` 을 빼면 주화기. 칸에 화기가 없으면 사격 명령은 무시된다.
 
-무력화·사망·패닉인 병사는 명령을 받지 않는다. 혼란·위축된 병사는 `STRESS.orderDelay`(2초) 뒤에 따른다 (`Soldier.order`, 나중 명령이 덮음). 제압된 병사는 받아 두지만 풀릴 때까지 움직이지 않는다.
+무력화·사망·패닉인 병사는 명령을 받지 않는다. 명령은 반응 시간(0 ~ `VARY.reaction` 0.5초) 뒤에 따르고, 혼란·위축된 병사는 `STRESS.orderDelay`(2초)를 더 기다린다 (`Soldier.order`, 나중 명령이 덮음). 제압된 병사는 받아 두지만 풀릴 때까지 움직이지 않는다.
 
 `TimedCommand { tick, cmd }` — 명령 기록 한 줄. 같은 지도·시나리오·시드 + 같은 기록 → 같은 판 (`runReplay`).
 

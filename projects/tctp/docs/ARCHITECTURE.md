@@ -35,6 +35,7 @@ content/  (지도·시나리오 JSON)
 | `world.ts` | `createWorld`, `step` (시간 상수 재노출) |
 | `action.ts` | 병사 행동 `Action`(`move`·`fire`·`reload`), 종류별 처리 함수 표 `ACTIONS`, 매 틱 `updateActions`, `destOf`, 튜닝 상수 `MOVE`. 구조는 [objects/action.md](objects/action.md) |
 | `drills.ts` | 행동 확인장 드릴 `DRILLS` (작은 평지 + 배치 + 명령 기록 + 확인 항목), 진행기 `DrillRun`. vitest 와 브라우저 `?debug=drills` 가 같이 쓴다 |
+| `vary.ts` | 사건별 흔들림 `VARY` (반응 시간·걸음·서는 자리·조준 시간·점사·겨눔·재장전·스트레스), `vary`·`gauss`·`inDisk`. 능력치가 아닌 사건 잡음 |
 | `fire.ts` | 화기 트리거 `pullTrigger` → 탄도선 판정(사람·지물·땅), 근탄 제압, 폭발, 부위 피해. 튜닝 상수 `FIRE`, 조준점 `AimPoint` |
 | `soldier.ts` | 기본 몸 `BODY`, 휴대 무게 한도 `checkCarry`, 몸 상태: 자세별 높이·기본 속도, 심리 단계 `stressLevelOf`, 하중 `loadOf`, 속도 `speedOf`, `damage`·`addStress`, 매 틱 `updateBody` (지구력·상태·스트레스). 튜닝 상수 `POSTURE_HEIGHT`·`BASE_SPEED`·`LOAD`·`STAMINA`·`STRESS`·`HEALTH` |
 | `command.ts` | `Command` 유니온(`move`, `stop`, `posture`), `TimedCommand`, `applyCommand`, 혼란 중 미룬 명령 `applyDueOrders` |
