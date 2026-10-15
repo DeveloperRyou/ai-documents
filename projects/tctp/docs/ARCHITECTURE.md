@@ -29,16 +29,17 @@ content/  (지도·시나리오 JSON)
 
 | 파일 | 내용 |
 |---|---|
-| `types.ts` | `World` (지도, 지형 격자, RNG, 정수 `tick`, `soldiers`, 진영별 `contacts`, `log`), `Soldier` (이름·직책·몸 크기·휴대 장비·위치), `Contact`, `Side` |
-| `world.ts` | `createWorld`, `step`, 시간 상수(`DT = 0.1`, `TICKS_PER_SEC = 10`), 튜닝 상수 `MOVE` |
-| `command.ts` | `Command` 유니온(`move`, `stop`), `TimedCommand`, `applyCommand` |
+| `types.ts` | `World` (지도, 지형 격자, RNG, 정수 `tick`, `soldiers`, 진영별 `contacts`, `log`), `Soldier` (이름·직책·몸 크기·휴대 장비·하중·자세·상태·부위별 체력·스트레스·지구력·위치), `Contact`, `Side` |
+| `world.ts` | `createWorld`, `step`, 시간 상수(`DT = 1`, `TICKS_PER_SEC = 1`), 튜닝 상수 `MOVE` |
+| `soldier.ts` | 몸 상태: 자세별 높이·기본 속도, 하중 `loadOf`, 속도 `speedOf`, `damage`·`addStress`, 매 틱 `updateBody` (지구력·상태·스트레스). 튜닝 상수 `POSTURE_HEIGHT`·`BASE_SPEED`·`LOAD`·`STAMINA`·`STRESS`·`HEALTH` |
+| `command.ts` | `Command` 유니온(`move`, `stop`, `posture`), `TimedCommand`, `applyCommand` |
 | `replay.ts` | `runReplay`(명령 기록 재생), `stateHash`(FNV-1a 상태 지문) |
 | `rng.ts` | mulberry32 RNG. 상태가 숫자 하나라 해시·세이브에 그대로 담긴다 |
 | `map.ts` | `MapData` 형식 (면·선 지물, 지명, 고도 격자) |
 | `terrain.ts` | 지형 격자: 지도의 면·선 지물을 1m 칸으로 굽고(`terrainOf`, 지도마다 한 번), 종류별 성질 표 `TERRAIN` (지물 높이·시야 감쇠·은폐·엄폐·이동 배율). 고도 base64 디코드와 쌍선형 `elevAt` |
 | `vision.ts` | 시선 `lineOfSight` (능선 차단·지물 감쇠), 시야각 `fovFactor`, 발견 확률 `detectChance`, 탐지 주기마다 `updateVision` 으로 `contacts` 갱신. 튜닝 상수 `VISION` |
-| `equipment.ts` | 화기(`Weapon`: 직사/곡사·탄약·유효사거리)·탄약(`Ammo`: 관통력·폭발·폭발 반경·제압 반경) 형식, `LoadoutItem`, 검사 `checkLoadout` |
-| `org.ts` | 편제 `OrgTemplate` (조 → 직책 → 휴대 장비, 출처·추정 메모), `strengthOf`, `checkOrg` |
+| `equipment.ts` | 화기(`Weapon`: 직사/곡사·탄약·유효사거리)·탄약(`Ammo`: 관통력·폭발·폭발 반경·제압 반경)·장구(`Gear`: 무게) 형식, `LoadoutItem`, 검사 `checkLoadout` |
+| `org.ts` | 편제 `OrgTemplate` (공통 장구 `kit`, 조 → 직책 → 휴대 장비, 출처·추정 메모), `strengthOf`, `checkOrg` |
 | `scenario.ts` | 시나리오 형식, `ContentDb`, `buildSoldiers` (편제·대형·이름으로 병사 생성), 기본 몸 크기 `BODY` |
 | `session.ts` | `Session`: 명령 접수(`issue`), 실제 시간 → 고정 틱 진행(`advance`, 상한 `LOOP.maxFrame`), `commandLog`, 일시정지 |
 | `snapshot.ts` | `snapshot(world, viewer, {truth})`: 렌더러용 순수 데이터 (JSON 직렬화 가능, `World` 와 참조 공유 없음). 정보 안개: 모르는 적은 빠지고, 아는 적은 `contact` = seen(실제 위치)·last(마지막 위치), 적의 이름·직책은 비운다. `truth` 는 디버그용 |
@@ -62,16 +63,17 @@ content/  (지도·시나리오 JSON)
 step(world, commands)
   1. commands 를 순서대로 applyCommand  ← 상태를 바꾸는 입구는 여기뿐
   2. world.tick++
-  3. updateMovement: dest 쪽으로 MOVE.walk × 선 칸의 move 배율 × DT 만큼 직선 이동. 다음 칸이 통행 불가면 그 자리, MOVE.arrive 안이면 정지
-  4. updateVision: VISION.interval 틱마다 진영별로 적을 본다
+  3. updateMovement: 움직일 수 있는 병사(무력화·제압 아님)만, dest 쪽으로 speedOf(자세·하중·지구력·다리) × 선 칸의 move 배율 × DT 만큼 직선 이동. 다음 칸이 통행 불가면 그 자리, MOVE.arrive 안이면 정지
+  4. updateBody: 지구력 소모·회복, status 결정 (제압·무력화면 엎드림), 스트레스 감소
+  5. updateVision: VISION.interval 틱마다 진영별로 적을 본다 (무력화된 병사는 관측자에서 빠짐)
        이미 보던 적 → 아무 관측자나 시선 투과율 ≥ VISION.track 이면 계속 봄
        아니면 관측자 id 순서로 detectChance 를 굴려 발견 (world.rng, 결정적)
        못 보면 마지막 위치를 VISION.memory 틱 동안 기억, 처음 발견하면 log 에 남김
 ```
 
 - 명령은 상태를 직접 바꾸지 않고, 틱 시작 때 `step` 안에서만 적용된다. 그래서 `(지도, 시드, 초기 편성, TimedCommand[])` 만 있으면 같은 판을 다시 만들 수 있다.
-- `stateHash` 는 tick, RNG 상태, 병사 id·위치(mm 반올림), 진영별 contacts(id·틱·보임)를 섞는다. 상태에 새 필드를 넣으면 해시에도 넣어야 결정성 테스트가 그 필드를 검사한다.
-- `Soldier` 는 위치·방향·이동 목표·소속(분대/조)과 이름·직책·몸 크기·휴대 장비를 가진다. 상태값(제압·부상 등)은 아직 없다. 장비는 id 로만 들고, 성능은 `ContentDb.equipment` 에서 찾는다.
+- `stateHash` 는 tick, RNG 상태, 병사 id·위치(mm 반올림)·자세·상태·스트레스·지구력·하중·부위별 체력, 진영별 contacts(id·틱·보임)를 섞는다. 상태에 새 필드를 넣으면 해시에도 넣어야 결정성 테스트가 그 필드를 검사한다.
+- `Soldier` 는 위치·방향·이동 목표·소속(분대/조)과 이름·직책·몸 크기·휴대 장비, 몸 상태(하중·자세·상태·부위별 체력·스트레스·지구력)를 가진다 ([objects/soldier.md](objects/soldier.md)). 장비는 id 로만 들고, 성능은 `ContentDb.equipment` 에서 찾는다 (하중은 편성 때 계산해 둔다).
 - 지형 격자는 지도에서만 만들어지고 바뀌지 않아 해시에 넣지 않는다. 1199 × 1001 칸 기준 굽기에 약 60ms.
 
 ## 클라이언트 (`packages/client/src`)
@@ -92,7 +94,7 @@ step(world, commands)
 requestAnimationFrame:
   session.advance(경과 실시간)
      acc += 경과 (정지 중 0, 최대 LOOP.maxFrame)
-     acc 가 0.1초 이상인 동안: pending 을 commandLog 에 {tick, cmd} 로 기록 → step(world, pending) → pending 비움
+     acc 가 1초 이상인 동안: pending 을 commandLog 에 {tick, cmd} 로 기록 → step(world, pending) → pending 비움
   snapshot = session.snapshot(scenario.player) → renderer.draw({snapshot, selected}) → HUD
 ```
 
@@ -120,5 +122,5 @@ requestAnimationFrame:
 
 ## 테스트
 
-- Vitest, `packages/*/src/**/*.test.ts`. `sim/src/world.test.ts` (이동·도착 정지, 같은 시드 + 같은 명령 기록 → 같은 해시), `sim/src/session.test.ts` (고정 틱 분할·상한, 정지 중 명령 보류, 세션 기록 리플레이 = 같은 해시, 스냅샷 JSON 왕복·참조 분리·타 진영 `dest` 제외, 정보 안개), `sim/src/vision.test.ts` (지형 굽기·고도 디코드, 시선 차단·감쇠·능선, 발견·등 뒤·건물 너머·기억과 망각, 통행 불가 칸), `tools/src/content.test.ts` (편제 인원 8·12, 시나리오의 편제·장비 참조, 시작 위치 통행 가능, 이름 중복 없음). 공용 도우미는 `sim/src/test-util.ts`.
+- Vitest, `packages/*/src/**/*.test.ts`. `sim/src/world.test.ts` (이동·도착 정지, 같은 시드 + 같은 명령 기록 → 같은 해시), `sim/src/session.test.ts` (고정 틱 분할·상한, 정지 중 명령 보류, 세션 기록 리플레이 = 같은 해시, 스냅샷 JSON 왕복·참조 분리·타 진영 `dest` 제외, 정보 안개), `sim/src/soldier.test.ts` (하중 합·하중 속도 감소, 자세 속도·높이, 지구력 소모·회복·지친 속도, 포복 소모, 제압 고착과 해제, 다리 부상 포복, 무력화·사망), `sim/src/vision.test.ts` (지형 굽기·고도 디코드, 시선 차단·감쇠·능선, 발견·등 뒤·건물 너머·기억과 망각, 통행 불가 칸), `tools/src/content.test.ts` (편제 인원 8·12, 시나리오의 편제·장비 참조, 시작 위치 통행 가능, 이름 중복 없음). 공용 도우미는 `sim/src/test-util.ts`.
 - CI (`.github/workflows/ci.yml`): push·PR 마다 `npm run check` (typecheck + Biome + Vitest) 와 `npm run build`.

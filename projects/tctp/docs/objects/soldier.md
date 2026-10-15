@@ -11,11 +11,57 @@
 | `role` | string | 직책 (편제의 `role`: 분대장, 기관총 사수 …) |
 | `squad` | string | 소속 분대 = 부대명 (`ForceSpec.name`). 최소 명령 단위 |
 | `team` | string | 소속 조 = `"<부대명> <조 이름>"` (예: `1분대 2조`) |
-| `size` | `BodySize` | 몸 크기 (m). 피탄 판정용 |
-| `loadout` | `LoadoutItem[]` | 휴대 장비 |
+| `size` | `BodySize` | 몸 크기 (m)·몸무게 (kg) |
+| `loadout` | `LoadoutItem[]` | 휴대 장비 (편제 공통 장구 `kit` + 직책별) |
+| `load` | number | 하중 (kg) = `loadOf(loadout)`. 편성 때 계산, 탄을 쓰면 줄인다 |
+| `posture` | `"stand" \| "crouch" \| "prone"` | 자세: 서기 / 앉아·무릎 / 엎드려 |
+| `status` | `SoldierStatus` | 상태 (아래). 매 틱 `updateBody` 가 정한다 |
+| `health` | `Health` | 부위별 체력 0~100 (아래) |
+| `stress` | number | 스트레스 0~100. 제압의 정도 |
+| `stamina` | number | 지구력 0~100 |
 | `x`, `y` | number | 위치 (m). 원점 = 지도 북서쪽, x 동쪽, y 남쪽 |
 | `facing` | number | 바라보는 방향, 화면 라디안 (0 = 동, 시계방향). 시나리오에서는 방위각(도)으로 주고 `bearingToFacing` 으로 바꾼다 |
 | `dest` | `{x, y} \| null` | 이동 목표. 없으면 정지 |
+
+## 몸 상태 (`soldier.ts`)
+
+수치는 모두 이름 붙은 상수(`POSTURE_HEIGHT`, `BASE_SPEED`, `LOAD`, `STAMINA`, `STRESS`, `HEALTH`)이고 대략값이다.
+
+### 상태 `SoldierStatus`
+우선순위: `dead` 사망 > `incapacitated` 무력화 > `suppressed` 제압 > `reloading` 재장전 > `firing` 사격 > `moving` 이동 > `idle` 정지.
+`firing`·`reloading` 은 자리만 있다 (사격 판정이 생기면 그쪽이 정한다. 이동 사격을 따로 둘지는 미정).
+
+| 상태 | 조건 | 효과 |
+|---|---|---|
+| `dead` | 급소(머리·가슴·복부) 하나가 0 | 엎드려 쓰러짐, 명령·이동·관측 없음 |
+| `incapacitated` | 급소 하나가 `HEALTH.incapacitated`(40) 미만 | 위와 같음 (살아는 있음) |
+| `suppressed` | `stress ≥ STRESS.suppressed`(70) | 엎드림, 이동 명령은 받아 두지만 풀릴 때까지 안 감 |
+| `moving` | 이번 틱에 움직임 | |
+| `idle` | 그 밖 | |
+
+### 부위별 체력 `Health`
+`head`, `torso`, `abdomen`, `leftArm`, `rightArm`, `leftLeg`, `rightLeg` 각 0~100. `damage(s, part, n)` 으로 깎는다.
+- 급소(`HEALTH.vital` = 머리·가슴·복부): 0 이면 사망, 40 미만이면 무력화.
+- 다리: 속도 × (왼다리 + 오른다리) / 200. 한쪽이 0 이면 자세와 상관없이 포복 속도.
+- 팔: 아직 효과 없음 (사격 판정이 생기면 명중에 쓴다).
+
+### 스트레스 `stress`
+`addStress(s, n)` 으로 올린다 (사격이 생기면 근탄·피탄·폭발). 초당 `STRESS.decay`(3) 씩 준다. 상태를 정한 뒤 줄어든다.
+
+### 이동 속도 `speedOf(s)` (m/s, 지형 배율 전)
+`BASE_SPEED[자세] × 하중 배율 × 지구력 배율 × 다리 배율`
+- 기본 속도: 서기 1.4 (보통 걸음 ≈ 5 km/h), 앉아 0.8, 포복 0.25.
+- 하중 배율: 비율 r = 하중 ÷ 몸무게. `max(0.4, 1 − 0.6 × max(0, r − 0.15))`. 예) 국군 소총수 20.8kg(r 0.30) → ×0.91 = 1.27 m/s, 기관총 사수 29kg(r 0.41) → ×0.84 = 1.17 m/s.
+- 지구력 배율: 50 이상이면 1, 아래로 내려가면 0 일 때 0.5 까지 선형.
+- 실제 한 틱 이동 = `speedOf × 선 칸의 move 배율 × DT(1초)`.
+
+### 지구력 `stamina`
+- 움직인 틱: `STAMINA.drain[자세] × (1 + r × 2)` 만큼 감소. 초당 서기 0.01, 앉아 0.05, 포복 0.15 (짐 없을 때). 선 걸음은 몇 시간 버티고 포복은 몇 분이면 지친다.
+- 멈춘 틱: 초당 0.1 회복.
+
+### 자세 `posture`
+- 몸 높이 = `size.h × POSTURE_HEIGHT` (서기 1, 앉아 0.6, 엎드려 0.2). 시야의 눈높이·피탄 높이가 이 값을 쓴다 (엎드리면 덜 보이고 덜 본다).
+- 바꾸는 명령: `{ kind: "posture", ids, posture }`. 제압·무력화되면 저절로 엎드린다.
 
 ## 몸 크기 `BodySize`
 
@@ -24,9 +70,9 @@
 | `w` | 가로 (어깨 폭) | 0.5 m |
 | `d` | 세로 (가슴 두께) | 0.3 m |
 | `h` | 높이 (선 자세 키) | 1.75 m |
+| `mass` | 몸무게 | 70 kg |
 
-- 지금 쓰는 곳: 시야 — 눈높이 = `h × VISION.eyeRatio(0.93)`, 겨냥 높이 = `h × VISION.aimRatio(0.7)` ([world.md](world.md)).
-- 자세(낮은 자세·포복)가 생기면 `h` 대신 자세별 높이를 쓴다.
+- 지금 쓰는 곳: 시야 — 눈높이 = 자세별 몸 높이 × `VISION.eyeRatio(0.93)`, 겨냥 높이 = 자세별 몸 높이 × `VISION.aimRatio(0.7)` ([world.md](world.md)). 하중 비율 — `mass`.
 
 ## 휴대 장비 `LoadoutItem`
 
@@ -35,8 +81,9 @@
 | `item` | 장비 id ([equipment.md](equipment.md)) |
 | `qty` | 수량. 화기는 정 수, 탄약은 발 수 |
 
-- 예: 유탄수 `[{k2,1}, {k201,1}, {556-k100,210}, {40-k200,12}]`.
+- 예: 국군 유탄수 `[{rok-kit,1}, {k2,1}, {k201,1}, {556-k100,210}, {40-k200,12}]` (`rok-kit` 은 편제 공통 장구).
 - `weaponsOf(loadout, catalog)` 로 화기만 뽑는다. `checkLoadout` 은 없는 장비·탄약·0 이하 수량을 오류로 돌려준다.
 
 ## 아직 없는 것
-제압·사기·부상·출혈·자세·하중. 추가하면 `stateHash`(`replay.ts`)에도 섞어야 결정성 테스트가 검사한다.
+사격 판정(스트레스·피해를 실제로 주는 쪽), 출혈, 사기(분대 단위로 둘 예정), 빈 탄창 무게, 적에게 보이는 상태(쓰러짐 등).
+상태 필드를 늘리면 `stateHash`(`replay.ts`)에도 섞어야 결정성 테스트가 검사한다.

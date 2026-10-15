@@ -27,7 +27,7 @@ npm run fetch-map -- <id> <남> <서> <북> <동> [이름]   # content/maps/<id>
 - `CLAUDE.md`, `AGENTS.md`, `docs/`, `.claude/` 는 ai-documents 레포(`projects/tctp/`)를 가리키는 심볼릭 링크다. 수정은 링크를 따라가 그쪽 레포에서 커밋·푸시한다.
 
 ## 원칙
-- **결정성**: 시드 RNG(`rng.ts`)만 쓴다 (`Math.random()` 금지). 시간은 정수 `tick` (1틱 = 0.1초). 같은 지도·시드·명령 기록 → 같은 `stateHash`.
+- **결정성**: 시드 RNG(`rng.ts`)만 쓴다 (`Math.random()` 금지). 시간은 정수 `tick` (1틱 = 1초). 같은 지도·시드·명령 기록 → 같은 `stateHash`.
 - **명령은 데이터**: 플레이어·AI 모두 `Command` 를 내고, 시뮬은 틱 시작 때 적용한다. 리플레이·사후검토·버그 재현은 명령 기록(`TimedCommand[]`)으로 한다.
 - **같은 사람 객체**: 아군·적 모두 `Soldier`. 진영과 장비만 다르다. 적 AI 도 플레이어와 같은 `Command` 만 쓴다.
 - **실제 지도, 연속 좌표**: 헥스 없음. 미터 좌표 (x 동쪽, y 남쪽, 원점 북서). 사람 = 지름 1m 실척.

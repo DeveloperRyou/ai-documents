@@ -11,6 +11,7 @@
 | `id`, `name` | 식별자, 표시 이름 |
 | `nation` | 소속 군 (대한민국 육군, 조선인민군 …) |
 | `echelon` | 제대 `"squad" \| "platoon" \| "company" \| "battalion" \| "brigade"` |
+| `kit` | `LoadoutItem[]` (선택) — 모든 구성원 공통 장구. 각 구성원 `loadout` 앞에 붙는다 |
 | `teams` | `OrgTeam[]` — 순서대로 병사 id 가 매겨진다 |
 | `source` | 근거 자료 |
 | `note` | 근거에 없어 추정한 부분 (선택) |

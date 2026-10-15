@@ -1,4 +1,4 @@
-# 장비 — 화기 `Weapon`, 탄약 `Ammo`
+# 장비 — 화기 `Weapon`, 탄약 `Ammo`, 장구 `Gear`
 
 코드: `packages/sim/src/equipment.ts`. 데이터: `content/equipment.json` (`{ note, items: Equipment[] }`).
 `catalogOf(file)` 가 id → 장비 사전(`EquipmentCatalog`)으로 바꾼다. 수치는 공개 자료 기준 대략값이고 튜닝 대상이다.
@@ -27,6 +27,21 @@
 | `blastRadius` | 폭발 살상 반경 (m). 폭발하지 않으면 0 |
 | `suppressionRadius` | 탄착점 주변 제압 반경 (m) |
 
+## 장구 `Gear` (`kind: "gear"`)
+
+싸우는 데 쓰지 않는 휴대품 묶음 (방탄모·방탄복·전투조끼·수통 등). 하중(`Soldier.load`)에만 들어간다.
+
+| 필드 | 뜻 |
+|---|---|
+| `id`, `name` | 식별자, 표시 이름 |
+| `mass` | 무게 (kg) |
+| `note` | 무엇이 들었는지 (선택) |
+
+| 장구 | 무게 | 내용 (추정, 군복·전투화·빈 탄창 제외) |
+|---|---|---|
+| `rok-kit` 국군 개인 전투장구 | 15 kg | 방탄모·방탄복(방탄판 포함)·전투조끼·수통 2·방독면·구급낭 |
+| `kpa-kit` 북한군 개인 전투장구 | 6 kg | 철모·탄입대·수통·방독면·잡낭 (방탄복 없음) |
+
 ## 현재 목록
 
 | 화기 | 사격 | 유효사거리 | 장전 | 탄약 | 관통 | 폭발 반경 | 제압 반경 | 쓰는 편제 |
@@ -42,4 +57,4 @@
 
 ## 추가하는 법
 `content/equipment.json` 의 `items` 에 한 줄 넣는다. 화기는 `ammo` 가 가리키는 탄약도 있어야 한다 (`tools/src/content.test.ts` 가 검사).
-수류탄·박격포처럼 화기 없이 던지거나 다른 성질이 필요하면 `kind` 를 늘리는 쪽으로 (지금은 `weapon`·`ammo` 둘).
+수류탄·박격포처럼 화기 없이 던지거나 다른 성질이 필요하면 `kind` 를 늘리는 쪽으로 (지금은 `weapon`·`ammo`·`gear` 셋).
