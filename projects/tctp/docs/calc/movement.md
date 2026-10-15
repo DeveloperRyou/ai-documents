@@ -1,6 +1,6 @@
 # 이동 계산
 
-코드: `soldier.ts` `speedOf`, `action.ts` `ACTIONS.move`. 이동 행동의 필드는 [../objects/action.md](../objects/action.md).
+코드: [`body/soldier.ts`](../../packages/sim/src/body/soldier.ts) `speedOf`, [`command/action.ts`](../../packages/sim/src/command/action.ts) `ACTIONS.move`. 이동 행동의 필드는 [../objects/action.md](../objects/action.md).
 
 ## 낼 수 있는 속도 `speedOf(s, gait)` (m/s, 지형 배율 전)
 

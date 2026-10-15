@@ -1,9 +1,9 @@
 # 난수를 쓰는 곳 (굴림 목록)
 
 [../README.md](../README.md) "한 틱 순서" 대로 적는다. 같은 단계 안은 병사 id 순. 흐름은 따로 적지 않으면 `World.rng`.
-분포 이름(`vary`, `gauss`, `inDisk` …)은 [README.md](README.md). 상수는 `VARY`(`vary.ts`)와 각 파일의 튜닝 상수.
+분포 이름(`vary`, `gauss`, `inDisk` …)은 [README.md](README.md). 상수는 `VARY`([`core/vary.ts`](../../../packages/sim/src/core/vary.ts))와 각 파일의 튜닝 상수.
 
-## 흔들림 상수 `VARY` (`vary.ts`)
+## 흔들림 상수 `VARY` ([`core/vary.ts`](../../../packages/sim/src/core/vary.ts))
 
 | 상수 | 값 | 뜻 |
 |---|---|---|
@@ -18,7 +18,7 @@
 
 몸 수치의 흔들림(`RATES.*.vary`)은 [../rates.md](../rates.md).
 
-## 1. 명령 (`command.ts`)
+## 1. 명령 ([`command/command.ts`](../../../packages/sim/src/command/command.ts))
 
 | 굴림 | 분포 | 결과 |
 |---|---|---|
@@ -29,7 +29,7 @@
 
 - 반응 시간 굴림은 명령을 받는 병사마다 (무력화·패닉이면 굴리지 않음). 명령 적용 시점에 굴리고, 미뤄 둔 명령이 적용될 때는 다시 굴리지 않는다.
 
-## 2. 행동 (`action.ts`, `fire.ts`)
+## 2. 행동 ([`command/action.ts`](../../../packages/sim/src/command/action.ts), [`combat/fire.ts`](../../../packages/sim/src/combat/fire.ts))
 
 ### 이동
 | 굴림 | 분포 | 언제 |
@@ -79,7 +79,7 @@
 | 스트레스 회복량 | `vary(회복 속도, ±50%)` × dt | 마지막 위협 뒤 4초가 지났고 스트레스 > 0 |
 | 패닉에서 벗어남 | `chance(0.25 × dt)` | 패닉이고 스트레스 < 30 |
 
-## 4. 경계 시선 (`scan.ts`, `World.lookRng`)
+## 4. 경계 시선 ([`perception/scan.ts`](../../../packages/sim/src/perception/scan.ts), `World.lookRng`)
 
 무력화된 병사, 사격·이동사격 중인 병사(눈이 겨누는 쪽에 고정)는 굴리지 않는다.
 

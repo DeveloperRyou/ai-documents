@@ -1,6 +1,6 @@
 # 행동 `Action`
 
-병사가 지금 하는 일. 코드: `packages/sim/src/action.ts`. 병사마다 하나(`Soldier.action`, 없으면 대기)를 가진다.
+병사가 지금 하는 일. 코드: [`packages/sim/src/command/action.ts`](../../packages/sim/src/command/action.ts). 병사마다 하나(`Soldier.action`, 없으면 대기)를 가진다.
 
 ## 구조 (명령 → 임무 → 행동 → 장비)
 
@@ -29,11 +29,11 @@ Command (플레이어·AI 입력, commandLog 에 기록, 리플레이 대상)
 조준사격·제압사격은 같은 `fire` 행동이다 (명령이 `FIRE_ORDER` 로 조준 시간·발 수·반경만 달리 넣는다, [world.md](world.md)).
 다음 단계에서 늘어날 것: 수류탄 투척, 개인호 구축, 응급처치, 웅크리기·도주 (패닉).
 
-## 흔들림 (`vary.ts`, `VARY`)
+## 흔들림 ([`core/vary.ts`](../../packages/sim/src/core/vary.ts), `VARY`)
 같은 명령을 받아도 병사마다, 매번 조금씩 다르게 움직이고 쏘게 하는 사건별 잡음 (반응 시간·서는 자리·걸음·조준 시간·점사 발 수·겨눔 어긋남·재장전). 병사에 붙는 능력치가 아니다 (능력치는 두지 않는다). 난수는 시드 RNG 라 결정성은 그대로.
 값과 굴리는 순서는 [../calc/random/rolls.md](../calc/random/rolls.md).
 
-## 사격 판정 (`fire.ts`, `pullTrigger`)
+## 사격 판정 ([`combat/fire.ts`](../../packages/sim/src/combat/fire.ts), `pullTrigger`)
 탄 하나하나를 날리지 않고, 쏜 틱에 탄도선을 따라 바로 판정한다. 결과는 `World.shots` (화면 효과용).
 - 직사: 총구 → 조준점 방향에 산포를 더한 직선. 처음 걸린 사람(아군 포함)·지물·땅이 탄착점. 탄도선 곁 사람은 근탄으로 눌린다.
 - 곡사: 조준점 둘레에 떨어진다 (지물을 넘어감). 폭발탄은 탄착점 둘레에 파편 부상·제압.

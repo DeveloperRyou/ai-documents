@@ -1,12 +1,12 @@
 # 월드 `World` · 아는 적 `Contact` · 명령 `Command` · 화면용 `Snapshot`
 
-## 월드 `World` (`types.ts`, `createWorld` in `world.ts`)
+## 월드 `World` ([`core/types.ts`](../../packages/sim/src/core/types.ts), `createWorld` in [`core/world.ts`](../../packages/sim/src/core/world.ts))
 | 필드 | 뜻 |
 |---|---|
 | `map` | 지도 `MapData` |
 | `terrain` | 지형 격자 ([terrain.md](terrain.md)) |
 | `rng` | 시드 RNG (mulberry32). 시뮬 안 난수는 이것만 (시선만 아래 `lookRng`) |
-| `lookRng` | 시선 고르기 전용 시드 RNG (`scan.ts`). 시선이 사격·피해 난수 흐름을 흔들지 않게 따로 둔다 |
+| `lookRng` | 시선 고르기 전용 시드 RNG ([`perception/scan.ts`](../../packages/sim/src/perception/scan.ts)). 시선이 사격·피해 난수 흐름을 흔들지 않게 따로 둔다 |
 | `catalog` | 장비 카탈로그 (`createWorld` 넷째 인자, 화기·탄약 제원) |
 | `tick` | 경과 틱 (정수, 1틱 = 0.25초) |
 | `soldiers` | `Soldier[]` ([soldier.md](soldier.md)), `soldiers[id]` |
@@ -17,7 +17,7 @@
 상태는 `step(world, commands)` 안에서만 바뀐다: 명령 적용 → 미뤄 둔 명령(`applyDueOrders`) → `tick++`·`shots` 비움 → 행동(`updateActions`) → 몸 상태(`updateBody`: 출혈·지구력·상태·자세·스트레스) → 경계 시선(`updateScan`) → 탐지(`updateVision`). 순서와 각 단계의 난수는 [../calc/README.md](../calc/README.md) "한 틱 순서".
 `stateHash` 는 tick·두 RNG 상태(`rng`·`lookRng`)·병사 위치·몸 방향·시선(`look`·`lookAim`·`lookTick`·돌아볼 틱·`bodyAim`)·자세·상태·행동(종류·필드, 이동의 걸음·이동사격 포함)·스트레스·마지막 위협 틱·근탄 틱들·심리 단계·미뤄 둔 명령 틱·지구력·하중·장전 탄·휴대 수량·혈액·부상(부위·정도·출혈·틱)·contacts 를 섞는다. 새 상태 필드를 넣으면 해시에도 넣는다.
 
-## 아는 적 `Contact` (`types.ts`, 갱신은 `vision.ts`)
+## 아는 적 `Contact` ([`core/types.ts`](../../packages/sim/src/core/types.ts), 갱신은 [`perception/vision.ts`](../../packages/sim/src/perception/vision.ts))
 | 필드 | 뜻 |
 |---|---|
 | `id` | 적 병사 id |
@@ -32,7 +32,7 @@
 - 못 보게 되면 마지막 위치를 `memory`(30초 = 120틱) 동안 기억 후 잊음.
 - 식·상수·계산 예(거리별 발견 확률, 매복)는 [../calc/vision.md](../calc/vision.md). 확인장은 배율마다 값을 보여 준다 (`detectFactors`: 숨음 ×, 걷는 눈 ×).
 
-## 명령 `Command` (`command.ts`)
+## 명령 `Command` ([`command/command.ts`](../../packages/sim/src/command/command.ts))
 | 종류 | 필드 | 뜻 |
 |---|---|---|
 | `move` | `ids`, `x`, `y`, `gait?`, `fire?`, `slot?` | 병사들에게 이동 행동을 준다 (진행 중 행동을 덮음). `gait`: `walk`(기본) 걷기 / `rush` 약진. `fire`: `{ target }` 또는 `{ x, y }` 이면 걸으며 쏜다 (이동사격, 조준사격·제압사격과 같은 `FIRE_ORDER`, 약진이면 무시) |
@@ -49,7 +49,7 @@
 
 `TimedCommand { tick, cmd }` — 명령 기록 한 줄. 같은 지도·시나리오·시드 + 같은 기록 → 같은 판 (`runReplay`).
 
-## 화면용 `Snapshot` (`snapshot.ts`)
+## 화면용 `Snapshot` ([`view/snapshot.ts`](../../packages/sim/src/view/snapshot.ts))
 렌더러는 `World` 대신 이것만 읽는다. 순수 데이터 (JSON 직렬화 가능, `World` 와 참조 공유 없음).
 
 `Snapshot { tick, time(초), viewer, soldiers: SoldierView[] }`, 세션에서 꺼내면 `paused`, `commands`(명령 수) 추가.

@@ -1,6 +1,6 @@
 # 지형 격자 `Terrain` · 칸 성질 `TerrainProps`
 
-코드: `packages/sim/src/terrain.ts`. 데이터는 따로 없고 지도(`MapData`)에서 굽는다.
+코드: [`packages/sim/src/terrain/terrain.ts`](../../packages/sim/src/terrain/terrain.ts). 데이터는 따로 없고 지도(`MapData`)에서 굽는다.
 `terrainOf(map)` 가 지도 객체마다 한 번 만들어 캐시한다 (라스도르프 1199 × 1001 칸에 약 60ms). 판 중에 바뀌지 않는다.
 
 ## `Terrain`

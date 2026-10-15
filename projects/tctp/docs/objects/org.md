@@ -1,6 +1,6 @@
 # 편제 `OrgTemplate`
 
-제대의 조 구성과 직책별 휴대 장비. 코드: `packages/sim/src/org.ts`. 데이터: `content/orgs/<id>.json`.
+제대의 조 구성과 직책별 휴대 장비. 코드: [`packages/sim/src/content/org.ts`](../../packages/sim/src/content/org.ts). 데이터: `content/orgs/<id>.json`.
 시나리오는 편제 id 로 부대를 세우므로, 편제를 고치면 그 편제를 쓰는 모든 시나리오에 반영된다.
 
 ## 형식

@@ -1,13 +1,13 @@
 # 병사 `Soldier`
 
-아군·적 모두 같은 객체. 진영과 장비만 다르다. 코드: `packages/sim/src/types.ts`.
+아군·적 모두 같은 객체. 진영과 장비만 다르다. 코드: [`packages/sim/src/core/types.ts`](../../packages/sim/src/core/types.ts).
 시나리오의 편제에서 `buildSoldiers` 가 만든다 ([scenario.md](scenario.md)). 직접 JSON 으로 쓰지 않는다.
 
 | 필드 | 타입 | 뜻 |
 |---|---|---|
 | `id` | number | 월드 안 번호. 0 부터 부대 순서대로 (`world.soldiers[id]`) |
 | `side` | `"blue" \| "red"` | 진영 |
-| `name` | string | 이름. `content/names.json` 의 성 + 이름을 시나리오 시드로 골라 부대 안에서 겹치지 않게 |
+| `name` | string | 이름. [`content/names.json`](../../content/names.json) 의 성 + 이름을 시나리오 시드로 골라 부대 안에서 겹치지 않게 |
 | `role` | string | 직책 (편제의 `role`: 분대장, 기관총 사수 …) |
 | `squad` | string | 소속 분대 = 부대명 (`ForceSpec.name`). 최소 명령 단위 |
 | `team` | string | 소속 조 = `"<부대명> <조 이름>"` (예: `1분대 2조`) |
@@ -34,7 +34,7 @@
 | `bodyAim` | `{ dir, started } \| null` | 몸을 돌려 향할 방향 (위협이 고개 한계 밖일 때). started = 고개가 한계 가까이 돌아 몸이 돌기 시작함 (그 뒤로는 끝까지 돈다) |
 | `action` | `Action \| null` | 지금 하는 행동. 없으면 대기 ([action.md](action.md)) |
 
-## 몸 상태 (`soldier.ts`)
+## 몸 상태 ([`body/soldier.ts`](../../packages/sim/src/body/soldier.ts))
 
 수치는 모두 이름 붙은 상수(`POSTURE_HEIGHT`, `BASE_SPEED`, `RUSH_SPEED`, `LOAD`, `STAMINA`, `STRESS`, `WOUND`)이고 대략값이다.
 늘고 주는 양(스트레스 증감·지구력 소모와 회복·출혈)과 확률 전환은 [../calc/rates.md](../calc/rates.md) (`RATES`)에 따로 모아 두었다. 여기에는 문턱과 그 결과만 적는다.
@@ -56,7 +56,7 @@
 | `moving` | 이번 틱에 움직임 | 지구력 소모, 발견되기 쉬움 |
 | `idle` | 그 밖 | |
 
-### 부상 `Wound` (`wound.ts`)
+### 부상 `Wound` ([`body/wound.ts`](../../packages/sim/src/body/wound.ts))
 체력 숫자는 없다. 맞을 때마다 부상 하나를 굴려 `wounds` 에 쌓는다: `{ part, severity, bleed (mL/초), tick }`.
 - 부위 `part`: `head`, `torso`, `abdomen`, `leftArm`, `rightArm`, `leftLeg`, `rightLeg`. 급소(`WOUND.vital`) = 머리·가슴·복부.
 - 정도 `severity`: `graze` 찰과 / `light` 경상 / `severe` 중상 / `critical` 치명. 확률표(`WOUND.bullet`, `WOUND.fragment`)에서 부위별로 굴린다.
@@ -103,7 +103,7 @@
 - 바꾸는 명령: `{ kind: "posture", ids, posture }`. 제압·패닉·무력화되면 저절로 엎드리고, 위협을 느끼면 서서 멈춘 병사는 앉는다. 약진하는 동안은 서고, 도착하면 엎드린다.
 - 엎드린 몸은 바라보는 방향으로 길게 눕는다 (발 → 머리 = `facing`). 피탄 판정이 이 방향을 쓴다 ([../calc/fire.md](../calc/fire.md) "맞은 부위").
 
-### 경계 (시선) `look` — `scan.ts`
+### 경계 (시선) `look` — [`perception/scan.ts`](../../packages/sim/src/perception/scan.ts)
 - 몸 방향(`facing`)과 눈 방향(`look`)이 따로다. 매 틱 행동 다음, 탐지 전에 `updateScan` 이 정한다 (튜닝 `SCAN`). 난수는 시선 전용 `World.lookRng` 만 써서 사격·피해 난수 흐름을 흔들지 않는다.
 - 볼 곳(`lookAim`)을 고르면 눈은 고개를 돌리듯 따라간다: 매 틱 남은 각의 `SCAN.ease`(50%), 최고 `SCAN.turnMax`(300°/초).
 - 고개는 몸 정면 ± `SCAN.neck`(90°) 안에서만 돈다. 위협 쪽(아는 적·돌아보기)이 그 밖이면 `bodyAim` 을 잡아 멈춰 있는 병사는 고개가 한계에서 `SCAN.bodyLead`(15°) 안쪽까지 먼저 돈 뒤 몸을 돌린다 (`SCAN.bodyTurn` 서기·앉기 240°/초, 엎드려 45°/초). 걷는 중이면 몸은 진행 방향에 묶여 고개만 한계까지 돌린다. 평소 구역 훑기로는 몸을 돌리지 않는다 (맨 뒤의 후방은 고개 한계 + 주변 시야로 본다).
@@ -120,7 +120,7 @@
 
 ## 몸 크기 `BodySize`
 
-| 필드 | 뜻 | 기본값 (`BODY`, `soldier.ts`) |
+| 필드 | 뜻 | 기본값 (`BODY`, [`body/soldier.ts`](../../packages/sim/src/body/soldier.ts)) |
 |---|---|---|
 | `w` | 가로 (어깨 폭) | 0.5 m |
 | `d` | 세로 (가슴 두께) | 0.3 m |
@@ -140,10 +140,10 @@
 - `weaponsOf(loadout, catalog)` 로 화기만 뽑는다. `checkLoadout` 은 없는 장비·탄약·0 이하 수량을 오류로 돌려준다.
 
 ### 휴대 한도
-- 화기 칸: 주화기(`primary`) 1정, 보조(`secondary`) 1정 (`WEAPON_SLOTS`, `equipment.ts`). 탄약·장구는 칸 없이 무게로만 제한.
+- 화기 칸: 주화기(`primary`) 1정, 보조(`secondary`) 1정 (`WEAPON_SLOTS`, [`content/equipment.ts`](../../packages/sim/src/content/equipment.ts)). 탄약·장구는 칸 없이 무게로만 제한.
 - 무게: 공통 장구 + 직책 장비 합이 몸무게 × `LOAD.maxRatio`(0.7, 49kg) 를 넘으면 오류 (`checkCarry`). 편제는 교범 접근하중 상한 × `LOAD.limitRatio`(0.45, 31.5kg) 안이어야 한다 (콘텐츠 테스트).
 - `checkOrg` 가 구성원마다 둘 다 검사한다. 지금 가장 무거운 구성원도 45% 안.
 
 ## 아직 없는 것
 응급처치(지혈대·압박, 리더 로직과 함께), 방호구(방탄모·방탄복이 부상을 줄이는 것), 패닉 중 도주·항복, 사기(분대 단위로 둘 예정), 빈 탄창 무게, 적에게 보이는 상태(쓰러짐 등).
-상태 필드를 늘리면 `stateHash`(`replay.ts`)에도 섞어야 결정성 테스트가 검사한다.
+상태 필드를 늘리면 `stateHash`([`core/replay.ts`](../../packages/sim/src/core/replay.ts))에도 섞어야 결정성 테스트가 검사한다.

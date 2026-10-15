@@ -1,14 +1,14 @@
 # 늘고 주는 몸 수치 `RATES`
 
-코드: `packages/sim/src/rates.ts`. 시간과 사건에 따라 늘었다 줄었다 하는 병사 수치(스트레스·지구력·혈액)를 모아 둔 곳이다.
-늘고 주는 양을 정하는 상수(`RATES`)와 그 변화를 적용하는 함수가 모두 여기 있다. 문턱(어디서부터 제압이고 실신·사망인가)은 따로 둔다: 심리 단계는 `soldier.ts` `STRESS`, 부상은 `wound.ts` `WOUND` ([../objects/soldier.md](../objects/soldier.md)).
+코드: [`packages/sim/src/body/rates.ts`](../../packages/sim/src/body/rates.ts). 시간과 사건에 따라 늘었다 줄었다 하는 병사 수치(스트레스·지구력·혈액)를 모아 둔 곳이다.
+늘고 주는 양을 정하는 상수(`RATES`)와 그 변화를 적용하는 함수가 모두 여기 있다. 문턱(어디서부터 제압이고 실신·사망인가)은 따로 둔다: 심리 단계는 [`body/soldier.ts`](../../packages/sim/src/body/soldier.ts) `STRESS`, 부상은 [`body/wound.ts`](../../packages/sim/src/body/wound.ts) `WOUND` ([../objects/soldier.md](../objects/soldier.md)).
 
 ## 원칙
 - **양은 흔든다**: 사건마다, 틱마다 정한 양에 `vary`(± 비율)를 곱한다. 같은 근탄이라도 매번 받는 양이 다르다.
 - **회복은 형편을 따른다**: 시간이 지나면 똑같이 줄지 않는다. 마지막 위협 뒤 얼마나 조용했는지, 엄폐에 있는지, 곁에 전우가 있는지, 피를 흘리는지에 따라 달라진다.
 - **단계 전환은 확률이다**: 패닉에 빠지는 것, 패닉에서 벗어나는 것, 맞자마자 쇼크에 빠지는 것은 문턱을 넘는 순간 정해지지 않는다. 초당 확률이나 사건 확률로 굴린다.
 - 난수는 모두 시드 RNG(`w.rng`)라 같은 시드와 명령 기록이면 결과도 같다.
-- 사격·이동 행동의 흔들림(조준 시간, 걸음, 재장전)은 `vary.ts` `VARY` 에 있다 ([random/rolls.md](random/rolls.md)). 여기에는 몸 수치만 둔다. 흔드는 식(`vary`)과 난수 순서는 [random/](random/README.md).
+- 사격·이동 행동의 흔들림(조준 시간, 걸음, 재장전)은 [`core/vary.ts`](../../packages/sim/src/core/vary.ts) `VARY` 에 있다 ([random/rolls.md](random/rolls.md)). 여기에는 몸 수치만 둔다. 흔드는 식(`vary`)과 난수 순서는 [random/](random/README.md).
 
 ## 스트레스 `RATES.stress`
 
@@ -18,10 +18,10 @@
 
 | 사건 | 기본값 | scale | 어디서 |
 |---|---|---|---|
-| 근탄 `nearMiss` | 15 | (1 − 거리/제압 반경) × 노출(엄폐 ×(1 − 0.6 × 엄폐), 이동 중 ×1.15) × 몰아쏘기(1 + `volume` 0.25 × 앞선 `volumeWindow` 3초 안 근탄 수, 최대 `volumeMax` 4발) | `fire.ts` 직사 → `rates.ts` `nearMiss` ([fire.md](fire.md) "근탄") |
-| 피격 `hit` | 30 | 1 | `fire.ts` `wound` |
-| 폭발 `blast` | 40 | (1 − 거리/제압 반경) × 시선 차폐(막히면 0.15) | `fire.ts` `explode` |
-| 전우 피격 `buddyDown` | 15 | `buddyRadius`(15m) 안의 같은 편 (싸울 수 있는) 병사 | `soldier.ts` `updateBody`, 무력화·사망하는 틱 |
+| 근탄 `nearMiss` | 15 | (1 − 거리/제압 반경) × 노출(엄폐 ×(1 − 0.6 × 엄폐), 이동 중 ×1.15) × 몰아쏘기(1 + `volume` 0.25 × 앞선 `volumeWindow` 3초 안 근탄 수, 최대 `volumeMax` 4발) | [`combat/fire.ts`](../../packages/sim/src/combat/fire.ts) 직사 → [`body/rates.ts`](../../packages/sim/src/body/rates.ts) `nearMiss` ([fire.md](fire.md) "근탄") |
+| 피격 `hit` | 30 | 1 | [`combat/fire.ts`](../../packages/sim/src/combat/fire.ts) `wound` |
+| 폭발 `blast` | 40 | (1 − 거리/제압 반경) × 시선 차폐(막히면 0.15) | [`combat/fire.ts`](../../packages/sim/src/combat/fire.ts) `explode` |
+| 전우 피격 `buddyDown` | 15 | `buddyRadius`(15m) 안의 같은 편 (싸울 수 있는) 병사 | [`body/soldier.ts`](../../packages/sim/src/body/soldier.ts) `updateBody`, 무력화·사망하는 틱 |
 
 ### 확률 사건
 | 사건 | 확률 | 결과 |
@@ -38,10 +38,10 @@
 ## 지구력 `RATES.stamina`
 - 움직인 틱: 초당 `drain[자세]` × (1 + 하중 비율 × `LOAD.staminaPerRatio` 2) × (1 ± `vary` 20%). 걸을 때는 서기 0.01, 앉아 0.05, 포복 0.15, 약진은 자세와 상관없이 1.
 - 멈춘 틱: 휴식 행동 중이면 초당 `rest`(0.3, 0 → 100 약 5분), 아니면 `idle`(0.02) × (1 ± 20%).
-- 문턱(속도가 줄기 시작하는 `tiredAt` 50, 최저 속도 배율)은 `soldier.ts` `STAMINA`.
+- 문턱(속도가 줄기 시작하는 `tiredAt` 50, 최저 속도 배율)은 [`body/soldier.ts`](../../packages/sim/src/body/soldier.ts) `STAMINA`.
 
 ## 혈액 `RATES.blood`
-- 부상마다 출혈 속도(mL/초)가 붙는다. 다칠 때 표 값 × (1 ± `vary` 40%)로 정한다 (`rollWound`, `wound.ts`).
+- 부상마다 출혈 속도(mL/초)가 붙는다. 다칠 때 표 값 × (1 ± `vary` 40%)로 정한다 (`rollWound`, [`body/wound.ts`](../../packages/sim/src/body/wound.ts)).
 - 매 틱 혈액량에서 모든 부상의 출혈 합 × dt 를 뺀다 (`updateBlood`).
 - 사람 피는 5L(`WOUND.blood`)이고, 30% 를 잃으면 약해지고 40% 면 실신(무력화), 50% 면 사망한다.
 
@@ -54,7 +54,7 @@
 
 - 지금은 출혈을 멈출 방법이 없다. 응급처치(지혈대·압박)는 리더 로직과 함께 넣는다 (사용자 결정).
 
-## 매 틱 순서 (`updateBody`, `soldier.ts`)
+## 매 틱 순서 (`updateBody`, [`body/soldier.ts`](../../packages/sim/src/body/soldier.ts))
 출혈 → (무력화면 쓰러짐) → 지구력 → 상태 → (막 쓰러졌으면 전우 피격) → 자세 → 스트레스.
 
 ## 계산 예
@@ -71,5 +71,5 @@
 | 다리 중상 (3 mL/초) 하나 | 5000 × 0.3 ÷ 3 / × 0.4 ÷ 3 / × 0.5 ÷ 3 | 약 8분에 약해짐, 11분에 실신, 14분에 사망 (출혈 ± 40%) |
 
 ### 제압 수치 근거 (#17)
-목표: 1m 안 초당 1발 → 몇 초(≤6초) 만에 제압, 3초에 1발 → 제압 유지, 3m 안 3초에 2발 → 제압, 드문 먼 근탄 → 제압 안 됨 (`soldier.test.ts` "제압 (근탄)", 드릴 `supp-*`).
+목표: 1m 안 초당 1발 → 몇 초(≤6초) 만에 제압, 3초에 1발 → 제압 유지, 3m 안 3초에 2발 → 제압, 드문 먼 근탄 → 제압 안 됨 ([`body/soldier.test.ts`](../../packages/sim/src/body/soldier.test.ts) "제압 (근탄)", 드릴 `supp-*`).
 출처: Leo Murray *War Games* (Morray 로 인용됨, https://defense-and-freedom.blogspot.com/2022/11/suppression-by-infantry-weapons.html), DTIC AD519874 (빗나간 거리에 선형, 탄량·소리에 비례), ARI TR-79-A19 (빗나간 거리·구경·발사 속도). 구경별 반경(5.56mm 3m, 7.62mm 4~6m)은 출처 미확인 현장 시험 인용이라 실마리로만 쓴다.

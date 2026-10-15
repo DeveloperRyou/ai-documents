@@ -1,6 +1,6 @@
 # 시야·탐지 계산
 
-코드: `vision.ts` (`VISION`), `scan.ts` (`SCAN`, 경계 시선), `terrain.ts` (`rimDist`·`rimExposure`·`aimZ`, `RIM`).
+코드: [`perception/vision.ts`](../../packages/sim/src/perception/vision.ts) (`VISION`), [`perception/scan.ts`](../../packages/sim/src/perception/scan.ts) (`SCAN`, 경계 시선), [`terrain/terrain.ts`](../../packages/sim/src/terrain/terrain.ts) (`rimDist`·`rimExposure`·`aimZ`, `RIM`).
 아는 적 `Contact` 필드는 [../objects/world.md](../objects/world.md), 경계 필드(`look` 등)는 [../objects/soldier.md](../objects/soldier.md) "경계 (시선)".
 
 ## 1. 시선 투과율 `lineOfSight` (0 = 막힘 ~ 1 = 트임)
@@ -49,7 +49,7 @@
 - 지난 주기에 보이던 적은 관측자 누구든 투과율(시야각 안) ≥ 0.15 (`track`) 이면 계속 보인다 (굴리지 않음).
 - 놓치면 다시 처음 보는 적처럼 굴린다. 마지막으로 본 뒤 30초(`memory` 120틱)가 지나면 잊는다.
 
-## 5. 경계 시선 (`scan.ts`)
+## 5. 경계 시선 ([`perception/scan.ts`](../../packages/sim/src/perception/scan.ts))
 
 탐지의 시야각은 `look` 으로 잰다. 시선은 매 틱 행동 뒤, 탐지 전에 움직인다.
 - 고개: 매 틱 남은 각의 50% (`ease`), 최고 300°/초 (`turnMax`, 한 틱 75°). 0.5° 안이면 붙는다. 몸 정면 ± 90° (`neck`) 밖으로는 못 돈다.

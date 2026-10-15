@@ -1,8 +1,8 @@
 # 장비 — 화기 `Weapon`, 탄약 `Ammo`, 장구 `Gear`
 
-코드: `packages/sim/src/equipment.ts`. 데이터: `content/equipment.json` (`{ note, items: Equipment[] }`).
+코드: [`packages/sim/src/content/equipment.ts`](../../packages/sim/src/content/equipment.ts). 데이터: [`content/equipment.json`](../../content/equipment.json) (`{ note, items: Equipment[] }`).
 `catalogOf(file)` 가 id → 장비 사전(`EquipmentCatalog`)으로 바꾼다. 수치는 공개 자료 기준 대략값이고 튜닝 대상이다.
-사격·제압·부상 판정(`fire.ts`)이 아래 값을 어떻게 쓰는지는 [../calc/fire.md](../calc/fire.md).
+사격·제압·부상 판정([`combat/fire.ts`](../../packages/sim/src/combat/fire.ts))이 아래 값을 어떻게 쓰는지는 [../calc/fire.md](../calc/fire.md).
 
 ## 화기 `Weapon` (`kind: "weapon"`)
 
@@ -76,5 +76,5 @@
 | PG-7V 대전차 고폭탄 (85mm) | RPG-7 | 2.2 | 260 | 3 | 8 | 90 |
 
 ## 추가하는 법
-`content/equipment.json` 의 `items` 에 한 줄 넣는다. 화기는 `slot` 을 정하고, `ammo` 가 가리키는 탄약도 있어야 한다 (`tools/src/content.test.ts` 가 검사).
+[`content/equipment.json`](../../content/equipment.json) 의 `items` 에 한 줄 넣는다. 화기는 `slot` 을 정하고, `ammo` 가 가리키는 탄약도 있어야 한다 ([`tools/src/content.test.ts`](../../packages/tools/src/content.test.ts) 가 검사).
 수류탄·박격포처럼 화기 없이 던지거나 다른 성질이 필요하면 `kind` 를 늘리는 쪽으로 (지금은 `weapon`·`ammo`·`gear` 셋).

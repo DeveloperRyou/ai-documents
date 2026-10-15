@@ -1,11 +1,11 @@
 # 사격 계산
 
-코드: `action.ts` `fireStep` (조준·점사), `fire.ts` `pullTrigger` (한 발), `wound.ts` `rollWound` (부상).
+코드: [`command/action.ts`](../../packages/sim/src/command/action.ts) `fireStep` (조준·점사), [`combat/fire.ts`](../../packages/sim/src/combat/fire.ts) `pullTrigger` (한 발), [`body/wound.ts`](../../packages/sim/src/body/wound.ts) `rollWound` (부상).
 행동 필드는 [../objects/action.md](../objects/action.md), 화기·탄약 값은 [../objects/equipment.md](../objects/equipment.md). 난수 쓰는 곳은 [random/rolls.md](random/rolls.md).
 
 탄 하나하나를 날리지 않는다. 방아쇠를 당긴 틱에 탄도선을 그어 바로 판정하고, 결과는 `World.shots`(화면 효과용)에 남긴다.
 
-## 1. 명령 → 조준 시간·발 수 (`FIRE_ORDER`, `command.ts`)
+## 1. 명령 → 조준 시간·발 수 (`FIRE_ORDER`, [`command/command.ts`](../../packages/sim/src/command/command.ts))
 
 | 명령 | 조준 시간 `aim` | 점사 `burst` | 쓸어 쏘는 반경 `sweep` |
 |---|---|---|---|

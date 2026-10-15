@@ -7,29 +7,30 @@
 ## 명령어
 ```bash
 npm run dev          # 클라이언트 http://localhost:5175 — 메뉴. 게임 직행 ?scenario=bd1-react-to-contact (&seed=7 &view=2d|iso|3d|split &truth=1)
-                     # 행동 확인장 ?debug=drills (&drill=<id>) — sim/src/drills.ts 의 드릴을 틱 단위로 재생
+                     # 행동 확인장 ?debug=drills (&drill=<id>) — sim/src/drills/drills.ts 의 드릴을 틱 단위로 재생
 npm run check        # typecheck + lint(Biome) + test(Vitest). 커밋 전 통과시킬 것
 npm run format       # Biome 자동 수정
 npm run build        # 클라이언트 빌드 (CI 는 check + build)
-npx vitest run packages/sim/src/world.test.ts   # 테스트 파일 하나 (-t "<이름>" 으로 골라 돌리기)
+npx vitest run packages/sim/src/core/world.test.ts   # 테스트 파일 하나 (-t "<이름>" 으로 골라 돌리기)
 npm run headless -- 1 --n 10 --sec 120 [--scenario id]
 npm run fetch-map -- <id> <남> <서> <북> <동> [이름]   # content/maps/<id>.json (--from-cache, --no-elev)
 ```
 
 ## 구조
-- npm workspaces. 패키지끼리는 `@tctp/sim`, `@tctp/sim/<파일>` 로 가져온다 (소스 TS 를 그대로 씀, 빌드 단계 없음).
+- npm workspaces. 패키지끼리는 `@tctp/sim`, `@tctp/sim/<폴더>/<파일>` 로 가져온다 (소스 TS 를 그대로 씀, 빌드 단계 없음).
+- `packages/sim/src` 는 도메인 폴더로 나뉜다: `core`(상태 타입·`step`·시간·RNG·흔들림·리플레이) · `command`(명령·행동) · `body`(몸 상태·부상·`RATES`) · `combat`(사격) · `perception`(경계 시선·시야) · `terrain`(지도 형식·지형 격자) · `content`(장비·편제·시나리오 형식) · `view`(세션·스냅샷) · `drills`(드릴·테스트 도우미). 테스트는 대상 파일 곁. 새 파일은 맞는 폴더에 넣고 `index.ts` 에서 다시 내보낸다. 표는 `docs/ARCHITECTURE.md`.
 - `packages/sim`: tsconfig 에 DOM·node 타입이 없다. 시뮬에서 `window`, `document`, `fs`, `performance` 등을 쓰면 타입 오류가 나는 게 정상.
 - `packages/client`: 입력 → `Command` → `Session`(sim, 고정 틱 루프) → `Snapshot` → `Renderer` 구현이 그린다. 렌더러는 `World` 를 보지 않는다 (교체 방법은 `docs/ARCHITECTURE.md` "프런트엔드 경계").
 - `packages/render3d`: Three.js 3D 렌더러 POC (`?view=3d`). 지도에 층수·지붕 정보가 없어 건물 높이는 바닥 면적으로 어림한다.
 - `packages/tools`: Node 전용 도구. `content/` 를 읽고 쓴다.
 - `content/maps/raw/` 는 OSM·고도 원본 캐시 (git 제외).
-- 틱 흐름: 상태는 `step(world, cmds)`(`sim/src/world.ts`) 안에서만 바뀌고, 명령은 `applyCommand`(`command.ts`)로 들어가 병사 행동(`Action`, `action.ts`)이 되고, 행동이 매 틱 진행된다 (구조: `docs/objects/action.md`). 클라이언트는 틱마다 낸 명령을 `commandLog` 에 쌓은 뒤 `step` 을 부른다. 테스트·headless 는 `runReplay` + `stateHash`(`replay.ts`)로 결정성을 비교한다.
-- 콘텐츠: `content/campaign.json`(과정 사다리) → `scenarios/*.json` → `orgs/*.json`(편제) → `equipment.json`(화기·탄약). 병사는 `buildSoldiers`(`scenario.ts`)로 편제에서 세운다. 지도는 `rasdorf.json` 하나.
-- 정보 안개: `World.contacts`(진영별 아는 적, `vision.ts`) → `snapshot` 이 거른다. 렌더러에 실제 적 위치를 넘기지 말 것 (`?truth=1` 디버그만).
+- 틱 흐름: 상태는 `step(world, cmds)`([`packages/sim/src/core/world.ts`](packages/sim/src/core/world.ts)) 안에서만 바뀌고, 명령은 `applyCommand`([`command/command.ts`](packages/sim/src/command/command.ts))로 들어가 병사 행동(`Action`, [`command/action.ts`](packages/sim/src/command/action.ts))이 되고, 행동이 매 틱 진행된다 (구조: [`docs/objects/action.md`](docs/objects/action.md)). 클라이언트는 틱마다 낸 명령을 `commandLog` 에 쌓은 뒤 `step` 을 부른다. 테스트·headless 는 `runReplay` + `stateHash`([`core/replay.ts`](packages/sim/src/core/replay.ts))로 결정성을 비교한다.
+- 콘텐츠: [`content/campaign.json`](content/campaign.json)(과정 사다리) → `scenarios/*.json` → `orgs/*.json`(편제) → `equipment.json`(화기·탄약). 병사는 `buildSoldiers`([`content/scenario.ts`](packages/sim/src/content/scenario.ts))로 편제에서 세운다. 지도는 `rasdorf.json` 하나.
+- 정보 안개: `World.contacts`(진영별 아는 적, [`perception/vision.ts`](packages/sim/src/perception/vision.ts)) → `snapshot` 이 거른다. 렌더러에 실제 적 위치를 넘기지 말 것 (`?truth=1` 디버그만).
 - `CLAUDE.md`, `AGENTS.md`, `docs/`, `.claude/` 는 ai-documents 레포(`projects/tctp/`)를 가리키는 심볼릭 링크다. 수정은 링크를 따라가 그쪽 레포에서 커밋·푸시한다.
 
 ## 원칙
-- **결정성**: 시드 RNG(`rng.ts`)만 쓴다 (`Math.random()` 금지). 시간은 정수 `tick` (1틱 = 0.25초, `time.ts`. 튜닝 수치는 초 단위로 적고 `secToTicks` 로 바꾼다). 같은 지도·시드·명령 기록 → 같은 `stateHash`.
+- **결정성**: 시드 RNG([`core/rng.ts`](packages/sim/src/core/rng.ts))만 쓴다 (`Math.random()` 금지). 시간은 정수 `tick` (1틱 = 0.25초, [`core/time.ts`](packages/sim/src/core/time.ts). 튜닝 수치는 초 단위로 적고 `secToTicks` 로 바꾼다). 같은 지도·시드·명령 기록 → 같은 `stateHash`.
 - **명령은 데이터**: 플레이어·AI 모두 `Command` 를 내고, 시뮬은 틱 시작 때 적용한다. 리플레이·사후검토·버그 재현은 명령 기록(`TimedCommand[]`)으로 한다.
 - **같은 사람 객체**: 아군·적 모두 `Soldier`. 진영과 장비만 다르다. 적 AI 도 플레이어와 같은 `Command` 만 쓴다.
 - **실제 지도, 연속 좌표**: 헥스 없음. 미터 좌표 (x 동쪽, y 남쪽, 원점 북서). 사람 = 지름 1m 실척.

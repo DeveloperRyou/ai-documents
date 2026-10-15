@@ -16,7 +16,7 @@
 - TACTICAL → 제대 과정 사다리(분대 → 소대, 위로 갈수록 잠김) → 과정의 훈련 목록 → 브리핑 패널(브리핑 · 편제 · 장비 탭) → 훈련 시작.
 - 편제 탭은 시나리오 부대를 편제대로 세운 결과(조·직책·이름·화기)를, 장비 탭은 화기 성능표를 보여 준다.
 - 분대 과정의 첫 훈련 = 미 육군 **배틀 드릴 1 접적 시 행동** (ATP 3-21.8). 이후 후보: 배틀 드릴 2 접촉 단절, 2A 분대 공격, 3 매복 대응.
-- 데이터: `content/campaign.json` (과정·훈련 목록), `content/scenarios/*.json` (지도·시드·브리핑·부대), `content/orgs/*.json` (편제), `content/equipment.json` (화기·탄약), `content/names.json` (이름 생성).
+- 데이터: [`content/campaign.json`](../content/campaign.json) (과정·훈련 목록), [`content/scenarios/*.json`](../content/scenarios) (지도·시드·브리핑·부대), [`content/orgs/*.json`](../content/orgs) (편제), [`content/equipment.json`](../content/equipment.json) (화기·탄약), [`content/names.json`](../content/names.json) (이름 생성).
 
 ## 객체 (최소 정의, 2026-10-15)
 | 객체 | 가진 것 |
@@ -29,7 +29,7 @@
 - 국군 소총분대 **8명**: 2020년부터 평·전시 8명 (기존 전시 10명 = 분대장·부분대장·소총수 4·유탄수 2·기관총 사수·부사수에서 소총수 2명 감소로 추정). 화기 K2·K201·K15.
 - 북한군 보병분대 **12명** (ATP 7-100.2 North Korean Tactics 3-73): 분대장 AK, 부분대장 AK+G-25, 기관총수 3 RPD, 부기관총수 3 AK, 대전차수 2 RPG-7+AK, 유탄수 AK+G-25, 저격수 SVD.
 - 두 편제 모두 조 나누기와 휴대 수량은 추정. 장비 수치는 공개 자료 기준 대략값.
-- 사격·제압 판정은 `fire.ts` ([calc/fire.md](calc/fire.md)). 수치는 대략값, 플레이하며 맞춘다.
+- 사격·제압 판정은 [`combat/fire.ts`](../packages/sim/src/combat/fire.ts) ([calc/fire.md](calc/fire.md)). 수치는 대략값, 플레이하며 맞춘다.
 
 ## 명령 구조 (2026-10-15)
 `Command`(입력, 기록) → `Order`(분대·조 임무) → `Action`(병사 개인 행동) → 장비 트리거. 자세한 것은 [objects/action.md](objects/action.md).

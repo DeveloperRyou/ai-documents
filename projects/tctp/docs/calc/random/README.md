@@ -1,11 +1,11 @@
 # 랜덤 수치 — 난수 생성기와 분포
 
-코드: `rng.ts` (생성기), `vary.ts` (분포 도우미·`VARY`). 난수를 쓰는 곳 전부는 [rolls.md](rolls.md).
+코드: [`core/rng.ts`](../../../packages/sim/src/core/rng.ts) (생성기), [`core/vary.ts`](../../../packages/sim/src/core/vary.ts) (분포 도우미·`VARY`). 난수를 쓰는 곳 전부는 [rolls.md](rolls.md).
 
 능력치는 두지 않는다. 같은 명령을 받은 병사들이 획일적으로 움직이지 않는 것은 **사건마다 굴리는 잡음** 때문이다.
 그리고 그 잡음은 모두 시드에서 나온다: 같은 지도·시나리오·시드 + 같은 명령 기록 → 같은 판 (`runReplay`, `stateHash`).
 
-## 생성기 `createRng(seed)` (`rng.ts`)
+## 생성기 `createRng(seed)` ([`core/rng.ts`](../../../packages/sim/src/core/rng.ts))
 
 - **mulberry32**. 상태는 32비트 정수 하나 (`rng.state`) → 세이브·리플레이·해시에 그대로 담는다.
 - 시드는 먼저 **splitmix32** 로 섞는다 (`scramble`). 시드 1, 2, 3 … 처럼 붙은 시드가 비슷한 첫 난수를 내지 않게.
@@ -25,13 +25,13 @@
 | 흐름 | 시드 | 쓰는 곳 |
 |---|---|---|
 | `World.rng` | 시나리오 시드 (`?seed=` 로 덮어씀) | 명령 반응·이동·사격·폭발·부상·스트레스·지구력·탐지. 시뮬 대부분 |
-| `World.lookRng` | 시드 XOR `0x5ca9` (`LOOK_SEED`) | 경계 시선만 (`scan.ts`). 시선 규칙을 고쳐도 사격·피해 흐름이 흔들리지 않게 |
+| `World.lookRng` | 시드 XOR `0x5ca9` (`LOOK_SEED`) | 경계 시선만 ([`perception/scan.ts`](../../../packages/sim/src/perception/scan.ts)). 시선 규칙을 고쳐도 사격·피해 흐름이 흔들리지 않게 |
 | 이름 | `시드 × 31 + 부대 순번`, 부대마다 새 생성기 | `buildSoldiers` 이름 고르기 (판 시작 전에 끝남) |
 
 - 같은 흐름 안에서 꺼내는 순서는 [../README.md](../README.md) "한 틱 순서" 와 병사 id 순서로 고정이다. 순서를 바꾸는 변경(새 굴림 추가, 처리 순서 변경)은 같은 시드의 결과를 바꾸므로, 드릴·테스트의 기대값이 시드에 기대고 있으면 함께 확인한다.
 - `stateHash` 는 두 흐름의 상태(`rng.state`, `lookRng.state`)를 섞는다 → 굴린 횟수가 하나라도 다르면 해시가 달라진다.
 
-## 분포 도우미 (`vary.ts`)
+## 분포 도우미 ([`core/vary.ts`](../../../packages/sim/src/core/vary.ts))
 
 | 이름 | 분포 | 식 | 꺼내는 수 |
 |---|---|---|---|
@@ -39,9 +39,9 @@
 | `gauss(w)` | 표준정규 N(0, 1) | Box-Muller: `√(−2 ln(1 − u₁)) × cos(2π u₂)` (sin 쪽은 버림) | 2 |
 | `inDisk(w, r)` | 반경 r 원 안 균등한 점 | 거리 `r √u₁`, 각 `2π u₂` (√ 로 가운데 몰림을 막음) | 2 |
 | `chance(p)` | 베르누이 | `u < p` | 1 |
-| 가중 선택 (`pickPart`, `fire.ts`) | 비율표에서 하나 | `u × 합` 에서 비율을 차례로 빼다 0 아래가 되는 항목 | 1 |
+| 가중 선택 (`pickPart`, [`combat/fire.ts`](../../../packages/sim/src/combat/fire.ts)) | 비율표에서 하나 | `u × 합` 에서 비율을 차례로 빼다 0 아래가 되는 항목 | 1 |
 | 누적표 + 치우침 (`rollWound`) | 확률표에서 하나, 무거운 쪽으로 밀 수 있음 | `u^k` 를 누적 확률에 넣음 (k = 50 / 위력) | 1 |
-| 시선 정규 (`gaussOf`, `scan.ts`) | `gauss` 와 같은 식, `lookRng` 로 | | 2 |
+| 시선 정규 (`gaussOf`, [`perception/scan.ts`](../../../packages/sim/src/perception/scan.ts)) | `gauss` 와 같은 식, `lookRng` 로 | | 2 |
 
 ### 쓰는 방식 셋
 1. **양을 흔든다** — `vary`: 조준 시간, 재장전, 걸음, 스트레스 증감, 지구력, 출혈. 평균은 base 그대로.

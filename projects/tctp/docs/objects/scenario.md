@@ -1,7 +1,7 @@
 # 시나리오 `Scenario` · 캠페인
 
-코드: `packages/sim/src/scenario.ts` (시나리오), `packages/client/src/content.ts` (캠페인 타입).
-데이터: `content/scenarios/<id>.json`, `content/campaign.json`, `content/names.json`.
+코드: [`packages/sim/src/content/scenario.ts`](../../packages/sim/src/content/scenario.ts) (시나리오), [`packages/client/src/content.ts`](../../packages/client/src/content.ts) (캠페인 타입).
+데이터: `content/scenarios/<id>.json`, [`content/campaign.json`](../../content/campaign.json), [`content/names.json`](../../content/names.json).
 
 ## 시나리오 `Scenario`
 

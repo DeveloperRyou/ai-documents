@@ -5,11 +5,11 @@
 
 | 문서 | 무엇을 셈하나 | 코드 (상수) |
 |---|---|---|
-| [movement.md](movement.md) | 이동 속도, 한 틱에 가는 거리, 약진 | `soldier.ts` (`BASE_SPEED`, `RUSH_SPEED`, `LOAD`, `STAMINA`), `action.ts` (`MOVE`) |
-| [fire.md](fire.md) | 조준 시간, 산포, 탄도선·명중 부위, 지물 차단, 곡사·폭발, 근탄 | `fire.ts` (`FIRE`), `action.ts`, `command.ts` (`FIRE_ORDER`), `wound.ts` (`WOUND`) |
-| [vision.md](vision.md) | 시선 투과율, 시야각, 발견 확률, 계속 보기, 경계 시선 | `vision.ts` (`VISION`), `scan.ts` (`SCAN`), `terrain.ts` (`RIM`) |
-| [rates.md](rates.md) | 늘고 주는 몸 수치: 스트레스·지구력·혈액 (`RATES`) | `rates.ts`, `wound.ts` |
-| [random/](random/README.md) | **랜덤 수치**: 난수 생성기, 분포, 난수를 쓰는 곳 전부와 순서 | `rng.ts`, `vary.ts` (`VARY`) |
+| [movement.md](movement.md) | 이동 속도, 한 틱에 가는 거리, 약진 | [`body/soldier.ts`](../../packages/sim/src/body/soldier.ts) (`BASE_SPEED`, `RUSH_SPEED`, `LOAD`, `STAMINA`), [`command/action.ts`](../../packages/sim/src/command/action.ts) (`MOVE`) |
+| [fire.md](fire.md) | 조준 시간, 산포, 탄도선·명중 부위, 지물 차단, 곡사·폭발, 근탄 | [`combat/fire.ts`](../../packages/sim/src/combat/fire.ts) (`FIRE`), [`command/action.ts`](../../packages/sim/src/command/action.ts), [`command/command.ts`](../../packages/sim/src/command/command.ts) (`FIRE_ORDER`), [`body/wound.ts`](../../packages/sim/src/body/wound.ts) (`WOUND`) |
+| [vision.md](vision.md) | 시선 투과율, 시야각, 발견 확률, 계속 보기, 경계 시선 | [`perception/vision.ts`](../../packages/sim/src/perception/vision.ts) (`VISION`), [`perception/scan.ts`](../../packages/sim/src/perception/scan.ts) (`SCAN`), [`terrain/terrain.ts`](../../packages/sim/src/terrain/terrain.ts) (`RIM`) |
+| [rates.md](rates.md) | 늘고 주는 몸 수치: 스트레스·지구력·혈액 (`RATES`) | [`body/rates.ts`](../../packages/sim/src/body/rates.ts), [`body/wound.ts`](../../packages/sim/src/body/wound.ts) |
+| [random/](random/README.md) | **랜덤 수치**: 난수 생성기, 분포, 난수를 쓰는 곳 전부와 순서 | [`core/rng.ts`](../../packages/sim/src/core/rng.ts), [`core/vary.ts`](../../packages/sim/src/core/vary.ts) (`VARY`) |
 
 ## 공통 규칙
 
@@ -20,7 +20,7 @@
 - **배율 곱**: 결과는 대부분 "기본값 × 배율 × 배율 …" 이다. 배율 1 = 영향 없음. 표마다 기본값과 배율을 나눠 적는다.
 - **문턱 vs 양**: 단계가 넘어가는 문턱(`STRESS`, `WOUND`, `STAMINA`)과 늘고 주는 양(`RATES`)은 따로 둔다.
 
-## 한 틱 순서 (`step`, `world.ts`)
+## 한 틱 순서 (`step`, [`core/world.ts`](../../packages/sim/src/core/world.ts))
 
 순서가 바뀌면 같은 시드에서도 결과가 달라진다 (난수를 꺼내는 순서가 바뀌므로, [random/README.md](random/README.md)).
 
