@@ -33,7 +33,7 @@ content/  (지도·시나리오 JSON)
 | `types.ts` | `World` (지도, 지형 격자, RNG, 정수 `tick`, `soldiers`, 진영별 `contacts`, `log`), `Soldier` (이름·직책·몸 크기·휴대 장비·하중·자세·상태·부상·혈액·스트레스·지구력·위치), `Wound`, `Contact`, `Side` |
 | `time.ts` | 시간 상수 `DT = 0.25`, `TICKS_PER_SEC = 4`, `secToTicks`. 튜닝 수치는 초 단위로 적고 틱으로 바꾼다 (DT 를 바꿔도 다른 상수는 그대로) |
 | `world.ts` | `createWorld`, `step` (시간 상수 재노출) |
-| `action.ts` | 병사 행동 `Action`(`move`·`fire`·`reload`), 종류별 처리 함수 표 `ACTIONS`, 매 틱 `updateActions`, `destOf`, 튜닝 상수 `MOVE`. 구조는 [objects/action.md](objects/action.md) |
+| `action.ts` | 병사 행동 `Action`(`move`·`fire`·`reload`·`rest`), 종류별 처리 함수 표 `ACTIONS`, 매 틱 `updateActions`, `destOf`, 튜닝 상수 `MOVE`. 구조는 [objects/action.md](objects/action.md) |
 | `drills.ts` | 행동 확인장 드릴 `DRILLS` (작은 평지 + 배치 + 명령 기록 + 확인 항목), 진행기 `DrillRun` (확인 항목별 결과·판정 틱). vitest 와 브라우저 `?debug=drills` 가 같이 쓴다 |
 | `vary.ts` | 사건별 흔들림 `VARY` (반응 시간·걸음·서는 자리·조준 시간·점사·겨눔·재장전·스트레스), `vary`·`gauss`·`inDisk`. 능력치가 아닌 사건 잡음 |
 | `fire.ts` | 화기 트리거 `pullTrigger` → 탄도선 판정(사람·지물·땅), 근탄 제압, 폭발, 부위 피해. 튜닝 상수 `FIRE`, 조준점 `AimPoint` |
@@ -74,7 +74,7 @@ step(world, commands)
   2. world.tick++
   3. updateActions: 행동할 수 있는 병사(무력화·제압·패닉 아님)만 id 순서로 행동 처리 함수를 한 걸음 진행, 끝나면 행동 비움
        move: 목표 쪽으로 speedOf(자세·하중·지구력·다리) × 선 칸의 move 배율 × DT 만큼 직선 이동. 다음 칸이 통행 불가면 그 자리, MOVE.arrive 안이면 끝
-  4. updateBody: 지구력 소모·회복, status 결정 (제압·패닉·무력화면 엎드림, 위협 인지면 앉음), 스트레스 감소 → 심리 단계 갱신
+  4. updateBody: 평온이 깨지면 휴식 그침, 지구력 소모·회복(휴식 중에만 제대로), status 결정 (제압·패닉·무력화면 엎드림, 위협 인지면 앉음), 스트레스 감소 → 심리 단계 갱신
   5. updateVision: VISION.interval(1초) 틱마다 진영별로 적을 본다 (무력화·패닉 병사는 관측자에서 빠지고, 발견 확률에 심리 단계 배율)
        이미 보던 적 → 아무 관측자나 시선 투과율 ≥ VISION.track 이면 계속 봄
        아니면 관측자 id 순서로 detectChance 를 굴려 발견 (world.rng, 결정적)
@@ -135,5 +135,5 @@ requestAnimationFrame:
 
 ## 테스트
 
-- Vitest, `packages/*/src/**/*.test.ts`. `sim/src/world.test.ts` (이동·도착 정지, 같은 시드 + 같은 명령 기록 → 같은 해시), `sim/src/session.test.ts` (고정 틱 분할·상한, 정지 중 명령 보류, 세션 기록 리플레이 = 같은 해시, 스냅샷 JSON 왕복·참조 분리·타 진영 `dest` 제외, 정보 안개), `sim/src/soldier.test.ts` (하중 합·하중 속도 감소, 자세 속도·높이, 지구력 소모·회복·지친 속도, 포복 소모, 심리 단계 문턱·패닉 회복 문턱, 위협 인지 앉기, 혼란 명령 지연, 제압 고착과 해제, 패닉 명령 거부·관측 불가, 심리 단계 발견 배율, 다리 부상 포복, 무력화·사망), `sim/src/vision.test.ts` (지형 굽기·고도 디코드, 시선 차단·감쇠·능선, 발견·등 뒤·건물 너머·기억과 망각, 통행 불가 칸), `tools/src/content.test.ts` (편제 인원 8·12, 전원 하중 ≤ 몸무게 × 0.45, 시나리오의 편제·장비 참조, 시작 위치 통행 가능, 이름 중복 없음). `sim/src/fire.test.ts` (조준사격·모르는 적·건물 차단·재장전·탄 소진·기관총 제압·엄폐·유탄·결정성), `tools/src/drills.test.ts` (모든 드릴을 실제 장비로 끝까지 돌려 확인 항목 검사 — 새 행동은 드릴을 더해 확인). 공용 도우미는 `sim/src/test-util.ts`.
+- Vitest, `packages/*/src/**/*.test.ts`. `sim/src/world.test.ts` (이동·도착 정지, 같은 시드 + 같은 명령 기록 → 같은 해시), `sim/src/session.test.ts` (고정 틱 분할·상한, 정지 중 명령 보류, 세션 기록 리플레이 = 같은 해시, 스냅샷 JSON 왕복·참조 분리·타 진영 `dest` 제외, 정보 안개), `sim/src/soldier.test.ts` (하중 합·하중 속도 감소, 자세 속도·높이, 지구력 소모·멈춤 소량 회복·지친 속도, 휴식 회복·휴식 그침·평온 아니면 휴식 거부, 포복 소모, 심리 단계 문턱·패닉 회복 문턱, 위협 인지 앉기, 혼란 명령 지연, 제압 고착과 해제, 패닉 명령 거부·관측 불가, 심리 단계 발견 배율, 다리 부상 포복, 무력화·사망), `sim/src/vision.test.ts` (지형 굽기·고도 디코드, 시선 차단·감쇠·능선, 발견·등 뒤·건물 너머·기억과 망각, 통행 불가 칸), `tools/src/content.test.ts` (편제 인원 8·12, 전원 하중 ≤ 몸무게 × 0.45, 시나리오의 편제·장비 참조, 시작 위치 통행 가능, 이름 중복 없음). `sim/src/fire.test.ts` (조준사격·모르는 적·건물 차단·재장전·탄 소진·기관총 제압·엄폐·유탄·결정성), `tools/src/drills.test.ts` (모든 드릴을 실제 장비로 끝까지 돌려 확인 항목 검사 — 새 행동은 드릴을 더해 확인). 공용 도우미는 `sim/src/test-util.ts`.
 - CI (`.github/workflows/ci.yml`): push·PR 마다 `npm run check` (typecheck + Biome + Vitest) 와 `npm run build`.

@@ -40,6 +40,7 @@
 | `fire` | `ids`, `target`, `slot?` | 아는 적 한 명을 조준사격 (`FIRE_ORDER.aimed`: 화기 조준 시간을 다 쓰고 한 발씩) |
 | `suppress` | `ids`, `x`, `y`, `slot?` | 지점을 제압사격 (`FIRE_ORDER.suppress`: 조준 1/4, 화기 점사 발 수, 둘레 4m 쓸어 쏨). 곡사 화기는 다 조준해 한 점에 |
 | `reload` | `ids`, `slot?` | 재장전 (더 채울 탄이 없으면 무시) |
+| `rest` | `ids` | 제자리 휴식 (평온하지 않으면 무시) |
 
 `slot` 을 빼면 주화기. 칸에 화기가 없으면 사격 명령은 무시된다.
 

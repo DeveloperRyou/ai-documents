@@ -34,9 +34,9 @@
 늘고 주는 양(스트레스 증감·지구력 소모와 회복·출혈)과 확률 전환은 [rates.md](rates.md) (`RATES`)에 따로 모아 두었다. 여기에는 문턱과 그 결과만 적는다.
 
 ### 상태 `SoldierStatus`
-우선순위: `dead` 사망 > `incapacitated` 무력화(부상) > `panicked` 패닉(심리적 무력화) > `suppressed` 제압 > `reloading` 재장전 > `firing` 사격 > `moving` 이동 > `idle` 정지.
+우선순위: `dead` 사망 > `incapacitated` 무력화(부상) > `panicked` 패닉(심리적 무력화) > `suppressed` 제압 > `reloading` 재장전 > `firing` 사격 > `resting` 휴식 > `moving` 이동 > `idle` 정지.
 위협 인지·혼란은 이동·사격과 함께 일어나므로 `status` 에 넣지 않고 `stressLevel` 로 본다.
-`firing` = 사격 행동 중 (조준 포함), `reloading` = 재장전 행동 중. 이동사격(걸으며 쏨)과 약진은 `moving`.
+`firing` = 사격 행동 중 (조준 포함), `reloading` = 재장전 행동 중, `resting` = 휴식 행동 중. 이동사격(걸으며 쏨)과 약진은 `moving`.
 
 | 상태 | 조건 | 효과 |
 |---|---|---|
@@ -89,7 +89,7 @@
 - 실제 한 틱 이동 = `speedOf × 선 칸의 move 배율 × 걸음 흔들림 × DT(0.25초)` (이동사격이면 × `MOVE.fireSpeed` 0.5).
 
 ### 지구력 `stamina`
-- 움직이면 줄고 멈추면 회복한다. 걸음은 몇 시간을 버티고 포복은 몇 분, 약진은 몇 십 초면 지친다. 양은 [rates.md](rates.md) "지구력".
+- 움직이면 줄고, **휴식** 행동(`rest` 명령) 중에만 제대로 회복한다 (그냥 멈춰 조준·사격·대기하면 아주 조금). 휴식은 평온(`calm`)할 때만 시작하고, 위협을 느끼면 그친다 (`canRest`). 걸음은 몇 시간을 버티고 포복은 몇 분, 약진은 몇 십 초면 지친다. 양은 [rates.md](rates.md) "지구력".
 
 ### 자세 `posture`
 - 몸 높이 = `size.h × POSTURE_HEIGHT` (서기 1, 앉아 0.6, 엎드려 0.2). 시야의 눈높이·피탄 높이가 이 값을 쓴다 (엎드리면 덜 보이고 덜 본다).
