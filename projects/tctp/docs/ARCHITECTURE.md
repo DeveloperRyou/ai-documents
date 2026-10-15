@@ -85,6 +85,7 @@ step(world, commands)
 | `renderer.ts` | `Renderer` 인터페이스: `setMap`·`resize`·`draw(RenderView)`, 화면 ↔ 지도(`screenToMap`·`pickSoldier`), 시점(`lookAt`·`pan`·`zoomAt`). 카메라·투영은 구현이 가진다 |
 | `canvas2d.ts` | `Canvas2DRenderer`: 지금 쓰는 2D 탑뷰 구현. `Snapshot` 만 읽는다. 마지막 위치만 아는 적은 흐리게 (`contactAlpha`) |
 | `iso25d.ts` | `Iso25DRenderer`: 2.5D 등각 투영 POC. 시뮬과 같은 고도(`elevAt`)로 지형·지물·병사를 들고 건물은 고정 높이로 세운다. 가림 처리는 묶음별 먼 것부터 그리기뿐이다 |
+| `opfor-llm.ts` | POC (`?opfor=llm`): 크롬 내장 LLM(Prompt API, Gemini Nano)이 대항군을 지휘. 대항군 진영 `Snapshot` 을 영어 상황 보고(조별 위치, 아는 적의 방위·거리)로 바꿔 `OPFOR_LLM.interval` 초마다 묻고, JSON 스키마로 강제한 조별 `move`(방위·거리)/`hold` 를 `Command` 로 `issue`. 응답은 비결정적이지만 `commandLog` 에 쌓여 리플레이는 유지. API·모델이 없으면 HUD 에 사유만 표시 |
 | `camera.ts` | 2D 탑뷰용 지도 미터 ↔ 화면 픽셀 변환, 커서 기준 확대 |
 
 ```
@@ -99,6 +100,7 @@ requestAnimationFrame:
 - 조작: 좌클릭 = 분대 선택 (한 명을 누르면 같은 분대 전원), 우클릭 = 이동, 휠 = 확대, 가운데 드래그 = 지도 이동, Space = 일시정지, Esc = 메뉴.
 - `commandLog` 는 리플레이·버그 재현용으로 쌓기만 하고, 아직 저장하거나 내보내지는 않는다.
 - 시드는 URL `?seed=` 로 받는다 (기본 = 시나리오의 seed). `?truth=1` 이면 정보 안개를 끄고 모르는 적도 흐리게 그린다 (디버그).
+- `?opfor=llm` 이면 대항군을 크롬 내장 LLM 이 지휘한다 (POC, 크롬 플래그 "Prompt API for Gemini Nano" 필요). 없으면 대항군은 움직이지 않는다.
 - 렌더러는 URL `?view=` 로 고른다: `2d` (기본), `iso` (2.5D POC), `split` (둘을 나란히, 같은 세션·선택을 공유).
 
 ## 도구 (`packages/tools/src`)

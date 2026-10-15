@@ -6,7 +6,7 @@
 
 ## 명령어
 ```bash
-npm run dev          # 클라이언트 http://localhost:5175 — 메뉴. 게임 직행 ?scenario=bd1-react-to-contact (&seed=7 &view=2d|iso|split &truth=1)
+npm run dev          # 클라이언트 http://localhost:5175 — 메뉴. 게임 직행 ?scenario=bd1-react-to-contact (&seed=7 &view=2d|iso|split &truth=1 &opfor=llm)
 npm run check        # typecheck + lint(Biome) + test(Vitest). 커밋 전 통과시킬 것
 npm run format       # Biome 자동 수정
 npm run build        # 클라이언트 빌드 (CI 는 check + build)
