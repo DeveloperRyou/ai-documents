@@ -26,11 +26,12 @@
 | `order` | `{tick, cmd} \| null` | 혼란·위축 중 받아 둔 명령. `tick` 이 되면 적용 |
 | `stamina` | number | 지구력 0~100 |
 | `x`, `y` | number | 위치 (m). 원점 = 지도 북서쪽, x 동쪽, y 남쪽 |
-| `facing` | number | 몸이 향한 방향 (이동·사격 방향), 화면 라디안 (0 = 동, 시계방향). 시나리오에서는 방위각(도)으로 주고 `bearingToFacing` 으로 바꾼다 |
+| `facing` | number | 몸이 향한 방향 (이동·사격 방향, 멈춰 있을 때 위협 쪽으로 돌아섬), 화면 라디안 (0 = 동, 시계방향). 시나리오에서는 방위각(도)으로 주고 `bearingToFacing` 으로 바꾼다 |
 | `look` | number | 눈이 보는 방향 (화면 라디안). 탐지 시야각(`fovFactor`)은 이것으로 잰다. 아래 "경계 (시선)" |
 | `lookAim` | number | 눈이 돌아가는 목표 방향. `look` 이 매 틱 이쪽으로 따라간다 |
 | `lookTick` | number | 다음에 볼 곳을 고를 틱 |
 | `glance` | `{ tick, dir } \| null` | 직사 탄이 스쳐 돌아볼 예정 (tick 에 dir 쪽으로) |
+| `bodyAim` | `number \| null` | 몸을 돌려 향할 방향 (위협이 고개 한계 밖일 때) |
 | `action` | `Action \| null` | 지금 하는 행동. 없으면 대기 ([action.md](action.md)) |
 
 ## 몸 상태 (`soldier.ts`)
@@ -103,7 +104,8 @@
 
 ### 경계 (시선) `look` — `scan.ts`
 - 몸 방향(`facing`)과 눈 방향(`look`)이 따로다. 매 틱 행동 다음, 탐지 전에 `updateScan` 이 정한다 (튜닝 `SCAN`). 난수는 시선 전용 `World.lookRng` 만 써서 사격·피해 난수 흐름을 흔들지 않는다.
-- 볼 곳(`lookAim`)을 고르면 눈은 고개를 돌리듯 따라간다: 매 틱 남은 각의 `SCAN.ease`(40%), 최고 `SCAN.turnMax`(360°/초).
+- 볼 곳(`lookAim`)을 고르면 눈은 고개를 돌리듯 따라간다: 매 틱 남은 각의 `SCAN.ease`(35%), 최고 `SCAN.turnMax`(240°/초).
+- 고개는 몸 정면 ± `SCAN.neck`(90°) 안에서만 돈다. 위협 쪽(아는 적·돌아보기)이 그 밖이면 `bodyAim` 을 잡아 멈춰 있는 병사는 몸을 돌린다 (`SCAN.bodyTurn` 서기·앉기 240°/초, 엎드려 60°/초). 걷는 중이면 몸은 진행 방향에 묶여 고개만 한계까지 돌린다. 평소 구역 훑기로는 몸을 돌리지 않는다 (맨 뒤의 후방은 고개 한계 + 주변 시야로 본다).
 - 경계 구역: 같은 진영·같은 분대 안 id 순서로 맨 앞 = 정면, 가운데 = 좌·우전방(±`SCAN.flank` 45°) 번갈아, 맨 뒤 = 후방 (`sectorOf`). 맨 뒤도 눈을 옮길 때 `SCAN.rearShare`(40%)만 뒤를 보고 나머지는 앞을 본다.
 - 구역 중심 ± `SCAN.sector`(50°) 안을 `SCAN.dwell`(1.5초 ± 60%)마다 이웃한 곳(± `SCAN.step` 35°)으로 훑는다 (이동 중·대기 중 모두).
 - 아는 적이 있으면 눈을 옮길 때마다 `SCAN.threat`(85%) 확률로 가장 가까운 아는 적 쪽(± 15°)을 본다.
