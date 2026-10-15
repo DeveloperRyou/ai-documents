@@ -52,9 +52,15 @@
 ## 화면용 `Snapshot` ([`view/snapshot.ts`](../../packages/sim/src/view/snapshot.ts))
 렌더러는 `World` 대신 이것만 읽는다. 순수 데이터 (JSON 직렬화 가능, `World` 와 참조 공유 없음).
 
-`Snapshot { tick, time(초), viewer, soldiers: SoldierView[] }`, 세션에서 꺼내면 `paused`, `commands`(명령 수) 추가.
+`Snapshot { tick, time(초), viewer, soldiers: SoldierView[], shots: ShotView[] }`, 세션에서 꺼내면 `paused`, `commands`(명령 수) 추가.
 
-`SoldierView`: `id, side, name, role, squad, team, x, y, facing, look, dest(이동 행동의 목표), posture, body?, contact?`
+`ShotView { tick(쏜 틱), from(총구 {x, y} 또는 null), x, y(탄착), hit, explosive, own }` — `shotViews` 가 보는 진영이 알 수 있는 만큼 거른다:
+- 아군 탄: 총구까지. 적 탄: 쏜 적이 지금 보이고(`contact.visible`) 곡사가 아니면 총구까지.
+- 그 밖의 적 탄은 폭발이거나, 아군을 맞혔거나, 탄도선이 아군 `SHOT_VIEW.nearMiss`(10m) 안을 지났을 때만 탄착만 (`from = null`). 나머지는 빠진다. truth 디버그는 전부 총구까지.
+- `snapshot(world, viewer)` 는 이번 틱 `World.shots` 만 담는다. `Session.snapshot` 은 `advance` 동안 모은 최근 `LOOP.shotSec`(1초) 탄을 넘겨 화면이 흐려 가며 그릴 수 있게 한다.
+
+
+`SoldierView`: `id, side, name, role, squad, team, x, y, facing, look, dest(이동 행동의 목표), fireAt?(사격 목표: 제압 지점 {x, y} 또는 조준 표적 {target}; 재장전 뒤 이어 쏠 것·이동사격 포함, 보는 진영만), posture, body?, contact?`
 - `body`: `{ action(행동 종류), status, wounds([{ part, severity }]), blood(남은 혈액 비율 0~1), stress, stressLevel, stamina, load, speed }` — `speed` 는 지금 낼 수 있는 걷기 속도 (m/s, 지형 계수 전).
 - 보는 진영 병사: 전부 담김, `dest`·`body` 포함.
 - 적: `contacts` 에 있는 적만. 이름·직책·소속은 빈 문자열, `dest`·`body` 없음.
