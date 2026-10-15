@@ -45,7 +45,7 @@ content/  (지도·시나리오 JSON)
 | `rng.ts` | mulberry32 RNG. 상태가 숫자 하나라 해시·세이브에 그대로 담긴다 |
 | `map.ts` | `MapData` 형식 (면·선 지물, 지명, 고도 격자) |
 | `terrain.ts` | 지형 격자: 지도의 면·선 지물을 1m 칸으로 굽고(`terrainOf`, 지도마다 한 번), 종류별 성질 표 `TERRAIN` (지물 높이·시야 감쇠·은폐·엄폐·이동 배율). 고도 base64 디코드와 쌍선형 `elevAt` |
-| `vision.ts` | 시선 `lineOfSight` (능선 차단·지물 감쇠), 시야각 `fovFactor`, 발견 확률 `detectChance`, 탐지 주기마다 `updateVision` 으로 `contacts` 갱신. 튜닝 상수 `VISION` |
+| `vision.ts` | 시선 `lineOfSight` (능선 차단·지물 감쇠, 끊긴 곳 `SightBlock` out), 시야각 `fovFactor`, 발견 확률 `detectChance` (배율 분해 `detectFactors`), 탐지 주기마다 `updateVision` 으로 `contacts` 갱신. 튜닝 상수 `VISION` |
 | `equipment.ts` | 화기(`Weapon`: 직사/곡사·탄약·유효사거리)·탄약(`Ammo`: 관통력·폭발·폭발 반경·제압 반경)·장구(`Gear`: 무게) 형식, `LoadoutItem`, 화기 칸 `WEAPON_SLOTS`(주 1·보조 1), 검사 `checkLoadout` (칸 초과 포함) |
 | `org.ts` | 편제 `OrgTemplate` (공통 장구 `kit`, 조 → 직책 → 휴대 장비, 출처·추정 메모), `strengthOf`, `checkOrg` |
 | `scenario.ts` | 시나리오 형식, `ContentDb`, `buildSoldiers` (편제·대형·이름으로 병사 생성) |
@@ -93,12 +93,12 @@ step(world, commands)
 | `main.ts` | 진입점. `?scenario=<id>` 가 있으면 게임, 없으면 메뉴 |
 | `content.ts` | `content/` 를 번들에 넣어 `ContentDb`·시나리오·캠페인으로 묶음. 지도는 시나리오를 고를 때 따로 불러옴 |
 | `menu.ts` | 메뉴 화면: 과정 고르기(TACTICAL·COMMAND·STAFF) → 제대 과정·훈련 목록·브리핑/편제/장비 탭 → 훈련 시작 |
-| `drills.ts` | 행동 확인장 화면 (`?debug=drills[&drill=<id>][&seed=<n>]`, 시드를 주면 재생·전체 실행 모두 그 시드): 드릴 목록(묶음별 접기·묶음 실행)·전체 실행(e2e, 통과 수·실패 항목), 재생·속도·한 틱 앞/뒤, 탄 자취·조준선·스트레스 고리·행동 이름표·고른 병사 시야(선 사람을 계속 볼 수 있는 거리, 광선별 `lineOfSight`) 덧그리기, 지도 호버 시 지형 값, 확인 항목(판정 시각·지금 참/거짓), 병사 카드(자세·상태·행동·스트레스/지구력/혈액/탄창 막대, 고르면 행동 진행·몸·위치·장비·아는 적·원본 값, 방금 바뀐 값 강조)·명령 기록·기록. 디버그라 `World` 를 직접 읽는다 |
+| `drills.ts` | 행동 확인장 화면 (`?debug=drills[&drill=<id>][&seed=<n>]`, 시드를 주면 재생·전체 실행 모두 그 시드): 드릴 목록(묶음별 접기·묶음 실행)·전체 실행(e2e, 통과 수·실패 항목), 재생·속도·한 틱 앞/뒤, 탄 자취·조준선·스트레스 고리·행동 이름표·고른 병사 시야(선 사람을 계속 볼 수 있는 거리, 광선별 `lineOfSight`)·적마다 시선선(투과율·끊긴 곳·발견 %/초)·등고선 덧그리기, 지도 호버 시 지형 값, 확인 항목(판정 시각·지금 값·참/거짓), 병사 카드(자세·상태·행동·스트레스/지구력/혈액/탄창 막대, 고르면 행동 진행·몸·위치·장비·아는 적·적마다 시선과 발견 배율·원본 값, 방금 바뀐 값 강조)·명령 기록·기록. 디버그라 `World` 를 직접 읽는다 |
 | `drill-format.ts` | 확인장용 한국어 이름표·행동 설명(`actionView`: 목표·남은 거리·조준/점사 진행)·명령 한 줄 |
 | `drill-timeline.ts` | 확인장 시간축: 병사별 행동 줄, 고른 병사의 스트레스·지구력·혈액 그래프, 명령·판정 표시. 누르거나 끌면 그 틱으로 간다 (뒤로는 처음부터 다시 돌림) |
 | `game.ts` | 게임 화면: 시나리오로 병사를 세우고, 입력 → `Command`, `Session` 진행, HUD. 렌더러는 인터페이스로만 쓴다 |
 | `renderer.ts` | `Renderer` 인터페이스: `setMap`·`resize`·`draw(RenderView)`, 화면 ↔ 지도(`screenToMap`·`pickSoldier`), 시점(`lookAt`·`pan`·`zoomAt`). 카메라·투영은 구현이 가진다 |
-| `canvas2d.ts` | `Canvas2DRenderer`: 지금 쓰는 2D 탑뷰 구현. `Snapshot` 만 읽는다. 마지막 위치만 아는 적은 흐리게 (`contactAlpha`) |
+| `canvas2d.ts` | `Canvas2DRenderer`: 지금 쓰는 2D 탑뷰 구현. `Snapshot` 만 읽는다. 마지막 위치만 아는 적은 흐리게 (`contactAlpha`). `showContours` 로 고도 격자 등고선 (기본 끔, 확인장만 켬) |
 | `iso25d.ts` | `Iso25DRenderer`: 2.5D 등각 투영 POC. 시뮬과 같은 고도(`elevAt`)로 지형·지물·병사를 들고 건물은 고정 높이로 세운다. 가림 처리는 묶음별 먼 것부터 그리기뿐이다 |
 | `camera.ts` | 2D 탑뷰용 지도 미터 ↔ 화면 픽셀 변환, 커서 기준 확대 |
 
