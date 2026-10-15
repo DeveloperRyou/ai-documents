@@ -41,7 +41,6 @@ npm run fetch-map -- <id> <남> <서> <북> <동> [이름]   # content/maps/<id>
 
 ## 작업 방식
 - 사용자가 요청한 범위만 바꾼다. 특히 요청 밖 UI 변경 금지 — 제안만 한다.
-- 이슈를 고칠 때마다 e2e 를 추가한다: 이 프로젝트의 e2e = 드릴 (`sim/src/drills.ts`, `tools/src/drills.test.ts` 가 전부 돌리고 `?debug=drills` 로 본다). 고친 동작의 정상 경로와 예외(그치는 조건·거부되는 조건)를 각각 드릴로 보인다.
 - 시뮬 규칙을 바꾸면 테스트를 추가하고, 밸런스에 영향이 있으면 headless 로 전후를 비교해 보고한다.
 - 개인 개발이다. 브랜치·PR 없이 작업 단위가 끝나면 (`npm run check` 통과 후) `main` 에 바로 커밋한다.
 - 코드를 커밋할 때마다 `docs/`(객체 필드를 바꾸면 `docs/objects/` 도)·`AGENTS.md`·`README.md` 를 최신화해야 하는지 판단하고, 필요하면 같은 작업에서 고친다 (`docs/`·`AGENTS.md` 는 ai-documents 쪽에 커밋).
