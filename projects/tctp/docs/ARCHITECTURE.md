@@ -32,16 +32,16 @@ content/  (지도·시나리오 JSON)
 | `types.ts` | `World` (지도, 지형 격자, RNG, 정수 `tick`, `soldiers`, 진영별 `contacts`, `log`), `Soldier` (이름·직책·몸 크기·휴대 장비·하중·자세·상태·부위별 체력·스트레스·지구력·위치), `Contact`, `Side` |
 | `time.ts` | 시간 상수 `DT = 0.25`, `TICKS_PER_SEC = 4`, `secToTicks`. 튜닝 수치는 초 단위로 적고 틱으로 바꾼다 (DT 를 바꿔도 다른 상수는 그대로) |
 | `world.ts` | `createWorld`, `step`, 튜닝 상수 `MOVE` (시간 상수 재노출) |
-| `soldier.ts` | 몸 상태: 자세별 높이·기본 속도, 심리 단계 `stressLevelOf`, 하중 `loadOf`, 속도 `speedOf`, `damage`·`addStress`, 매 틱 `updateBody` (지구력·상태·스트레스). 튜닝 상수 `POSTURE_HEIGHT`·`BASE_SPEED`·`LOAD`·`STAMINA`·`STRESS`·`HEALTH` |
+| `soldier.ts` | 기본 몸 `BODY`, 휴대 무게 한도 `checkCarry`, 몸 상태: 자세별 높이·기본 속도, 심리 단계 `stressLevelOf`, 하중 `loadOf`, 속도 `speedOf`, `damage`·`addStress`, 매 틱 `updateBody` (지구력·상태·스트레스). 튜닝 상수 `POSTURE_HEIGHT`·`BASE_SPEED`·`LOAD`·`STAMINA`·`STRESS`·`HEALTH` |
 | `command.ts` | `Command` 유니온(`move`, `stop`, `posture`), `TimedCommand`, `applyCommand`, 혼란 중 미룬 명령 `applyDueOrders` |
 | `replay.ts` | `runReplay`(명령 기록 재생), `stateHash`(FNV-1a 상태 지문) |
 | `rng.ts` | mulberry32 RNG. 상태가 숫자 하나라 해시·세이브에 그대로 담긴다 |
 | `map.ts` | `MapData` 형식 (면·선 지물, 지명, 고도 격자) |
 | `terrain.ts` | 지형 격자: 지도의 면·선 지물을 1m 칸으로 굽고(`terrainOf`, 지도마다 한 번), 종류별 성질 표 `TERRAIN` (지물 높이·시야 감쇠·은폐·엄폐·이동 배율). 고도 base64 디코드와 쌍선형 `elevAt` |
 | `vision.ts` | 시선 `lineOfSight` (능선 차단·지물 감쇠), 시야각 `fovFactor`, 발견 확률 `detectChance`, 탐지 주기마다 `updateVision` 으로 `contacts` 갱신. 튜닝 상수 `VISION` |
-| `equipment.ts` | 화기(`Weapon`: 직사/곡사·탄약·유효사거리)·탄약(`Ammo`: 관통력·폭발·폭발 반경·제압 반경)·장구(`Gear`: 무게) 형식, `LoadoutItem`, 검사 `checkLoadout` |
+| `equipment.ts` | 화기(`Weapon`: 직사/곡사·탄약·유효사거리)·탄약(`Ammo`: 관통력·폭발·폭발 반경·제압 반경)·장구(`Gear`: 무게) 형식, `LoadoutItem`, 화기 칸 `WEAPON_SLOTS`(주 1·보조 1), 검사 `checkLoadout` (칸 초과 포함) |
 | `org.ts` | 편제 `OrgTemplate` (공통 장구 `kit`, 조 → 직책 → 휴대 장비, 출처·추정 메모), `strengthOf`, `checkOrg` |
-| `scenario.ts` | 시나리오 형식, `ContentDb`, `buildSoldiers` (편제·대형·이름으로 병사 생성), 기본 몸 크기 `BODY` |
+| `scenario.ts` | 시나리오 형식, `ContentDb`, `buildSoldiers` (편제·대형·이름으로 병사 생성) |
 | `session.ts` | `Session`: 명령 접수(`issue`), 실제 시간 → 고정 틱 진행(`advance`, 상한 `LOOP.maxFrame`), `commandLog`, 일시정지 |
 | `snapshot.ts` | `snapshot(world, viewer, {truth})`: 렌더러용 순수 데이터 (JSON 직렬화 가능, `World` 와 참조 공유 없음). 정보 안개: 모르는 적은 빠지고, 아는 적은 `contact` = seen(실제 위치)·last(마지막 위치), 적의 이름·직책은 비운다. `truth` 는 디버그용 |
 
@@ -124,5 +124,5 @@ requestAnimationFrame:
 
 ## 테스트
 
-- Vitest, `packages/*/src/**/*.test.ts`. `sim/src/world.test.ts` (이동·도착 정지, 같은 시드 + 같은 명령 기록 → 같은 해시), `sim/src/session.test.ts` (고정 틱 분할·상한, 정지 중 명령 보류, 세션 기록 리플레이 = 같은 해시, 스냅샷 JSON 왕복·참조 분리·타 진영 `dest` 제외, 정보 안개), `sim/src/soldier.test.ts` (하중 합·하중 속도 감소, 자세 속도·높이, 지구력 소모·회복·지친 속도, 포복 소모, 심리 단계 문턱·패닉 회복 문턱, 위협 인지 앉기, 혼란 명령 지연, 제압 고착과 해제, 패닉 명령 거부·관측 불가, 심리 단계 발견 배율, 다리 부상 포복, 무력화·사망), `sim/src/vision.test.ts` (지형 굽기·고도 디코드, 시선 차단·감쇠·능선, 발견·등 뒤·건물 너머·기억과 망각, 통행 불가 칸), `tools/src/content.test.ts` (편제 인원 8·12, 시나리오의 편제·장비 참조, 시작 위치 통행 가능, 이름 중복 없음). 공용 도우미는 `sim/src/test-util.ts`.
+- Vitest, `packages/*/src/**/*.test.ts`. `sim/src/world.test.ts` (이동·도착 정지, 같은 시드 + 같은 명령 기록 → 같은 해시), `sim/src/session.test.ts` (고정 틱 분할·상한, 정지 중 명령 보류, 세션 기록 리플레이 = 같은 해시, 스냅샷 JSON 왕복·참조 분리·타 진영 `dest` 제외, 정보 안개), `sim/src/soldier.test.ts` (하중 합·하중 속도 감소, 자세 속도·높이, 지구력 소모·회복·지친 속도, 포복 소모, 심리 단계 문턱·패닉 회복 문턱, 위협 인지 앉기, 혼란 명령 지연, 제압 고착과 해제, 패닉 명령 거부·관측 불가, 심리 단계 발견 배율, 다리 부상 포복, 무력화·사망), `sim/src/vision.test.ts` (지형 굽기·고도 디코드, 시선 차단·감쇠·능선, 발견·등 뒤·건물 너머·기억과 망각, 통행 불가 칸), `tools/src/content.test.ts` (편제 인원 8·12, 전원 하중 ≤ 몸무게 × 0.45, 시나리오의 편제·장비 참조, 시작 위치 통행 가능, 이름 중복 없음). 공용 도우미는 `sim/src/test-util.ts`.
 - CI (`.github/workflows/ci.yml`): push·PR 마다 `npm run check` (typecheck + Biome + Vitest) 와 `npm run build`.

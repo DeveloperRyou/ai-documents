@@ -19,7 +19,7 @@
 `OrgTeam`: `name` (조 이름, 부대명 뒤에 붙음), `members: OrgMember[]`.
 `OrgMember`: `role` (직책), `leader` (조장, 선택), `loadout: LoadoutItem[]` ([soldier.md](soldier.md)).
 
-함수: `strengthOf(org)` = 인원 수, `checkOrg(org, catalog)` = 휴대 장비 오류 목록.
+함수: `strengthOf(org)` = 인원 수, `checkOrg(org, catalog)` = 구성원마다 공통 장구 + 직책 장비를 합쳐 없는 장비·탄약, 화기 칸(주 1·보조 1), 무게 한도(몸무게 × 0.7) 오류 목록.
 
 ## 현재 편제
 

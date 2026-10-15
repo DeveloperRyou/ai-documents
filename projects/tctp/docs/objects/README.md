@@ -5,7 +5,7 @@
 
 | 문서 | 객체 | 코드 | 데이터 |
 |---|---|---|---|
-| [soldier.md](soldier.md) | 병사 `Soldier`, 몸 크기 `BodySize`, 휴대 장비 `LoadoutItem` | `types.ts`, `scenario.ts` (`BODY`) | 편제에서 생성 |
+| [soldier.md](soldier.md) | 병사 `Soldier`, 몸 크기 `BodySize`, 휴대 장비 `LoadoutItem` | `types.ts`, `soldier.ts` (`BODY`) | 편제에서 생성 |
 | [equipment.md](equipment.md) | 화기 `Weapon`, 탄약 `Ammo` | `equipment.ts` | `content/equipment.json` |
 | [org.md](org.md) | 편제 `OrgTemplate` → 조 `OrgTeam` → 직책 `OrgMember` | `org.ts` | `content/orgs/*.json` |
 | [scenario.md](scenario.md) | 시나리오 `Scenario`, 부대 배치 `ForceSpec`, 브리핑, 캠페인 | `scenario.ts`, `client/content.ts` | `content/scenarios/*.json`, `content/campaign.json`, `content/names.json` |
