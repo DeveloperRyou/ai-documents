@@ -53,7 +53,7 @@
 
 `Snapshot { tick, time(초), viewer, soldiers: SoldierView[] }`, 세션에서 꺼내면 `paused`, `commands`(명령 수) 추가.
 
-`SoldierView`: `id, side, name, role, squad, team, x, y, facing, dest(이동 행동의 목표), posture, body?, contact?`
+`SoldierView`: `id, side, name, role, squad, team, x, y, facing, look, dest(이동 행동의 목표), posture, body?, contact?`
 - `body`: `{ action(행동 종류), status, wounds([{ part, severity }]), blood(남은 혈액 비율 0~1), stress, stressLevel, stamina, load, speed }` — `speed` 는 지금 낼 수 있는 걷기 속도 (m/s, 지형 배율 전).
 - 보는 진영 병사: 전부 담김, `dest`·`body` 포함.
 - 적: `contacts` 에 있는 적만. 이름·직책·소속은 빈 문자열, `dest`·`body` 없음.
