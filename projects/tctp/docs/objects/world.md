@@ -5,13 +5,14 @@
 |---|---|
 | `map` | 지도 `MapData` |
 | `terrain` | 지형 격자 ([terrain.md](terrain.md)) |
-| `rng` | 시드 RNG (mulberry32). 시뮬 안 난수는 이것만 |
+| `rng` | 시드 RNG (mulberry32). 시뮬 안 난수는 이것만 (시선만 아래 `lookRng`) |
+| `lookRng` | 시선 고르기 전용 시드 RNG (`scan.ts`). 시선이 사격·피해 난수 흐름을 흔들지 않게 따로 둔다 |
 | `catalog` | 장비 카탈로그 (`createWorld` 넷째 인자, 화기·탄약 제원) |
 | `tick` | 경과 틱 (정수, 1틱 = 0.25초) |
 | `soldiers` | `Soldier[]` ([soldier.md](soldier.md)), `soldiers[id]` |
 | `contacts` | 진영별로 아는 적 `Record<Side, Contact[]>` (id 오름차순) |
 | `log` | `LogEntry { tick, side \| "system", text }` — 시작, 적 발견, 피격·전사 등 |
-| `shots` | 이번 틱에 쏜 탄 `Shot { by, x0, y0, x1, y1, hit, explosive }` (화면 효과용, 매 틱 비움, 해시 제외) |
+| `shots` | 이번 틱에 쏜 탄 `Shot { by, x0, y0, x1, y1, hit, explosive, indirect }` (indirect = 곡사, 맞는 쪽은 쏜 곳을 모름) (화면 효과용, 매 틱 비움, 해시 제외) |
 
 상태는 `step(world, commands)` 안에서만 바뀐다: 명령 적용 → 미뤄 둔 명령(`applyDueOrders`) → `tick++` → 행동(`updateActions`) → 몸 상태(`updateBody`: 지구력·상태·스트레스) → 시야.
 `stateHash` 는 tick·RNG·병사 위치·자세·상태·행동(종류·필드)·스트레스·심리 단계·미뤄 둔 명령 틱·지구력·하중·장전 탄·휴대 수량·혈액·부상(부위·정도·출혈·틱)·마지막 위협 틱·contacts 를 섞는다 (이동 행동의 걸음·이동사격 포함). 새 상태 필드를 넣으면 해시에도 넣는다.

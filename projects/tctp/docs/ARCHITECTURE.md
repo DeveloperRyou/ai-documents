@@ -76,7 +76,7 @@ step(world, commands)
   3. updateActions: 행동할 수 있는 병사(무력화·제압·패닉 아님)만 id 순서로 행동 처리 함수를 한 걸음 진행, 끝나면 행동 비움
        move: 목표 쪽으로 speedOf(자세·하중·지구력·다리) × 선 칸의 move 배율 × DT 만큼 직선 이동. 다음 칸이 통행 불가면 그 자리, MOVE.arrive 안이면 끝
   4. updateBody: 평온이 깨지면 휴식 그침, 지구력 소모·회복(휴식 중에만 제대로), status 결정 (제압·패닉·무력화면 엎드림, 위협 인지면 앉음), 스트레스 감소 → 심리 단계 갱신
-  5. updateScan: 병사마다 눈 방향(look) 갱신 — 사격 중이면 겨누는 쪽, 근탄을 받으면 쏜 쪽, 아니면 보는 시간이 다 될 때 경계 구역 안 / 아는 적 쪽을 고른다 (world.rng)
+  5. updateScan: 병사마다 볼 곳(lookAim)을 정하고 눈(look)을 그쪽으로 돌린다 — 사격 중이면 겨누는 쪽, 직사 탄이 스치면 반응 시간 뒤 어림한 쏜 쪽(곡사는 무시), 아니면 보는 시간이 다 될 때 경계 구역 안 / 아는 적 쪽 (world.lookRng)
   6. updateVision: VISION.interval(1초) 틱마다 진영별로 적을 본다 (무력화·패닉 병사는 관측자에서 빠지고, 발견 확률에 심리 단계 배율)
        이미 보던 적 → 아무 관측자나 시선 투과율 ≥ VISION.track 이면 계속 봄
        아니면 관측자 id 순서로 detectChance 를 굴려 발견 (world.rng, 결정적)
