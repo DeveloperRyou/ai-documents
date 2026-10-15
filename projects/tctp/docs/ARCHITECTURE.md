@@ -36,7 +36,7 @@ content/  (지도·시나리오 JSON)
 | 파일 | 내용 |
 |---|---|
 | [`types.ts`](../packages/sim/src/core/types.ts) | `World` (지도, 지형 격자, RNG, 정수 `tick`, `soldiers`, 진영별 `contacts`, `log`), `Soldier` (이름·직책·몸 크기·휴대 장비·하중·자세·상태·부상·혈액·스트레스·지구력·위치), `Wound`, `Contact`, `Side` |
-| [`time.ts`](../packages/sim/src/core/time.ts) | 시간 상수 `DT = 0.25`, `TICKS_PER_SEC = 4`, `secToTicks`. 튜닝 수치는 초 단위로 적고 틱으로 바꾼다 (DT 를 바꿔도 다른 상수는 그대로) |
+| [`time.ts`](../packages/sim/src/core/time.ts) | 시간 상수 `DT = 0.25`, `TICKS_PER_SEC = 4`, `secToTicks`, 초당 확률 → 틱 확률 `perSecChance`. 튜닝 수치는 초 단위로 적고 틱으로 바꾼다 (DT 를 바꿔도 다른 상수는 그대로) |
 | [`world.ts`](../packages/sim/src/core/world.ts) | `createWorld`, `step` (시간 상수 재노출) |
 | [`rng.ts`](../packages/sim/src/core/rng.ts) | mulberry32 RNG. 상태가 숫자 하나라 해시·세이브에 그대로 담긴다 |
 | [`vary.ts`](../packages/sim/src/core/vary.ts) | 사건별 흔들림 `VARY` (반응 시간·걸음·서는 자리·조준 시간·점사·겨눔·재장전·스트레스), `vary`·`gauss`·`inDisk`. 능력치가 아닌 사건 잡음 |
@@ -68,7 +68,7 @@ content/  (지도·시나리오 JSON)
 | 파일 | 내용 |
 |---|---|
 | [`scan.ts`](../packages/sim/src/perception/scan.ts) | 경계(시선): 분대 안 자리별 경계 구역 `sectorOf`, 눈 방향 `look` 을 정하는 `updateScan`. 튜닝 상수 `SCAN` |
-| [`vision.ts`](../packages/sim/src/perception/vision.ts) | 시선 `lineOfSight` (능선 차단·지물 감쇠, 끊긴 곳 `SightBlock` out), 시야각 `fovFactor`(눈 방향 `look` 기준), 발견 확률 `detectChance` (배율 분해 `detectFactors`), 탐지 주기마다 `updateVision` 으로 `contacts` 갱신. 튜닝 상수 `VISION` |
+| [`vision.ts`](../packages/sim/src/perception/vision.ts) | 시선 `lineOfSight` (능선 차단·지물 감쇠, 끊긴 곳 `SightBlock` out), 시야각 `fovFactor`(눈 방향 `look` 기준), 발견 확률 `detectChance` (배율 분해 `detectFactors`), 매 틱 `updateVision` 으로 `contacts` 갱신. 튜닝 상수 `VISION` |
 
 ### [`terrain/`](../packages/sim/src/terrain) — 지도 형식과 지형 격자
 
@@ -123,7 +123,7 @@ step(world, commands)
        move: 목표 쪽으로 speedOf(자세·하중·지구력·다리) × 선 칸의 move 배율 × DT 만큼 직선 이동. 다음 칸이 통행 불가면 그 자리, MOVE.arrive 안이면 끝
   4. updateBody: 평온이 깨지면 휴식 그침, 지구력 소모·회복(휴식 중에만 제대로), status 결정 (제압·패닉·무력화면 엎드림, 위협 인지면 앉음), 스트레스 감소 → 심리 단계 갱신
   5. updateScan: 병사마다 볼 곳(lookAim)을 정하고 눈(look)을 그쪽으로 돌린다 — 사격 중이면 겨누는 쪽, 직사 탄이 스치면 반응 시간 뒤 어림한 쏜 쪽(곡사는 무시), 아니면 보는 시간이 다 될 때 경계 구역 안 / 아는 적 쪽 (world.lookRng)
-  6. updateVision: VISION.interval(1초) 틱마다 진영별로 적을 본다 (무력화·패닉 병사는 관측자에서 빠지고, 발견 확률에 심리 단계 배율)
+  6. updateVision: 매 틱 진영별로 적을 본다 (무력화·패닉 병사는 관측자에서 빠지고, 발견 확률에 심리 단계 배율)
        이미 보던 적 → 아무 관측자나 시선 투과율 ≥ VISION.track 이면 계속 봄
        아니면 관측자 id 순서로 detectChance 를 굴려 발견 (world.rng, 결정적)
        못 보면 마지막 위치를 VISION.memory 틱 동안 기억, 처음 발견하면 log 에 남김
