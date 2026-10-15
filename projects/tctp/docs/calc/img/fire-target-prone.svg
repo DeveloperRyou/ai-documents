@@ -1,0 +1,174 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="672" height="488" viewBox="0 0 672 488" font-family="'Noto Sans KR', 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif" font-size="12">
+<rect width="672" height="488" fill="#fff"/>
+<text x="336" y="22" text-anchor="middle" font-size="15" font-weight="bold" fill="#222">K2 조준사격 탄착 — 정면에서 엎드린 사람을 겨눔 (엎드려 쏨, 평상)</text>
+<text x="336" y="40" text-anchor="middle" fill="#555">앞에서 본 모습 (가로 ±1.5m · 높이 0~1.5m). 빨강 = 사람에 맞음, 회색 = 빗나감, 점선 원 = 첫 발 1σ·2σ</text>
+<clipPath id="p0"><rect x="24" y="68" width="300" height="160"/></clipPath>
+<rect x="24" y="68" width="300" height="150" fill="#f6f8fb" stroke="#999"/>
+<g clip-path="url(#p0)">
+<line x1="24" x2="324" y1="218" y2="218" stroke="#8a6d3b" stroke-width="2"/>
+<rect x="139" y="183" width="70" height="35" fill="#c9d6e8" stroke="#5a6f8f"/>
+<circle cx="174" cy="197" r="15" fill="none" stroke="#1f6fd1" stroke-dasharray="4 3" stroke-width="1"/>
+<circle cx="174" cy="197" r="30" fill="none" stroke="#1f6fd1" stroke-dasharray="4 3" stroke-width="1"/>
+<line x1="169" x2="179" y1="197" y2="197" stroke="#222"/>
+<line x1="174" x2="174" y1="192" y2="202" stroke="#222"/>
+<circle cx="172.15441048236244" cy="203.83667526328972" r="2.6" fill="#d1495b" fill-opacity="0.85"/>
+<circle cx="166.2985145906517" cy="167.54684277533033" r="2.6" fill="#777" fill-opacity="0.85"/>
+<circle cx="160.61819111980543" cy="191.587845481685" r="2.6" fill="#d1495b" fill-opacity="0.85"/>
+<circle cx="150.9797418399898" cy="178.2420330207512" r="2.6" fill="#777" fill-opacity="0.85"/>
+<path d="M159.93738993123034,215l6,6m0,-6l-6,6" stroke="#8a6d3b" stroke-width="1.4"/>
+<circle cx="183.52881869550978" cy="187.29135502719495" r="2.6" fill="#d1495b" fill-opacity="0.85"/>
+<circle cx="177.67190372001983" cy="191.0066796239963" r="2.6" fill="#d1495b" fill-opacity="0.85"/>
+<circle cx="208.4201477917921" cy="205.59484153453016" r="2.6" fill="#d1495b" fill-opacity="0.85"/>
+<circle cx="162.95084010778402" cy="214.56266465106" r="2.6" fill="#d1495b" fill-opacity="0.85"/>
+<circle cx="168.60542035230867" cy="181.7115789030666" r="2.6" fill="#777" fill-opacity="0.85"/>
+<circle cx="194.0398277136966" cy="215.17880724439095" r="2.6" fill="#d1495b" fill-opacity="0.85"/>
+<circle cx="153.7789953452846" cy="191.21504185879277" r="2.6" fill="#d1495b" fill-opacity="0.85"/>
+<circle cx="173.2409827381022" cy="191.36034592944443" r="2.6" fill="#d1495b" fill-opacity="0.85"/>
+<circle cx="137.05568187853254" cy="180.1535458578688" r="2.6" fill="#777" fill-opacity="0.85"/>
+<circle cx="145.32897050622034" cy="208.58962960076454" r="2.6" fill="#d1495b" fill-opacity="0.85"/>
+<circle cx="144.51425904129889" cy="201.27443242983102" r="2.6" fill="#d1495b" fill-opacity="0.85"/>
+<circle cx="189.8187905961419" cy="199.10947684652743" r="2.6" fill="#d1495b" fill-opacity="0.85"/>
+<circle cx="172.56697680830945" cy="192.66001635079817" r="2.6" fill="#d1495b" fill-opacity="0.85"/>
+<circle cx="180.26926886724826" cy="211.83553914778497" r="2.6" fill="#d1495b" fill-opacity="0.85"/>
+<circle cx="165.43624225320355" cy="164.76333738286758" r="2.6" fill="#777" fill-opacity="0.85"/>
+<circle cx="156.888342609404" cy="208.2872266085703" r="2.6" fill="#d1495b" fill-opacity="0.85"/>
+<circle cx="181.48280508803904" cy="189.09392290047032" r="2.6" fill="#d1495b" fill-opacity="0.85"/>
+<circle cx="184.96094531441804" cy="189.57169804018625" r="2.6" fill="#d1495b" fill-opacity="0.85"/>
+<path d="M160.7402078402239,215l6,6m0,-6l-6,6" stroke="#8a6d3b" stroke-width="1.4"/>
+<path d="M168.9310998130144,215l6,6m0,-6l-6,6" stroke="#8a6d3b" stroke-width="1.4"/>
+<circle cx="166.19265809225504" cy="171.9733211991312" r="2.6" fill="#777" fill-opacity="0.85"/>
+<circle cx="158.50907758867496" cy="210.38651844668362" r="2.6" fill="#d1495b" fill-opacity="0.85"/>
+<circle cx="176.75115414107543" cy="179.52745818785235" r="2.6" fill="#777" fill-opacity="0.85"/>
+<circle cx="165.65007010468585" cy="199.11626753659368" r="2.6" fill="#d1495b" fill-opacity="0.85"/>
+<circle cx="186.95374538716143" cy="180.7824767816006" r="2.6" fill="#777" fill-opacity="0.85"/>
+</g>
+<text x="24" y="62" font-weight="bold" fill="#222">100m</text>
+<text x="24" y="236" fill="#333">σ 1.5 mrad = 0.15m · 30발 중 명중 19 · 땅 3(×)</text>
+<text x="24" y="252" fill="#777" font-size="11">조준마다 한 발</text>
+<clipPath id="p1"><rect x="348" y="68" width="300" height="160"/></clipPath>
+<rect x="348" y="68" width="300" height="150" fill="#f6f8fb" stroke="#999"/>
+<g clip-path="url(#p1)">
+<line x1="348" x2="648" y1="218" y2="218" stroke="#8a6d3b" stroke-width="2"/>
+<rect x="463" y="183" width="70" height="35" fill="#c9d6e8" stroke="#5a6f8f"/>
+<circle cx="498" cy="197" r="30" fill="none" stroke="#1f6fd1" stroke-dasharray="4 3" stroke-width="1"/>
+<circle cx="498" cy="197" r="60" fill="none" stroke="#1f6fd1" stroke-dasharray="4 3" stroke-width="1"/>
+<line x1="493" x2="503" y1="197" y2="197" stroke="#222"/>
+<line x1="498" x2="498" y1="192" y2="202" stroke="#222"/>
+<circle cx="522.9080734693048" cy="204.26242813386048" r="2.6" fill="#d1495b" fill-opacity="0.85"/>
+<circle cx="476.5939972983076" cy="186.40909293234702" r="2.6" fill="#d1495b" fill-opacity="0.85"/>
+<circle cx="438.47571668301094" cy="176.98469901685704" r="2.6" fill="#777" fill-opacity="0.85"/>
+<circle cx="440.60410868653867" cy="185.25223333571248" r="2.6" fill="#777" fill-opacity="0.85"/>
+<circle cx="544.899679286537" cy="216.83010883619048" r="2.6" fill="#777" fill-opacity="0.85"/>
+<circle cx="486.82415807635914" cy="193.1951477724745" r="2.6" fill="#d1495b" fill-opacity="0.85"/>
+<circle cx="486.1543716317789" cy="180.88076472011443" r="2.6" fill="#777" fill-opacity="0.85"/>
+<path d="M492.9491103024626,215l6,6m0,-6l-6,6" stroke="#8a6d3b" stroke-width="1.4"/>
+<circle cx="485.6118199941167" cy="178.63826263692638" r="2.6" fill="#777" fill-opacity="0.85"/>
+<circle cx="510.80965998384704" cy="201.23673144261818" r="2.6" fill="#d1495b" fill-opacity="0.85"/>
+<circle cx="472.768410281797" cy="146.2292902159251" r="2.6" fill="#777" fill-opacity="0.85"/>
+<circle cx="509.47952546934505" cy="170.28928420376695" r="2.6" fill="#777" fill-opacity="0.85"/>
+<path d="M512.3381296282852,215l6,6m0,-6l-6,6" stroke="#8a6d3b" stroke-width="1.4"/>
+<circle cx="480.60205237342353" cy="192.2999868142636" r="2.6" fill="#d1495b" fill-opacity="0.85"/>
+<circle cx="534.951319438021" cy="213.6962779609809" r="2.6" fill="#777" fill-opacity="0.85"/>
+<path d="M480.4170945957908,215l6,6m0,-6l-6,6" stroke="#8a6d3b" stroke-width="1.4"/>
+<path d="M469.38603533519245,215l6,6m0,-6l-6,6" stroke="#8a6d3b" stroke-width="1.4"/>
+<circle cx="510.01389867369926" cy="173.10222471055977" r="2.6" fill="#777" fill-opacity="0.85"/>
+<circle cx="463.5473798669654" cy="206.7829391933591" r="2.6" fill="#d1495b" fill-opacity="0.85"/>
+<path d="M471.29273604460815,215l6,6m0,-6l-6,6" stroke="#8a6d3b" stroke-width="1.4"/>
+<circle cx="491.3604568266639" cy="161.34025717563776" r="2.6" fill="#777" fill-opacity="0.85"/>
+<circle cx="564.3636863633515" cy="165.09774956236834" r="2.6" fill="#777" fill-opacity="0.85"/>
+<circle cx="512.4939346595125" cy="187.96134147082188" r="2.6" fill="#d1495b" fill-opacity="0.85"/>
+<circle cx="535.1342008440574" cy="208.27137238143297" r="2.6" fill="#777" fill-opacity="0.85"/>
+<circle cx="431.9567449432286" cy="128.39477257601087" r="2.6" fill="#777" fill-opacity="0.85"/>
+<path d="M541.5749797902611,215l6,6m0,-6l-6,6" stroke="#8a6d3b" stroke-width="1.4"/>
+<circle cx="484.04584949338846" cy="196.4108321264282" r="2.6" fill="#d1495b" fill-opacity="0.85"/>
+<path d="M430.45703860987123,215l6,6m0,-6l-6,6" stroke="#8a6d3b" stroke-width="1.4"/>
+<circle cx="520.0021638022513" cy="216.06422274167093" r="2.6" fill="#d1495b" fill-opacity="0.85"/>
+<circle cx="462.69405479078875" cy="142.44153069271812" r="2.6" fill="#777" fill-opacity="0.85"/>
+</g>
+<text x="348" y="62" font-weight="bold" fill="#222">200m</text>
+<text x="348" y="236" fill="#333">σ 1.5 mrad = 0.30m · 30발 중 명중 9 · 땅 7(×)</text>
+<text x="348" y="252" fill="#777" font-size="11">조준마다 한 발</text>
+<clipPath id="p2"><rect x="24" y="272" width="300" height="160"/></clipPath>
+<rect x="24" y="272" width="300" height="150" fill="#f6f8fb" stroke="#999"/>
+<g clip-path="url(#p2)">
+<line x1="24" x2="324" y1="422" y2="422" stroke="#8a6d3b" stroke-width="2"/>
+<rect x="139" y="387" width="70" height="35" fill="#c9d6e8" stroke="#5a6f8f"/>
+<circle cx="174" cy="401" r="45" fill="none" stroke="#1f6fd1" stroke-dasharray="4 3" stroke-width="1"/>
+<circle cx="174" cy="401" r="90" fill="none" stroke="#1f6fd1" stroke-dasharray="4 3" stroke-width="1"/>
+<line x1="169" x2="179" y1="401" y2="401" stroke="#222"/>
+<line x1="174" x2="174" y1="396" y2="406" stroke="#222"/>
+<circle cx="113.36243550045265" cy="415.1082178090435" r="2.6" fill="#777" fill-opacity="0.85"/>
+<circle cx="134.26444411061652" cy="360.7265436654356" r="2.6" fill="#777" fill-opacity="0.85"/>
+<path d="M217.74250214231876,419l6,6m0,-6l-6,6" stroke="#8a6d3b" stroke-width="1.4"/>
+<path d="M103.19460489362251,419l6,6m0,-6l-6,6" stroke="#8a6d3b" stroke-width="1.4"/>
+<circle cx="181.6148342771997" cy="363.8067566246301" r="2.6" fill="#777" fill-opacity="0.85"/>
+<path d="M179.66035302555434,419l6,6m0,-6l-6,6" stroke="#8a6d3b" stroke-width="1.4"/>
+<circle cx="90.51328197851699" cy="409.6188354535415" r="2.6" fill="#777" fill-opacity="0.85"/>
+<circle cx="114.0450929803847" cy="353.9368209003321" r="2.6" fill="#777" fill-opacity="0.85"/>
+<path d="M133.5261165249689,419l6,6m0,-6l-6,6" stroke="#8a6d3b" stroke-width="1.4"/>
+<circle cx="205.54404355932346" cy="401.4856414834197" r="2.6" fill="#d1495b" fill-opacity="0.85"/>
+<circle cx="186.13921002386041" cy="385.832472679064" r="2.6" fill="#777" fill-opacity="0.85"/>
+<circle cx="184.99785844308008" cy="394.8436755459846" r="2.6" fill="#d1495b" fill-opacity="0.85"/>
+<circle cx="109.23531876592526" cy="338.078355580373" r="2.6" fill="#777" fill-opacity="0.85"/>
+<circle cx="116.14991594457452" cy="395.47326093366996" r="2.6" fill="#777" fill-opacity="0.85"/>
+<circle cx="161.12610985123197" cy="397.147345507935" r="2.6" fill="#d1495b" fill-opacity="0.85"/>
+<path d="M131.78942867934404,419l6,6m0,-6l-6,6" stroke="#8a6d3b" stroke-width="1.4"/>
+<circle cx="109.93196544650537" cy="392.32467231452847" r="2.6" fill="#777" fill-opacity="0.85"/>
+<circle cx="74.32877123948255" cy="409.9848983944984" r="2.6" fill="#777" fill-opacity="0.85"/>
+<circle cx="212.10081428970244" cy="384.94757815330206" r="2.6" fill="#777" fill-opacity="0.85"/>
+<circle cx="139.84816182517343" cy="412.092647698019" r="2.6" fill="#d1495b" fill-opacity="0.85"/>
+<path d="M92.4925910924681,419l6,6m0,-6l-6,6" stroke="#8a6d3b" stroke-width="1.4"/>
+<circle cx="140.0054983477949" cy="379.48508027278973" r="2.6" fill="#777" fill-opacity="0.85"/>
+<circle cx="177.2649246508903" cy="371.2296502367325" r="2.6" fill="#777" fill-opacity="0.85"/>
+<circle cx="168.38736449061116" cy="390.31675164414065" r="2.6" fill="#d1495b" fill-opacity="0.85"/>
+<circle cx="237.3756551174262" cy="370.8580023447654" r="2.6" fill="#777" fill-opacity="0.85"/>
+<path d="M188.75185034802502,419l6,6m0,-6l-6,6" stroke="#8a6d3b" stroke-width="1.4"/>
+<path d="M128.05054454509565,419l6,6m0,-6l-6,6" stroke="#8a6d3b" stroke-width="1.4"/>
+<path d="M161.06214682616672,419l6,6m0,-6l-6,6" stroke="#8a6d3b" stroke-width="1.4"/>
+<circle cx="189.95736663300877" cy="352.9120368329606" r="2.6" fill="#777" fill-opacity="0.85"/>
+<circle cx="138.58370575434884" cy="419.002865937578" r="2.6" fill="#777" fill-opacity="0.85"/>
+</g>
+<text x="24" y="266" font-weight="bold" fill="#222">300m</text>
+<text x="24" y="440" fill="#333">σ 1.5 mrad = 0.45m · 30발 중 명중 5 · 땅 9(×)</text>
+<text x="24" y="456" fill="#777" font-size="11">조준마다 한 발</text>
+<clipPath id="p3"><rect x="348" y="272" width="300" height="160"/></clipPath>
+<rect x="348" y="272" width="300" height="150" fill="#f6f8fb" stroke="#999"/>
+<g clip-path="url(#p3)">
+<line x1="348" x2="648" y1="422" y2="422" stroke="#8a6d3b" stroke-width="2"/>
+<rect x="463" y="387" width="70" height="35" fill="#c9d6e8" stroke="#5a6f8f"/>
+<circle cx="498" cy="401" r="60" fill="none" stroke="#1f6fd1" stroke-dasharray="4 3" stroke-width="1"/>
+<circle cx="498" cy="401" r="120" fill="none" stroke="#1f6fd1" stroke-dasharray="4 3" stroke-width="1"/>
+<line x1="493" x2="503" y1="401" y2="401" stroke="#222"/>
+<line x1="498" x2="498" y1="396" y2="406" stroke="#222"/>
+<circle cx="584.841525782373" cy="380.90020358564976" r="2.6" fill="#777" fill-opacity="0.85"/>
+<circle cx="629.8941994105268" cy="307.09706484504966" r="2.6" fill="#777" fill-opacity="0.85"/>
+<path d="M433.7010738730838,419l6,6m0,-6l-6,6" stroke="#8a6d3b" stroke-width="1.4"/>
+<circle cx="424.09805278074214" cy="370.53776968558077" r="2.6" fill="#777" fill-opacity="0.85"/>
+<circle cx="521.6313604883925" cy="402.8802524207943" r="2.6" fill="#d1495b" fill-opacity="0.85"/>
+<circle cx="497.4023689221335" cy="351.4346027506234" r="2.6" fill="#777" fill-opacity="0.85"/>
+<path d="M466.4367178239728,419l6,6m0,-6l-6,6" stroke="#8a6d3b" stroke-width="1.4"/>
+<path d="M539.1964252522406,419l6,6m0,-6l-6,6" stroke="#8a6d3b" stroke-width="1.4"/>
+<path d="M482.9482357928889,419l6,6m0,-6l-6,6" stroke="#8a6d3b" stroke-width="1.4"/>
+<path d="M546.1076615240077,419l6,6m0,-6l-6,6" stroke="#8a6d3b" stroke-width="1.4"/>
+<circle cx="439.4163411038236" cy="355.9090643118583" r="2.6" fill="#777" fill-opacity="0.85"/>
+<circle cx="494.5435276898801" cy="381.114066095948" r="2.6" fill="#777" fill-opacity="0.85"/>
+<circle cx="566.8682928368071" cy="296.88084299561933" r="2.6" fill="#777" fill-opacity="0.85"/>
+<circle cx="570.6134199764465" cy="316.9780838536477" r="2.6" fill="#777" fill-opacity="0.85"/>
+<circle cx="558.082740365372" cy="415.289153567533" r="2.6" fill="#777" fill-opacity="0.85"/>
+<circle cx="503.6251725991201" cy="362.9553432108144" r="2.6" fill="#777" fill-opacity="0.85"/>
+<circle cx="409.88201324557815" cy="412.81020139464505" r="2.6" fill="#777" fill-opacity="0.85"/>
+<path d="M497.3374061791235,419l6,6m0,-6l-6,6" stroke="#8a6d3b" stroke-width="1.4"/>
+<path d="M439.90346626859065,419l6,6m0,-6l-6,6" stroke="#8a6d3b" stroke-width="1.4"/>
+<circle cx="482.2782673236118" cy="419.6569632426055" r="2.6" fill="#d1495b" fill-opacity="0.85"/>
+<circle cx="511.319600467383" cy="355.66060421196954" r="2.6" fill="#777" fill-opacity="0.85"/>
+<circle cx="576.8028019170225" cy="421.90423802602123" r="2.6" fill="#777" fill-opacity="0.85"/>
+<path d="M417.2376593348255,419l6,6m0,-6l-6,6" stroke="#8a6d3b" stroke-width="1.4"/>
+<circle cx="475.06709167977033" cy="280.41829337680815" r="2.6" fill="#777" fill-opacity="0.85"/>
+<path d="M571.0516470378109,419l6,6m0,-6l-6,6" stroke="#8a6d3b" stroke-width="1.4"/>
+<path d="M467.496526542281,419l6,6m0,-6l-6,6" stroke="#8a6d3b" stroke-width="1.4"/>
+<path d="M409.3590172508377,419l6,6m0,-6l-6,6" stroke="#8a6d3b" stroke-width="1.4"/>
+</g>
+<text x="348" y="266" font-weight="bold" fill="#222">400m</text>
+<text x="348" y="440" fill="#333">σ 1.5 mrad = 0.60m · 30발 중 명중 2 · 땅 11(×) · 그림 밖 3</text>
+<text x="348" y="456" fill="#777" font-size="11">조준마다 한 발</text>
+</svg>
