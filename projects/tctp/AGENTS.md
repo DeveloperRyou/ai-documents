@@ -6,7 +6,7 @@
 
 ## 명령어
 ```bash
-npm run dev          # 클라이언트 http://localhost:5175 — 메뉴. 게임 직행 ?scenario=bd1-react-to-contact (&seed=7 &view=2d|iso|split &truth=1)
+npm run dev          # 클라이언트 http://localhost:5175 — 메뉴. 게임 직행 ?scenario=bd1-react-to-contact (&seed=7 &view=2d|iso|3d|split &truth=1)
 npm run check        # typecheck + lint(Biome) + test(Vitest). 커밋 전 통과시킬 것
 npm run format       # Biome 자동 수정
 npm run build        # 클라이언트 빌드 (CI 는 check + build)
@@ -19,6 +19,7 @@ npm run fetch-map -- <id> <남> <서> <북> <동> [이름]   # content/maps/<id>
 - npm workspaces. 패키지끼리는 `@tctp/sim`, `@tctp/sim/<파일>` 로 가져온다 (소스 TS 를 그대로 씀, 빌드 단계 없음).
 - `packages/sim`: tsconfig 에 DOM·node 타입이 없다. 시뮬에서 `window`, `document`, `fs`, `performance` 등을 쓰면 타입 오류가 나는 게 정상.
 - `packages/client`: 입력 → `Command` → `Session`(sim, 고정 틱 루프) → `Snapshot` → `Renderer` 구현이 그린다. 렌더러는 `World` 를 보지 않는다 (교체 방법은 `docs/ARCHITECTURE.md` "프런트엔드 경계").
+- `packages/render3d`: Three.js 3D 렌더러 POC (`?view=3d`). 지도에 층수·지붕 정보가 없어 건물 높이는 바닥 면적으로 어림한다.
 - `packages/tools`: Node 전용 도구. `content/` 를 읽고 쓴다.
 - `content/maps/raw/` 는 OSM·고도 원본 캐시 (git 제외).
 - 틱 흐름: 상태는 `step(world, cmds)`(`sim/src/world.ts`) 안에서만 바뀌고, 명령은 `applyCommand`(`command.ts`)로 들어간다. 클라이언트는 틱마다 낸 명령을 `commandLog` 에 쌓은 뒤 `step` 을 부른다. 테스트·headless 는 `runReplay` + `stateHash`(`replay.ts`)로 결정성을 비교한다.

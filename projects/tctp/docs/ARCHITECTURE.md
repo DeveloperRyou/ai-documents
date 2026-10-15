@@ -18,6 +18,7 @@ content/  (지도·시나리오 JSON)
 |---|---|---|
 | `@tctp/sim` | 어디서나 (lib `ES2022`, types 없음) | 상태 타입, 1틱 진행, 명령 적용, 고정 틱 세션, 화면용 스냅샷, 리플레이·해시, 시드 RNG, 지도 형식 |
 | `@tctp/client` | 브라우저 (Vite, Canvas 2D) | 입력을 `Command` 로 바꿔 `Session` 에 넣고, `Snapshot` 을 `Renderer` 로 그린다 |
+| `@tctp/render3d` | 브라우저 (Three.js WebGL) | 3D 렌더러 POC: 고도 메시 지면(지물을 칠한 텍스처), 박공지붕 건물, 숲·산울타리·담장, 관절 인형 병사(자세·걸음 애니메이션), 해·그림자·안개. 클라이언트 `Renderer` 를 구조적으로 맞추고 `Snapshot`·`MapData` 만 읽는다 |
 | `@tctp/tools` | Node (`tsx`) | OSM·고도로 지도 생성, 화면 없이 시뮬 실행 |
 
 - 의존은 항상 `sim` 쪽으로만 향한다. `sim` 은 다른 패키지와 `content/` 를 모른다. 지도는 호출하는 쪽이 읽어서 `createWorld` 에 넘긴다.
@@ -103,7 +104,7 @@ requestAnimationFrame:
 - 조작: 좌클릭 = 분대 선택 (한 명을 누르면 같은 분대 전원), 우클릭 = 이동, 휠 = 확대, 가운데 드래그 = 지도 이동, Space = 일시정지, Esc = 메뉴.
 - `commandLog` 는 리플레이·버그 재현용으로 쌓기만 하고, 아직 저장하거나 내보내지는 않는다.
 - 시드는 URL `?seed=` 로 받는다 (기본 = 시나리오의 seed). `?truth=1` 이면 정보 안개를 끄고 모르는 적도 흐리게 그린다 (디버그).
-- 렌더러는 URL `?view=` 로 고른다: `2d` (기본), `iso` (2.5D POC), `split` (둘을 나란히, 같은 세션·선택을 공유).
+- 렌더러는 URL `?view=` 로 고른다: `2d` (기본), `iso` (2.5D POC), `3d` (`@tctp/render3d` POC, Q/E 회전·R/F 기울기), `split` (둘을 나란히, 같은 세션·선택을 공유).
 
 ## 도구 (`packages/tools/src`)
 
