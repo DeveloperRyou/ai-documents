@@ -18,7 +18,7 @@
 
 | 사건 | 기본값 | scale | 어디서 |
 |---|---|---|---|
-| 근탄 `nearMiss` | 8 | (1 − 거리/제압 반경) × 노출(엄폐 ×(1 − 0.6 × 엄폐), 이동 중 ×1.15) | `fire.ts` 직사 |
+| 근탄 `nearMiss` | 15 | (1 − 거리/제압 반경) × 노출(엄폐 ×(1 − 0.6 × 엄폐), 이동 중 ×1.15) × 몰아쏘기(1 + `volume` 0.25 × 앞선 `volumeWindow` 3초 안 근탄 수, 최대 `volumeMax` 4발) | `fire.ts` 직사 → `rates.ts` `nearMiss` |
 | 피격 `hit` | 30 | 1 | `fire.ts` `wound` |
 | 폭발 `blast` | 40 | (1 − 거리/제압 반경) × 시선 차폐(막히면 0.15) | `fire.ts` `explode` |
 | 전우 피격 `buddyDown` | 15 | `buddyRadius`(15m) 안의 같은 편 (싸울 수 있는) 병사 | `soldier.ts` `updateBody`, 무력화·사망하는 틱 |
@@ -31,8 +31,8 @@
 | 패닉 회복 `rallyPerSec` | 스트레스 < `STRESS.rally`(30) 일 때 초당 0.25 | 그 스트레스의 단계로 돌아감 |
 
 ### 줄어듦 (매 틱 `updateStress`)
-- 마지막 위협 뒤 `quiet`(2초)가 지나기 전에는 줄지 않는다.
-- 초당 감소 = `decay`(3) × (1 + `cover`(0.5) × 발밑 엄폐) × (`buddyRadius` 안에 싸울 수 있는 전우가 있으면 `buddyNear` 1.3) × (피를 흘리면 `bleeding` 0.4).
+- 마지막 위협 뒤 `quiet`(4초)가 지나기 전에는 줄지 않는다 (근탄마다 다시 센다. 3초에 1발이면 풀리지 않아 제압이 유지된다).
+- 초당 감소 = `decay`(2) × (1 + `cover`(0.5) × 발밑 엄폐) × (`buddyRadius` 안에 싸울 수 있는 전우가 있으면 `buddyNear` 1.3) × (피를 흘리면 `bleeding` 0.4).
 - 틱마다 이 값에 ± `decayVary`(50%)를 곱한다.
 
 ## 지구력 `RATES.stamina`
@@ -56,3 +56,7 @@
 
 ## 매 틱 순서 (`updateBody`, `soldier.ts`)
 출혈 → (무력화면 쓰러짐) → 지구력 → 상태 → (막 쓰러졌으면 전우 피격) → 자세 → 스트레스.
+
+### 제압 수치 근거 (#17)
+목표: 1m 안 초당 1발 → 몇 초(≤6초) 만에 제압, 3초에 1발 → 제압 유지, 3m 안 3초에 2발 → 제압, 드문 먼 근탄 → 제압 안 됨 (`soldier.test.ts` "제압 (근탄)", 드릴 `supp-*`).
+출처: Leo Murray *War Games* (Morray 로 인용됨, https://defense-and-freedom.blogspot.com/2022/11/suppression-by-infantry-weapons.html), DTIC AD519874 (빗나간 거리에 선형, 탄량·소리에 비례), ARI TR-79-A19 (빗나간 거리·구경·발사 속도). 구경별 반경(5.56mm 3m, 7.62mm 4~6m)은 출처 미확인 현장 시험 인용이라 실마리로만 쓴다.

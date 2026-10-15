@@ -21,6 +21,7 @@
 | `blood` | number | 혈액량 (mL, 처음 5000). 출혈로 준다 |
 | `stress` | number | 스트레스 0~100. 화력에 눌린 정도 |
 | `threatTick` | number \| null | 마지막으로 위협(근탄·피탄·폭발·전우 피격)을 받은 틱. 조용해진 뒤에야 스트레스가 풀린다 |
+| `nearMisses` | number[] | 최근 `volumeWindow`(3초) 안 근탄 틱들. 몰아 날아온 탄일수록 근탄 하나가 더 누른다 ([rates.md](rates.md)) |
 | `stressLevel` | `StressLevel` | 심리 단계 (아래). `stress` 와 이전 단계에서 정해진다 |
 | `order` | `{tick, cmd} \| null` | 혼란·위축 중 받아 둔 명령. `tick` 이 되면 적용 |
 | `stamina` | number | 지구력 0~100 |
