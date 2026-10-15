@@ -32,8 +32,8 @@ content/  (지도·시나리오 JSON)
 | `types.ts` | `World` (지도, 지형 격자, RNG, 정수 `tick`, `soldiers`, 진영별 `contacts`, `log`), `Soldier` (이름·직책·몸 크기·휴대 장비·하중·자세·상태·부위별 체력·스트레스·지구력·위치), `Contact`, `Side` |
 | `time.ts` | 시간 상수 `DT = 0.25`, `TICKS_PER_SEC = 4`, `secToTicks`. 튜닝 수치는 초 단위로 적고 틱으로 바꾼다 (DT 를 바꿔도 다른 상수는 그대로) |
 | `world.ts` | `createWorld`, `step`, 튜닝 상수 `MOVE` (시간 상수 재노출) |
-| `soldier.ts` | 몸 상태: 자세별 높이·기본 속도, 하중 `loadOf`, 속도 `speedOf`, `damage`·`addStress`, 매 틱 `updateBody` (지구력·상태·스트레스). 튜닝 상수 `POSTURE_HEIGHT`·`BASE_SPEED`·`LOAD`·`STAMINA`·`STRESS`·`HEALTH` |
-| `command.ts` | `Command` 유니온(`move`, `stop`, `posture`), `TimedCommand`, `applyCommand` |
+| `soldier.ts` | 몸 상태: 자세별 높이·기본 속도, 심리 단계 `stressLevelOf`, 하중 `loadOf`, 속도 `speedOf`, `damage`·`addStress`, 매 틱 `updateBody` (지구력·상태·스트레스). 튜닝 상수 `POSTURE_HEIGHT`·`BASE_SPEED`·`LOAD`·`STAMINA`·`STRESS`·`HEALTH` |
+| `command.ts` | `Command` 유니온(`move`, `stop`, `posture`), `TimedCommand`, `applyCommand`, 혼란 중 미룬 명령 `applyDueOrders` |
 | `replay.ts` | `runReplay`(명령 기록 재생), `stateHash`(FNV-1a 상태 지문) |
 | `rng.ts` | mulberry32 RNG. 상태가 숫자 하나라 해시·세이브에 그대로 담긴다 |
 | `map.ts` | `MapData` 형식 (면·선 지물, 지명, 고도 격자) |
@@ -63,17 +63,18 @@ content/  (지도·시나리오 JSON)
 ```
 step(world, commands)
   1. commands 를 순서대로 applyCommand  ← 상태를 바꾸는 입구는 여기뿐
+     applyDueOrders: 혼란·위축으로 미뤄 둔 명령 중 때가 된 것 적용
   2. world.tick++
   3. updateMovement: 움직일 수 있는 병사(무력화·제압 아님)만, dest 쪽으로 speedOf(자세·하중·지구력·다리) × 선 칸의 move 배율 × DT 만큼 직선 이동. 다음 칸이 통행 불가면 그 자리, MOVE.arrive 안이면 정지
-  4. updateBody: 지구력 소모·회복, status 결정 (제압·무력화면 엎드림), 스트레스 감소
-  5. updateVision: VISION.interval(1초) 틱마다 진영별로 적을 본다 (무력화된 병사는 관측자에서 빠짐)
+  4. updateBody: 지구력 소모·회복, status 결정 (제압·패닉·무력화면 엎드림, 위협 인지면 앉음), 스트레스 감소 → 심리 단계 갱신
+  5. updateVision: VISION.interval(1초) 틱마다 진영별로 적을 본다 (무력화·패닉 병사는 관측자에서 빠지고, 발견 확률에 심리 단계 배율)
        이미 보던 적 → 아무 관측자나 시선 투과율 ≥ VISION.track 이면 계속 봄
        아니면 관측자 id 순서로 detectChance 를 굴려 발견 (world.rng, 결정적)
        못 보면 마지막 위치를 VISION.memory 틱 동안 기억, 처음 발견하면 log 에 남김
 ```
 
 - 명령은 상태를 직접 바꾸지 않고, 틱 시작 때 `step` 안에서만 적용된다. 그래서 `(지도, 시드, 초기 편성, TimedCommand[])` 만 있으면 같은 판을 다시 만들 수 있다.
-- `stateHash` 는 tick, RNG 상태, 병사 id·위치(mm 반올림)·자세·상태·스트레스·지구력·하중·부위별 체력, 진영별 contacts(id·틱·보임)를 섞는다. 상태에 새 필드를 넣으면 해시에도 넣어야 결정성 테스트가 그 필드를 검사한다.
+- `stateHash` 는 tick, RNG 상태, 병사 id·위치(mm 반올림)·자세·상태·스트레스·심리 단계·미뤄 둔 명령 틱·지구력·하중·부위별 체력, 진영별 contacts(id·틱·보임)를 섞는다. 상태에 새 필드를 넣으면 해시에도 넣어야 결정성 테스트가 그 필드를 검사한다.
 - `Soldier` 는 위치·방향·이동 목표·소속(분대/조)과 이름·직책·몸 크기·휴대 장비, 몸 상태(하중·자세·상태·부위별 체력·스트레스·지구력)를 가진다 ([objects/soldier.md](objects/soldier.md)). 장비는 id 로만 들고, 성능은 `ContentDb.equipment` 에서 찾는다 (하중은 편성 때 계산해 둔다).
 - 지형 격자는 지도에서만 만들어지고 바뀌지 않아 해시에 넣지 않는다. 1199 × 1001 칸 기준 굽기에 약 60ms.
 
@@ -123,5 +124,5 @@ requestAnimationFrame:
 
 ## 테스트
 
-- Vitest, `packages/*/src/**/*.test.ts`. `sim/src/world.test.ts` (이동·도착 정지, 같은 시드 + 같은 명령 기록 → 같은 해시), `sim/src/session.test.ts` (고정 틱 분할·상한, 정지 중 명령 보류, 세션 기록 리플레이 = 같은 해시, 스냅샷 JSON 왕복·참조 분리·타 진영 `dest` 제외, 정보 안개), `sim/src/soldier.test.ts` (하중 합·하중 속도 감소, 자세 속도·높이, 지구력 소모·회복·지친 속도, 포복 소모, 제압 고착과 해제, 다리 부상 포복, 무력화·사망), `sim/src/vision.test.ts` (지형 굽기·고도 디코드, 시선 차단·감쇠·능선, 발견·등 뒤·건물 너머·기억과 망각, 통행 불가 칸), `tools/src/content.test.ts` (편제 인원 8·12, 시나리오의 편제·장비 참조, 시작 위치 통행 가능, 이름 중복 없음). 공용 도우미는 `sim/src/test-util.ts`.
+- Vitest, `packages/*/src/**/*.test.ts`. `sim/src/world.test.ts` (이동·도착 정지, 같은 시드 + 같은 명령 기록 → 같은 해시), `sim/src/session.test.ts` (고정 틱 분할·상한, 정지 중 명령 보류, 세션 기록 리플레이 = 같은 해시, 스냅샷 JSON 왕복·참조 분리·타 진영 `dest` 제외, 정보 안개), `sim/src/soldier.test.ts` (하중 합·하중 속도 감소, 자세 속도·높이, 지구력 소모·회복·지친 속도, 포복 소모, 심리 단계 문턱·패닉 회복 문턱, 위협 인지 앉기, 혼란 명령 지연, 제압 고착과 해제, 패닉 명령 거부·관측 불가, 심리 단계 발견 배율, 다리 부상 포복, 무력화·사망), `sim/src/vision.test.ts` (지형 굽기·고도 디코드, 시선 차단·감쇠·능선, 발견·등 뒤·건물 너머·기억과 망각, 통행 불가 칸), `tools/src/content.test.ts` (편제 인원 8·12, 시나리오의 편제·장비 참조, 시작 위치 통행 가능, 이름 중복 없음). 공용 도우미는 `sim/src/test-util.ts`.
 - CI (`.github/workflows/ci.yml`): push·PR 마다 `npm run check` (typecheck + Biome + Vitest) 와 `npm run build`.
