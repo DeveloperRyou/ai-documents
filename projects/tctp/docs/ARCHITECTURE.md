@@ -1,7 +1,7 @@
 # 아키텍처 — 현재 코드 기준
 
 지금 코드가 어떻게 짜여 있는지 정리한 문서. 왜 그렇게 정했는지와 앞으로 옮겨 올 시뮬 모델은 [`DESIGN.md`](DESIGN.md) 에 있다.
-객체별 필드·단위·현재 값은 [`objects/`](objects/README.md).
+객체별 필드·단위·현재 값은 [`objects/`](objects/README.md), 수치 계산 식과 난수는 [`calc/`](calc/README.md).
 코드가 바뀌면 이 문서도 같이 고친다.
 
 ## 패키지와 의존 방향
@@ -39,7 +39,7 @@ content/  (지도·시나리오 JSON)
 | `fire.ts` | 화기 트리거 `pullTrigger` → 탄도선 판정(사람·지물·땅), 근탄 제압, 폭발, 부위 피해. 튜닝 상수 `FIRE`, 조준점 `AimPoint` |
 | `soldier.ts` | 기본 몸 `BODY`, 휴대 무게 한도 `checkCarry`, 몸 상태: 자세별 높이·기본 속도·약진 속도, 심리 단계 `stressLevelOf`, 하중 `loadOf`, 속도 `speedOf(s, gait)`, 매 틱 `updateBody` (출혈·지구력·상태·자세·스트레스). 튜닝 상수 `POSTURE_HEIGHT`·`BASE_SPEED`·`RUSH_SPEED`·`LOAD`·`STAMINA`·`STRESS` |
 | `wound.ts` | 부상: `rollWound`(부위·탄 위력·총탄/파편 → 정도·출혈), 부위 기능 `partLevel`·`armUse`·`legUse`, `isDead`·`isIncapacitated`·`isWeak`. 튜닝 상수 `WOUND` |
-| `rates.ts` | 늘고 주는 몸 수치: 스트레스(`threat`·`addStress`·`shock`·`buddyDown`·`updateStress`), 지구력 `updateStamina`, 출혈 `updateBlood`. 튜닝 상수 `RATES` ([objects/rates.md](objects/rates.md)) |
+| `rates.ts` | 늘고 주는 몸 수치: 스트레스(`threat`·`addStress`·`shock`·`buddyDown`·`updateStress`), 지구력 `updateStamina`, 출혈 `updateBlood`. 튜닝 상수 `RATES` ([calc/rates.md](calc/rates.md)) |
 | `command.ts` | `Command` 유니온(`move`, `stop`, `posture`), `TimedCommand`, `applyCommand`, 혼란 중 미룬 명령 `applyDueOrders` |
 | `replay.ts` | `runReplay`(명령 기록 재생), `stateHash`(FNV-1a 상태 지문) |
 | `rng.ts` | mulberry32 RNG. 상태가 숫자 하나라 해시·세이브에 그대로 담긴다 |
