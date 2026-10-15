@@ -7,6 +7,7 @@
 ## 명령어
 ```bash
 npm run dev          # 클라이언트 http://localhost:5175 — 메뉴. 게임 직행 ?scenario=bd1-react-to-contact (&seed=7 &view=2d|iso|3d|split &truth=1)
+                     # 행동 확인장 ?debug=drills (&drill=<id>) — sim/src/drills.ts 의 드릴을 틱 단위로 재생
 npm run check        # typecheck + lint(Biome) + test(Vitest). 커밋 전 통과시킬 것
 npm run format       # Biome 자동 수정
 npm run build        # 클라이언트 빌드 (CI 는 check + build)
