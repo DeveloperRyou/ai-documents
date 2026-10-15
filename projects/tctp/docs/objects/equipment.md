@@ -15,6 +15,11 @@
 | `range` | 유효사거리 (m) |
 | `magazine` | 한 번 장전하는 탄 수 (탄창·탄띠·1발) |
 | `mass` | 무게 (kg, 탄 제외) |
+| `dispersion` | 산포 (mrad, 표준편차): 다 조준하고 엎드려 쏠 때. 곡사는 사거리 대비 탄착 오차 |
+| `aimTime` | 다 조준하는 데 걸리는 시간 (초) |
+| `rof` | 발사 속도 (발/분). 점사 안에서 한 틱(0.25초)에 나가는 발 수 |
+| `burst` | 제압사격 한 번에 당기는 발 수 |
+| `reload` | 재장전 시간 (초) |
 
 ## 탄약 `Ammo` (`kind: "ammo"`)
 
@@ -26,7 +31,10 @@
 | `penetration` | 관통력 (mm 균질압연강판 상당, 근거리) |
 | `explosive` | 폭발 여부 |
 | `blastRadius` | 폭발 살상 반경 (m). 폭발하지 않으면 0 |
-| `suppressionRadius` | 탄착점 주변 제압 반경 (m) |
+| `suppressionRadius` | 제압 반경 (m). 직사는 탄도선(총구 → 탄착점) 주변, 폭발은 탄착점 주변 |
+| `damage` | 피해 (체력). 직사는 맞은 부위에, 폭발은 살상 반경 안에서 |
+
+함수: `weaponIn(loadout, catalog, slot)` = 칸에 든 화기, `roundsOf(loadout, ammo)` = 지닌 탄 수(장전 탄 포함), `initialLoaded` = 처음 장전 (장전 수와 지닌 탄 중 작은 값). 사격 판정은 [action.md](action.md) "사격 판정".
 
 ## 장구 `Gear` (`kind: "gear"`)
 

@@ -6,13 +6,15 @@
 | `map` | 지도 `MapData` |
 | `terrain` | 지형 격자 ([terrain.md](terrain.md)) |
 | `rng` | 시드 RNG (mulberry32). 시뮬 안 난수는 이것만 |
+| `catalog` | 장비 카탈로그 (`createWorld` 넷째 인자, 화기·탄약 제원) |
 | `tick` | 경과 틱 (정수, 1틱 = 0.25초) |
 | `soldiers` | `Soldier[]` ([soldier.md](soldier.md)), `soldiers[id]` |
 | `contacts` | 진영별로 아는 적 `Record<Side, Contact[]>` (id 오름차순) |
-| `log` | `LogEntry { tick, side \| "system", text }` — 시작, 적 발견 등 |
+| `log` | `LogEntry { tick, side \| "system", text }` — 시작, 적 발견, 피격·전사 등 |
+| `shots` | 이번 틱에 쏜 탄 `Shot { by, x0, y0, x1, y1, hit, explosive }` (화면 효과용, 매 틱 비움, 해시 제외) |
 
 상태는 `step(world, commands)` 안에서만 바뀐다: 명령 적용 → 미뤄 둔 명령(`applyDueOrders`) → `tick++` → 행동(`updateActions`) → 몸 상태(`updateBody`: 지구력·상태·스트레스) → 시야.
-`stateHash` 는 tick·RNG·병사 위치·자세·상태·행동(종류·필드)·스트레스·심리 단계·미뤄 둔 명령 틱·지구력·하중·부위별 체력·contacts 를 섞는다. 새 상태 필드를 넣으면 해시에도 넣는다.
+`stateHash` 는 tick·RNG·병사 위치·자세·상태·행동(종류·필드)·스트레스·심리 단계·미뤄 둔 명령 틱·지구력·하중·장전 탄·휴대 수량·부위별 체력·contacts 를 섞는다. 새 상태 필드를 넣으면 해시에도 넣는다.
 
 ## 아는 적 `Contact` (`types.ts`, 갱신은 `vision.ts`)
 | 필드 | 뜻 |
@@ -35,6 +37,11 @@
 | `move` | `ids`, `x`, `y` | 병사들에게 이동 행동을 준다 (진행 중 행동을 덮음) |
 | `stop` | `ids` | 행동을 비운다 |
 | `posture` | `ids`, `posture` | 자세 바꾸기 (`stand`·`crouch`·`prone`) |
+| `fire` | `ids`, `target`, `slot?` | 아는 적 한 명을 조준사격 (`FIRE_ORDER.aimed`: 화기 조준 시간을 다 쓰고 한 발씩) |
+| `suppress` | `ids`, `x`, `y`, `slot?` | 지점을 제압사격 (`FIRE_ORDER.suppress`: 조준 1/4, 화기 점사 발 수, 둘레 6m 쓸어 쏨). 곡사 화기는 다 조준해 한 점에 |
+| `reload` | `ids`, `slot?` | 재장전 (더 채울 탄이 없으면 무시) |
+
+`slot` 을 빼면 주화기. 칸에 화기가 없으면 사격 명령은 무시된다.
 
 무력화·사망·패닉인 병사는 명령을 받지 않는다. 혼란·위축된 병사는 `STRESS.orderDelay`(2초) 뒤에 따른다 (`Soldier.order`, 나중 명령이 덮음). 제압된 병사는 받아 두지만 풀릴 때까지 움직이지 않는다.
 

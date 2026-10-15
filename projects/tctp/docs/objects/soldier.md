@@ -14,6 +14,7 @@
 | `size` | `BodySize` | 몸 크기 (m)·몸무게 (kg) |
 | `loadout` | `LoadoutItem[]` | 휴대 장비 (편제 공통 장구 `kit` + 직책별) |
 | `load` | number | 하중 (kg) = `loadOf(loadout)`. 편성 때 계산, 탄을 쓰면 줄인다 |
+| `loaded` | `Record<WeaponSlot, number>` | 화기 칸별 장전된 탄 수 (`loadout` 의 탄 수에 포함). 쏘면 둘 다 1 씩 준다 |
 | `posture` | `"stand" \| "crouch" \| "prone"` | 자세: 서기 / 앉아·무릎 / 엎드려 |
 | `status` | `SoldierStatus` | 상태 (아래). 매 틱 `updateBody` 가 정한다 |
 | `health` | `Health` | 부위별 체력 0~100 (아래) |
@@ -32,7 +33,7 @@
 ### 상태 `SoldierStatus`
 우선순위: `dead` 사망 > `incapacitated` 무력화(부상) > `panicked` 패닉(심리적 무력화) > `suppressed` 제압 > `reloading` 재장전 > `firing` 사격 > `moving` 이동 > `idle` 정지.
 위협 인지·혼란은 이동·사격과 함께 일어나므로 `status` 에 넣지 않고 `stressLevel` 로 본다.
-`firing`·`reloading` 은 자리만 있다 (사격 판정이 생기면 그쪽이 정한다. 이동 사격을 따로 둘지는 미정).
+`firing` = 사격 행동 중 (조준 포함), `reloading` = 재장전 행동 중. 이동 사격을 따로 둘지는 미정.
 
 | 상태 | 조건 | 효과 |
 |---|---|---|

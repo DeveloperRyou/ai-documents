@@ -33,7 +33,8 @@ content/  (지도·시나리오 JSON)
 | `types.ts` | `World` (지도, 지형 격자, RNG, 정수 `tick`, `soldiers`, 진영별 `contacts`, `log`), `Soldier` (이름·직책·몸 크기·휴대 장비·하중·자세·상태·부위별 체력·스트레스·지구력·위치), `Contact`, `Side` |
 | `time.ts` | 시간 상수 `DT = 0.25`, `TICKS_PER_SEC = 4`, `secToTicks`. 튜닝 수치는 초 단위로 적고 틱으로 바꾼다 (DT 를 바꿔도 다른 상수는 그대로) |
 | `world.ts` | `createWorld`, `step` (시간 상수 재노출) |
-| `action.ts` | 병사 행동 `Action`(지금은 `move`), 종류별 처리 함수 표 `ACTIONS`, 매 틱 `updateActions`, `destOf`, 튜닝 상수 `MOVE`. 구조는 [objects/action.md](objects/action.md) |
+| `action.ts` | 병사 행동 `Action`(`move`·`fire`·`reload`), 종류별 처리 함수 표 `ACTIONS`, 매 틱 `updateActions`, `destOf`, 튜닝 상수 `MOVE`. 구조는 [objects/action.md](objects/action.md) |
+| `fire.ts` | 화기 트리거 `pullTrigger` → 탄도선 판정(사람·지물·땅), 근탄 제압, 폭발, 부위 피해. 튜닝 상수 `FIRE`, 조준점 `AimPoint` |
 | `soldier.ts` | 기본 몸 `BODY`, 휴대 무게 한도 `checkCarry`, 몸 상태: 자세별 높이·기본 속도, 심리 단계 `stressLevelOf`, 하중 `loadOf`, 속도 `speedOf`, `damage`·`addStress`, 매 틱 `updateBody` (지구력·상태·스트레스). 튜닝 상수 `POSTURE_HEIGHT`·`BASE_SPEED`·`LOAD`·`STAMINA`·`STRESS`·`HEALTH` |
 | `command.ts` | `Command` 유니온(`move`, `stop`, `posture`), `TimedCommand`, `applyCommand`, 혼란 중 미룬 명령 `applyDueOrders` |
 | `replay.ts` | `runReplay`(명령 기록 재생), `stateHash`(FNV-1a 상태 지문) |
