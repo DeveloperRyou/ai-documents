@@ -30,7 +30,8 @@ content/  (지도·시나리오 JSON)
 | 파일 | 내용 |
 |---|---|
 | `types.ts` | `World` (지도, 지형 격자, RNG, 정수 `tick`, `soldiers`, 진영별 `contacts`, `log`), `Soldier` (이름·직책·몸 크기·휴대 장비·하중·자세·상태·부위별 체력·스트레스·지구력·위치), `Contact`, `Side` |
-| `world.ts` | `createWorld`, `step`, 시간 상수(`DT = 1`, `TICKS_PER_SEC = 1`), 튜닝 상수 `MOVE` |
+| `time.ts` | 시간 상수 `DT = 0.25`, `TICKS_PER_SEC = 4`, `secToTicks`. 튜닝 수치는 초 단위로 적고 틱으로 바꾼다 (DT 를 바꿔도 다른 상수는 그대로) |
+| `world.ts` | `createWorld`, `step`, 튜닝 상수 `MOVE` (시간 상수 재노출) |
 | `soldier.ts` | 몸 상태: 자세별 높이·기본 속도, 하중 `loadOf`, 속도 `speedOf`, `damage`·`addStress`, 매 틱 `updateBody` (지구력·상태·스트레스). 튜닝 상수 `POSTURE_HEIGHT`·`BASE_SPEED`·`LOAD`·`STAMINA`·`STRESS`·`HEALTH` |
 | `command.ts` | `Command` 유니온(`move`, `stop`, `posture`), `TimedCommand`, `applyCommand` |
 | `replay.ts` | `runReplay`(명령 기록 재생), `stateHash`(FNV-1a 상태 지문) |
@@ -65,7 +66,7 @@ step(world, commands)
   2. world.tick++
   3. updateMovement: 움직일 수 있는 병사(무력화·제압 아님)만, dest 쪽으로 speedOf(자세·하중·지구력·다리) × 선 칸의 move 배율 × DT 만큼 직선 이동. 다음 칸이 통행 불가면 그 자리, MOVE.arrive 안이면 정지
   4. updateBody: 지구력 소모·회복, status 결정 (제압·무력화면 엎드림), 스트레스 감소
-  5. updateVision: VISION.interval 틱마다 진영별로 적을 본다 (무력화된 병사는 관측자에서 빠짐)
+  5. updateVision: VISION.interval(1초) 틱마다 진영별로 적을 본다 (무력화된 병사는 관측자에서 빠짐)
        이미 보던 적 → 아무 관측자나 시선 투과율 ≥ VISION.track 이면 계속 봄
        아니면 관측자 id 순서로 detectChance 를 굴려 발견 (world.rng, 결정적)
        못 보면 마지막 위치를 VISION.memory 틱 동안 기억, 처음 발견하면 log 에 남김
@@ -94,7 +95,7 @@ step(world, commands)
 requestAnimationFrame:
   session.advance(경과 실시간)
      acc += 경과 (정지 중 0, 최대 LOOP.maxFrame)
-     acc 가 1초 이상인 동안: pending 을 commandLog 에 {tick, cmd} 로 기록 → step(world, pending) → pending 비움
+     acc 가 DT(0.25초) 이상인 동안: pending 을 commandLog 에 {tick, cmd} 로 기록 → step(world, pending) → pending 비움
   snapshot = session.snapshot(scenario.player) → renderer.draw({snapshot, selected}) → HUD
 ```
 

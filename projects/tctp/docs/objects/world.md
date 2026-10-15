@@ -6,7 +6,7 @@
 | `map` | 지도 `MapData` |
 | `terrain` | 지형 격자 ([terrain.md](terrain.md)) |
 | `rng` | 시드 RNG (mulberry32). 시뮬 안 난수는 이것만 |
-| `tick` | 경과 틱 (정수, 1틱 = 1초) |
+| `tick` | 경과 틱 (정수, 1틱 = 0.25초) |
 | `soldiers` | `Soldier[]` ([soldier.md](soldier.md)), `soldiers[id]` |
 | `contacts` | 진영별로 아는 적 `Record<Side, Contact[]>` (id 오름차순) |
 | `log` | `LogEntry { tick, side \| "system", text }` — 시작, 적 발견 등 |
@@ -22,12 +22,12 @@
 | `tick` | 마지막으로 본 틱 |
 | `visible` | 지금 보이는지 |
 
-갱신 (`updateVision`, `VISION.interval` = 1틱(1초)마다):
+갱신 (`updateVision`, `VISION.interval` = 1초(4틱)마다):
 - 이미 보던 적: 진영 안 누군가 시선 투과율 ≥ `track`(0.15) 이면 계속 봄.
 - 관측자 = 무력화·사망하지 않은 아군. 눈높이·표적 높이는 자세별 몸 높이로 계산 ([soldier.md](soldier.md)).
 - 처음 보는 적: 관측자 id 순서로 `detectChance` 를 굴림 = `baseChance(0.36) × min(1, (30m / 거리)²) × 시야각 배율 × 시선 투과율 × (1 − 은폐) × 움직이면(status = moving) 2`, 상한 0.95. 0.36 = 0.5초 주기 0.2 를 두 번 굴린 값 (1 − 0.8²).
 - 시야각: 정면 120° 안 1, 200° 끝에서 0.25 까지 감소, 그 밖 0. 최대 거리 800m.
-- 못 보게 되면 마지막 위치를 `memory`(30틱 = 30초) 동안 기억 후 잊음. 진영 안에서는 바로 공유.
+- 못 보게 되면 마지막 위치를 `memory`(30초 = 120틱) 동안 기억 후 잊음. 진영 안에서는 바로 공유.
 
 ## 명령 `Command` (`command.ts`)
 | 종류 | 필드 | 뜻 |
