@@ -22,11 +22,12 @@ Command (플레이어·AI 입력, commandLog 에 기록, 리플레이 대상)
 | 종류 | 필드 | 처리 (`ACTIONS`) | 끝 |
 |---|---|---|---|
 | `move` | `x`, `y` (목표, m), `pace` (걸음 계수), `gait` (`walk` 걷기 / `rush` 약진), `fire` (이동사격: 사격 행동 또는 null) | 목표 쪽으로 `speedOf(gait) × 선 칸 move 계수 × pace × 틱 흔들림 × DT` 만큼 직선 이동, 방향을 목표로. 다음 위치가 통행 불가면 그 자리 (경로 탐색 없음). **약진**: 서서 뛰고 (3.5 m/s × 하중·지구력, 지구력 소모 큼) 도착하면 엎드린다. 다리를 다쳤거나 약해졌으면 걷는다. **이동사격** (걷기 + `fire`): 걸음 × `MOVE.fireSpeed`(0.5), 같은 틱에 `fire` 를 한 걸음 진행 (산포 × 2). 속도 식은 [../calc/movement.md](../calc/movement.md). 표적을 놓치거나 탄창이 비면 사격만 그친다 (걸으며 재장전하지 않음) | 목표 `MOVE.arrive`(0.5m) 안 |
-| `fire` | `slot`, `at`(조준점: 아는 적 `{soldier, id}` / 지점 `{point, x, y}`), `aim`(초, 화기 기준 조준 시간 × 명령의 조준 계수), `burst`(발), `sweep`(m), 진행 `aimed`·`need`·`left`·`shot`·`ox`·`oy` | 조준점을 향해 `aim` × 조준 시간 계수(심리 `FIRE.stressAim` × 팔 × 실혈, ± `VARY.aim`) 초 조준 → 점사 `burst` (2발 이상이면 ± 1) 발 (한 틱에 `max(1, round(rof × DT / 60))` 발) → 다시 조준. 점사마다 조준점 둘레 `sweep` 안의 한 점 + 겨눔 어긋남(`VARY.hold`)을 겨눈다. 탄창이 비면 재장전 행동으로 바꾸고 끝나면 이어 쏜다 | 겨눈 적이 안 보이거나 죽음, 탄이 다 떨어짐, 두 팔을 다 못 씀 |
+| `fire` | `slot`, `at`(조준점: 아는 적 `{soldier, id}` / 지점 `{point, x, y}`), `aim`(초, 화기 기준 조준 시간 × 명령의 조준 계수), `burst`(발), `sweep`(m), 진행 `aimed`·`need`·`left`·`shot`·`ox`·`oy` | 조준점을 향해 `aim` × 조준 시간 계수(심리 `FIRE.stressAim` × 팔 × 실혈, ± `VARY.aim`) 초 조준 → 점사 `burst` (2발 이상이면 ± 1) 발 (한 틱에 `max(1, round(rof × DT / 60))` 발) → 다시 조준. 점사마다 조준점 둘레 `sweep` 안의 한 점 + 겨눔 어긋남(`VARY.hold`)을 겨눈다. 탄창이 비면 재장전 행동으로 바꾸고 끝나면 이어 쏜다 | 겨눈 적이 진영에 안 보이거나 **사수 본인 눈에 안 보임**(`canAimAt`: 표적 쪽으로 돌아섰을 때 시선 투과 < `VISION.track`), 죽음, 탄이 다 떨어짐, 두 팔을 다 못 씀 |
 | `reload` | `slot`, `until`(틱), `then`(이어 갈 사격) | `until` 에 장전 수만큼 (모자라면 남은 만큼) 채우고 `then` 으로 | `then` 이 없으면 채운 뒤 |
 | `rest` | (없음) | 아무것도 하지 않는다. 이 행동 중에만 지구력이 `RATES.stamina.rest` 로 회복 | 평온(`calm`)이 깨지면 (`updateBody`) |
 
 조준사격·제압사격은 같은 `fire` 행동이다 (명령이 `FIRE_ORDER` 로 조준 시간·발 수·반경만 달리 넣는다, [world.md](world.md)).
+조준사격(적 한 명)은 사수 본인이 그 적을 볼 때만 된다 — 다른 아군만 보는 적은 명령 때 거부(행동을 바꾸지 않음)되고, 쏘는 중에 가려지면 그친다 (이동사격은 사격만 그친다). 못 보는 적의 알려진 자리는 제압사격(지점)으로 쏜다.
 다음 단계에서 늘어날 것: 수류탄 투척, 개인호 구축, 응급처치, 웅크리기·도주 (패닉).
 
 ## 흔들림 ([`core/vary.ts`](../../packages/sim/src/core/vary.ts), `VARY`)
