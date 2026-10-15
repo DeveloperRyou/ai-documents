@@ -172,6 +172,7 @@ requestAnimationFrame:
 | [`fetch-osm.ts`](../packages/tools/src/fetch-osm.ts) | `npm run fetch-map` | Overpass 에서 bbox 의 지물을 받아 미터 좌표 `MapData` 로 변환해 `content/maps/<id>.json` 에 저장. 원본은 `content/maps/raw/` 에 캐시 (`--from-cache` 로 재변환만) |
 | [`elevation.ts`](../packages/tools/src/elevation.ts) | (fetch-osm 이 호출) | AWS Terrain Tiles (terrarium PNG) 를 받아 고도 격자로 재표본화. PNG 디코더는 직접 구현 |
 | [`content.ts`](../packages/tools/src/content.ts) | | `content/` 를 파일 경로로 읽어 `ContentDb`·시나리오·지도로 (`loadDb`, `loadScenario`, `loadMap`) |
+| [`calc-charts.ts`](../packages/tools/src/calc-charts.ts) | `npm run charts` | 튜닝 상수로 수치 계산 그래프를 그려 `docs/calc/img/*.svg` 로 쓴다 (식은 시뮬과 같게 옮김) |
 | [`headless.ts`](../packages/tools/src/headless.ts) | `npm run headless` | 시나리오(`--scenario`, 기본 배틀 드릴 1)를 시드마다 돌려 `stateHash`, 진영별 첫 발견 시각, 아는 적 수, 소요 시간을 출력. 명령은 임시로 "플레이어 부대 전원이 적 부대 위치로 이동" |
 
 ## 데이터

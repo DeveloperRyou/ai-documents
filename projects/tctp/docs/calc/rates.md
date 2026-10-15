@@ -23,6 +23,9 @@
 | 폭발 `blast` | 40 | (1 − 거리/제압 반경) × 시선 차폐(막히면 0.15) | [`combat/fire.ts`](../../packages/sim/src/combat/fire.ts) `explode` |
 | 전우 피격 `buddyDown` | 15 | `buddyRadius`(15m) 안의 같은 편 (싸울 수 있는) 병사 | [`body/soldier.ts`](../../packages/sim/src/body/soldier.ts) `updateBody`, 무력화·사망하는 틱 |
 
+![근탄 한 발이 올리는 스트레스 (± 30% 흔들림 전, 엄폐 없음)](img/rates-nearmiss.svg)
+*근탄 한 발이 올리는 스트레스 (± 30% 흔들림 전, 엄폐 없음)*
+
 ### 확률 사건
 | 사건 | 확률 | 결과 |
 |---|---|---|
@@ -30,15 +33,24 @@
 | 제압 중 패닉 `breakPerSec` | 초당 0.2 × (스트레스 − 70) / 30 | 패닉. 스트레스가 최대(100)에 닿으면 반드시 |
 | 패닉 회복 `rallyPerSec` | 스트레스 < `STRESS.rally`(30) 일 때 초당 0.25 | 그 스트레스의 단계로 돌아감 |
 
+![제압(70) 을 넘으면 스트레스에 비례해 패닉 확률이 오르고, 100 이면 반드시](img/rates-break.svg)
+*제압(70) 을 넘으면 스트레스에 비례해 패닉 확률이 오르고, 100 이면 반드시*
+
 ### 줄어듦 (매 틱 `updateStress`)
 - 마지막 위협 뒤 `quiet`(4초)가 지나기 전에는 줄지 않는다 (근탄마다 다시 센다. 3초에 1발이면 풀리지 않아 제압이 유지된다).
 - 초당 감소 = `decay`(2) × (1 + `cover`(0.5) × 발밑 엄폐) × (`buddyRadius` 안에 싸울 수 있는 전우가 있으면 `buddyNear` 1.3) × (피를 흘리면 `bleeding` 0.4).
 - 틱마다 이 값에 ± `decayVary`(50%)를 곱한다.
 
+![마지막 위협 뒤 4초 기다린 다음 형편에 따라 다른 속도로 준다](img/rates-recover.svg)
+*마지막 위협 뒤 4초 기다린 다음 형편에 따라 다른 속도로 준다*
+
 ## 지구력 `RATES.stamina`
 - 움직인 틱: 초당 `drain[자세]` × (1 + 하중 비율 × `LOAD.staminaPerRatio` 2) × (1 ± `vary` 20%). 걸을 때는 서기 0.01, 앉아 0.05, 포복 0.15, 약진은 자세와 상관없이 1.
 - 멈춘 틱: 휴식 행동 중이면 초당 `rest`(0.3, 0 → 100 약 5분), 아니면 `idle`(0.02) × (1 ± 20%).
 - 문턱(속도가 줄기 시작하는 `tiredAt` 50, 최저 속도 배율)은 [`body/soldier.ts`](../../packages/sim/src/body/soldier.ts) `STAMINA`.
+
+![자세·걸음별 지구력 소모 (멈추면 거의 회복 안 됨, 쉬어야 회복)](img/rates-stamina.svg)
+*자세·걸음별 지구력 소모 (멈추면 거의 회복 안 됨, 쉬어야 회복)*
 
 ## 혈액 `RATES.blood`
 - 부상마다 출혈 속도(mL/초)가 붙는다. 다칠 때 표 값 × (1 ± `vary` 40%)로 정한다 (`rollWound`, [`body/wound.ts`](../../packages/sim/src/body/wound.ts)).
@@ -53,6 +65,9 @@
 | 팔다리 | 0.1 | 0.5 | 3 (≈ 14분) | 12 (동맥, ≈ 3.5분) |
 
 - 지금은 출혈을 멈출 방법이 없다. 응급처치(지혈대·압박)는 리더 로직과 함께 넣는다 (사용자 결정).
+
+![부상 하나의 혈액 감소와 약해짐·실신·사망 문턱](img/rates-blood.svg)
+*부상 하나의 혈액 감소와 약해짐·실신·사망 문턱*
 
 ## 매 틱 순서 (`updateBody`, [`body/soldier.ts`](../../packages/sim/src/body/soldier.ts))
 출혈 → (무력화면 쓰러짐) → 지구력 → 상태 → (막 쓰러졌으면 전우 피격) → 자세 → 스트레스.

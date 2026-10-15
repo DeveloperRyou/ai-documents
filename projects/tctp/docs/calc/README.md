@@ -2,6 +2,7 @@
 
 객체가 **무엇을 가지는지**는 [`../objects/`](../objects/README.md), 그 값들이 **어떻게 섞여 결과가 되는지**는 여기에 둔다.
 식은 코드(`packages/sim/src`)를 그대로 옮긴 것이고, 상수 이름을 함께 적는다. 상수 값이 바뀌면 이 문서의 표·계산 예도 고친다.
+그래프(`img/*.svg`)는 튜닝 상수로 그린다: 상수를 바꾸면 `npm run charts` 로 다시 그린다 ([`tools/src/calc-charts.ts`](../../packages/tools/src/calc-charts.ts)). 식을 바꾸면 그 스크립트의 같은 식도 고친다.
 
 | 문서 | 무엇을 셈하나 | 코드 (상수) |
 |---|---|---|

@@ -13,6 +13,7 @@ npm run format       # Biome 자동 수정
 npm run build        # 클라이언트 빌드 (CI 는 check + build)
 npx vitest run packages/sim/src/core/world.test.ts   # 테스트 파일 하나 (-t "<이름>" 으로 골라 돌리기)
 npm run headless -- 1 --n 10 --sec 120 [--scenario id]
+npm run charts       # docs/calc/img/*.svg 다시 그리기 (튜닝 상수·식을 바꾼 뒤)
 npm run fetch-map -- <id> <남> <서> <북> <동> [이름]   # content/maps/<id>.json (--from-cache, --no-elev)
 ```
 
@@ -44,4 +45,4 @@ npm run fetch-map -- <id> <남> <서> <북> <동> [이름]   # content/maps/<id>
 - 사용자가 요청한 범위만 바꾼다. 특히 요청 밖 UI 변경 금지 — 제안만 한다.
 - 시뮬 규칙을 바꾸면 테스트를 추가하고, 밸런스에 영향이 있으면 headless 로 전후를 비교해 보고한다.
 - 개인 개발이다. 브랜치·PR 없이 작업 단위가 끝나면 (`npm run check` 통과 후) `main` 에 바로 커밋한다.
-- 코드를 커밋할 때마다 `docs/`(객체 필드를 바꾸면 `docs/objects/`, 튜닝 상수·식·난수 굴림을 바꾸면 `docs/calc/` 도)·`AGENTS.md`·`README.md` 를 최신화해야 하는지 판단하고, 필요하면 같은 작업에서 고친다 (`docs/`·`AGENTS.md` 는 ai-documents 쪽에 커밋).
+- 코드를 커밋할 때마다 `docs/`(객체 필드를 바꾸면 `docs/objects/`, 튜닝 상수·식·난수 굴림을 바꾸면 `docs/calc/` 와 `npm run charts` 도)·`AGENTS.md`·`README.md` 를 최신화해야 하는지 판단하고, 필요하면 같은 작업에서 고친다 (`docs/`·`AGENTS.md` 는 ai-documents 쪽에 커밋).
