@@ -2,45 +2,45 @@
 
 코드: [`body/soldier.ts`](../../packages/sim/src/body/soldier.ts) `speedOf`, [`command/action.ts`](../../packages/sim/src/command/action.ts) `ACTIONS.move`. 이동 행동의 필드는 [../objects/action.md](../objects/action.md).
 
-## 낼 수 있는 속도 `speedOf(s, gait)` (m/s, 지형 배율 전)
+## 낼 수 있는 속도 `speedOf(s, gait)` (m/s, 지형 계수 전)
 
 ```
-속도 = 기본 × 하중 배율 × 지구력 배율 × 다리 배율 × 실혈 배율
+속도 = 기준 속도 × 하중 계수 × 지구력 계수 × 다리 계수 × 실혈 계수
 ```
 
 | 항 | 식 | 상수 |
 |---|---|---|
-| 기본 | 걷기 = 자세별 (서기 1.4 · 앉아 0.8 · 포복 0.25). 약진 = 3.5 (서서 뜀). 약진을 못 하면 (다리 저하·실혈) 선 걸음 1.4. 다리 하나라도 못 쓰면 무엇이든 포복 0.25 | `BASE_SPEED`, `RUSH_SPEED`, `canRush` |
-| 하중 배율 | r = 하중 ÷ 몸무게, `max(minSpeed, 1 − speedPerRatio × max(0, r − freeRatio))` = `max(0.4, 1 − 0.6 × max(0, r − 0.15))` | `LOAD.freeRatio` 0.15, `speedPerRatio` 0.6, `minSpeed` 0.4 |
-| 지구력 배율 | `minSpeed + (1 − minSpeed) × min(1, 지구력 / tiredAt)` = `0.5 + 0.5 × min(1, 지구력 / 50)` (50 이상이면 1, 0 이면 0.5) | `STAMINA.tiredAt` 50, `minSpeed` 0.5 |
-| 다리 배율 | 경상(저하) 0.5, 멀쩡 1 (못 쓰면 위 기본에서 포복) | `WOUND.legImpaired` |
-| 실혈 배율 | 피를 30% 넘게 잃으면 0.6 | `WOUND.weak.speed` |
+| 기준 속도 | 걷기 = 자세별 (서기 1.4 · 앉아 0.8 · 포복 0.25). 약진 = 3.5 (서서 뜀). 약진을 못 하면 (다리 저하·실혈) 선 걸음 1.4. 다리 하나라도 못 쓰면 무엇이든 포복 0.25 | `BASE_SPEED`, `RUSH_SPEED`, `canRush` |
+| 하중 계수 | r = 하중 ÷ 몸무게, `max(minSpeed, 1 − speedPerRatio × max(0, r − freeRatio))` = `max(0.4, 1 − 0.6 × max(0, r − 0.15))` | `LOAD.freeRatio` 0.15, `speedPerRatio` 0.6, `minSpeed` 0.4 |
+| 지구력 계수 | `minSpeed + (1 − minSpeed) × min(1, 지구력 / tiredAt)` = `0.5 + 0.5 × min(1, 지구력 / 50)` (50 이상이면 1, 0 이면 0.5) | `STAMINA.tiredAt` 50, `minSpeed` 0.5 |
+| 다리 계수 | 경상(저하) 0.5, 멀쩡 1 (못 쓰면 위 기준 속도에서 포복) | `WOUND.legImpaired` |
+| 실혈 계수 | 피를 30% 넘게 잃으면 0.6 | `WOUND.weak.speed` |
 
 화면의 병사 상세 "속도"(`SoldierView.body.speed`)는 걷기 속도다.
 
-![하중 배율: 몸무게의 15% 까지는 그대로, 넘으면 직선으로 줄고 0.4 에서 멈춘다](img/move-load.svg)
-*하중 배율: 몸무게의 15% 까지는 그대로, 넘으면 직선으로 줄고 0.4 에서 멈춘다*
+![하중 계수: 몸무게의 15% 까지는 그대로, 넘으면 직선으로 줄고 0.4 에서 멈춘다](img/move-load.svg)
+*하중 계수: 몸무게의 15% 까지는 그대로, 넘으면 직선으로 줄고 0.4 에서 멈춘다*
 
-![지구력 배율: 50 아래에서만 줄어 0 이면 절반](img/move-stamina.svg)
-*지구력 배율: 50 아래에서만 줄어 0 이면 절반*
+![지구력 계수: 50 아래에서만 줄어 0 이면 절반](img/move-stamina.svg)
+*지구력 계수: 50 아래에서만 줄어 0 이면 절반*
 
-![국군 소총수 실제 속도 (하중 배율 0.91 포함)](img/move-speed.svg)
-*국군 소총수 실제 속도 (하중 배율 0.91 포함)*
+![국군 소총수 실제 속도 (하중 계수 0.91 포함)](img/move-speed.svg)
+*국군 소총수 실제 속도 (하중 계수 0.91 포함)*
 
 ## 한 틱에 가는 거리 (`ACTIONS.move`)
 
 ```
-걸음 = speedOf × 선 칸 move 배율 × pace × (이동사격이면 0.5) × stride × DT
+걸음 = speedOf × 선 칸 move 계수 × pace × (이동사격이면 0.5) × stride × DT
 ```
 - `pace`: 이동 명령을 받을 때 한 번 굴린 1 ± 10% (`VARY.pace`). `stride`: 틱마다 1 ± 5% (`VARY.stride`). [random/rolls.md](random/rolls.md).
-- 선 칸 `move` 배율: 지형 표 ([../objects/terrain.md](../objects/terrain.md)). 도로 1.1, 숲 0.7, 덤불 0.6, 참호 0.4 …
+- 선 칸 `move` 계수: 지형 표 ([../objects/terrain.md](../objects/terrain.md)). 도로 1.1, 숲 0.7, 덤불 0.6, 참호 0.4 …
 - 목표까지 남은 거리보다 길면 목표에서 멈춘다. 남은 거리가 `MOVE.arrive` 0.5m 안이면 도착 (약진이면 엎드림).
 - 다음 위치 칸의 `move` 가 0 (건물·물·강)이면 그 틱은 움직이지 않는다. 경로 탐색이 없어 막히면 그 자리에서 행동이 계속된다.
 - 약진은 출발 틱에 서고, 걷기는 자세를 그대로 둔다. 이동사격은 걷기에만 붙는다 (`MOVE.fireSpeed` 0.5).
 
 ## 계산 예 (몸무게 70kg, 지구력 50 이상, 다치지 않음)
 
-| 병사 | 하중 | r | 하중 배율 | 서서 걷기 | 약진 |
+| 병사 | 하중 | r | 하중 계수 | 서서 걷기 | 약진 |
 |---|---|---|---|---|---|
 | 국군 소총수·분대장 (장구 15 + K2 + 5.56 210발) | 20.8 kg | 0.30 | 0.91 | 1.28 m/s | 3.19 m/s |
 | 국군 기관총 사수 (장구 15 + K15 + 5.56 600발) | 29.3 kg | 0.42 | 0.84 | 1.17 m/s | 2.94 m/s |
@@ -55,8 +55,8 @@
 
 | 상수 | 값 | 하는 일 | 키우면 |
 |---|---|---|---|
-| `BASE_SPEED.stand` / `crouch` / `prone` | 1.4 / 0.8 / 0.25 m/s | 짐 없고 지치지 않은 사람이 그 자세로 걷는(기는) 속도. 모든 배율이 곱해지는 출발점 | 그 자세 이동이 빨라짐 |
-| `RUSH_SPEED` | 3.5 m/s | 약진(서서 뛰기) 기본 속도 | 약진이 빨라짐 (지구력 소모는 그대로 `RATES.stamina.drain.rush`) |
+| `BASE_SPEED.stand` / `crouch` / `prone` | 1.4 / 0.8 / 0.25 m/s | 짐 없고 지치지 않은 사람이 그 자세로 걷는(기는) 속도. 모든 계수가 곱해지는 출발점 | 그 자세 이동이 빨라짐 |
+| `RUSH_SPEED` | 3.5 m/s | 약진(서서 뛰기) 기준 속도 | 약진이 빨라짐 (지구력 소모는 그대로 `RATES.stamina.drain.rush`) |
 | `LOAD.freeRatio` | 0.15 | 몸무게 대비 이 비율까지의 짐은 속도를 깎지 않는다 (70kg 이면 10.5kg) | 더 무거운 짐까지 속도 그대로 |
 | `LOAD.speedPerRatio` | 0.6 | freeRatio 를 넘는 하중 비율 1 당 깎는 속도 비율 (r 이 0.1 넘으면 6% 느려짐) | 짐이 속도를 더 많이 깎음 |
 | `LOAD.minSpeed` | 0.4 | 짐 때문에 깎이는 속도의 바닥 (아무리 무거워도 40% 는 남음) | 무거운 짐에도 덜 느려짐 |
@@ -65,10 +65,10 @@
 | `LOAD.maxRatio` | 0.7 | 이를 넘는 휴대 목록은 오류 (`checkCarry`). 속도와 무관 | — |
 | `STAMINA.tiredAt` | 50 | 지구력이 이 아래로 내려가면 속도가 줄기 시작 | 더 일찍 느려짐 |
 | `STAMINA.minSpeed` | 0.5 | 지구력 0 일 때 남는 속도 비율 | 녹초가 돼도 덜 느려짐 |
-| `WOUND.legImpaired` | 0.5 | 다리 경상(기능 저하)일 때 속도 배율. 약진도 못 함 | 다리 다쳐도 덜 느려짐 |
-| `WOUND.weak.speed` | 0.6 | 피를 `WOUND.weakLoss`(30%) 넘게 잃었을 때 속도 배율. 약진도 못 함 | 실혈해도 덜 느려짐 |
+| `WOUND.legImpaired` | 0.5 | 다리 경상(기능 저하)일 때 속도 계수. 약진도 못 함 | 다리 다쳐도 덜 느려짐 |
+| `WOUND.weak.speed` | 0.6 | 피를 `WOUND.weakLoss`(30%) 넘게 잃었을 때 속도 계수. 약진도 못 함 | 실혈해도 덜 느려짐 |
 | `MOVE.arrive` | 0.5 m | 목표까지 이 거리 안이면 도착으로 보고 행동을 끝냄 | 목표 근처에서 더 일찍 멈춤 |
-| `MOVE.fireSpeed` | 0.5 | 이동사격(걸으며 쏨) 중 걸음 배율 | 쏘면서 더 빨리 걸음 |
+| `MOVE.fireSpeed` | 0.5 | 이동사격(걸으며 쏨) 중 걸음 계수 | 쏘면서 더 빨리 걸음 |
 | `VARY.pace` | ± 10% | 이동 명령마다 한 번 굴리는 그 병사의 걸음 빠르기 (대형이 조금씩 흩어짐) | 같은 명령에도 도착 시각이 더 벌어짐 |
 | `VARY.stride` | ± 5% | 틱마다 걸음 흔들림 | 걸음이 더 들쭉날쭉 |
-| 지형 `move` | 칸마다 ([../objects/terrain.md](../objects/terrain.md)) | 선 칸의 통행 배율. 0 이면 들어갈 수 없음 | 그 지형이 빨라짐 |
+| 지형 `move` | 칸마다 ([../objects/terrain.md](../objects/terrain.md)) | 선 칸의 통행 계수. 0 이면 들어갈 수 없음 | 그 지형이 빨라짐 |

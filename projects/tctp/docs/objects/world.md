@@ -30,7 +30,7 @@
 - 이미 보던 적: 진영 안 누군가 시선 투과율 ≥ `track`(0.15) 이면 계속 봄.
 - 처음 보는 적: 관측자 id 순서로 발견 확률을 굴림 (거리·시야각(`look` 기준)·시선 투과율·은폐·움직임·걷는 관측자·관측자 심리 단계의 곱, 상한 0.95).
 - 못 보게 되면 마지막 위치를 `memory`(30초 = 120틱) 동안 기억 후 잊음.
-- 식·상수·계산 예(거리별 발견 확률, 매복)는 [../calc/vision.md](../calc/vision.md). 확인장은 배율마다 값을 보여 준다 (`detectFactors`: 숨음 ×, 걷는 눈 ×).
+- 식·상수·계산 예(거리별 발견 확률, 매복)는 [../calc/vision.md](../calc/vision.md). 확인장은 계수마다 값을 보여 준다 (`detectFactors`: 숨음 ×, 걷는 눈 ×).
 
 ## 명령 `Command` ([`command/command.ts`](../../packages/sim/src/command/command.ts))
 | 종류 | 필드 | 뜻 |
@@ -55,7 +55,7 @@
 `Snapshot { tick, time(초), viewer, soldiers: SoldierView[] }`, 세션에서 꺼내면 `paused`, `commands`(명령 수) 추가.
 
 `SoldierView`: `id, side, name, role, squad, team, x, y, facing, look, dest(이동 행동의 목표), posture, body?, contact?`
-- `body`: `{ action(행동 종류), status, wounds([{ part, severity }]), blood(남은 혈액 비율 0~1), stress, stressLevel, stamina, load, speed }` — `speed` 는 지금 낼 수 있는 걷기 속도 (m/s, 지형 배율 전).
+- `body`: `{ action(행동 종류), status, wounds([{ part, severity }]), blood(남은 혈액 비율 0~1), stress, stressLevel, stamina, load, speed }` — `speed` 는 지금 낼 수 있는 걷기 속도 (m/s, 지형 계수 전).
 - 보는 진영 병사: 전부 담김, `dest`·`body` 포함.
 - 적: `contacts` 에 있는 적만. 이름·직책·소속은 빈 문자열, `dest`·`body` 없음.
   `contact = "seen"` 이면 실제 위치·방향·자세, `"last"` 이면 마지막으로 본 위치 (`posture = null`).
