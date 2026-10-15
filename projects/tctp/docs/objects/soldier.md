@@ -23,7 +23,7 @@
 | `stamina` | number | 지구력 0~100 |
 | `x`, `y` | number | 위치 (m). 원점 = 지도 북서쪽, x 동쪽, y 남쪽 |
 | `facing` | number | 바라보는 방향, 화면 라디안 (0 = 동, 시계방향). 시나리오에서는 방위각(도)으로 주고 `bearingToFacing` 으로 바꾼다 |
-| `dest` | `{x, y} \| null` | 이동 목표. 없으면 정지 |
+| `action` | `Action \| null` | 지금 하는 행동. 없으면 대기 ([action.md](action.md)) |
 
 ## 몸 상태 (`soldier.ts`)
 
@@ -36,10 +36,10 @@
 
 | 상태 | 조건 | 효과 |
 |---|---|---|
-| `dead` | 급소(머리·가슴·복부) 하나가 0 | 엎드려 쓰러짐, 명령·이동·관측 없음 |
+| `dead` | 급소(머리·가슴·복부) 하나가 0 | 엎드려 쓰러짐, 명령·행동·관측 없음 |
 | `incapacitated` | 급소 하나가 `HEALTH.incapacitated`(40) 미만 | 위와 같음 (살아는 있음) |
-| `panicked` | `stressLevel = broken` | 엎드려 웅크림, 명령·관측 없음, 이동 목표 버림 |
-| `suppressed` | `stressLevel = suppressed` | 엎드림, 이동 명령은 받아 두지만 풀릴 때까지 안 감 |
+| `panicked` | `stressLevel = broken` | 엎드려 웅크림, 명령·관측 없음, 행동 버림 |
+| `suppressed` | `stressLevel = suppressed` | 엎드림, 행동이 멈춤 (남겨 두었다가 풀리면 이어 감) |
 | `moving` | 이번 틱에 움직임 | |
 | `idle` | 그 밖 | |
 

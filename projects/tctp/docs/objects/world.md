@@ -11,8 +11,8 @@
 | `contacts` | 진영별로 아는 적 `Record<Side, Contact[]>` (id 오름차순) |
 | `log` | `LogEntry { tick, side \| "system", text }` — 시작, 적 발견 등 |
 
-상태는 `step(world, commands)` 안에서만 바뀐다: 명령 적용 → 미뤄 둔 명령(`applyDueOrders`) → `tick++` → 이동 → 몸 상태(`updateBody`: 지구력·상태·스트레스) → 시야.
-`stateHash` 는 tick·RNG·병사 위치·자세·상태·스트레스·심리 단계·미뤄 둔 명령 틱·지구력·하중·부위별 체력·contacts 를 섞는다. 새 상태 필드를 넣으면 해시에도 넣는다.
+상태는 `step(world, commands)` 안에서만 바뀐다: 명령 적용 → 미뤄 둔 명령(`applyDueOrders`) → `tick++` → 행동(`updateActions`) → 몸 상태(`updateBody`: 지구력·상태·스트레스) → 시야.
+`stateHash` 는 tick·RNG·병사 위치·자세·상태·행동(종류·필드)·스트레스·심리 단계·미뤄 둔 명령 틱·지구력·하중·부위별 체력·contacts 를 섞는다. 새 상태 필드를 넣으면 해시에도 넣는다.
 
 ## 아는 적 `Contact` (`types.ts`, 갱신은 `vision.ts`)
 | 필드 | 뜻 |
@@ -32,8 +32,8 @@
 ## 명령 `Command` (`command.ts`)
 | 종류 | 필드 | 뜻 |
 |---|---|---|
-| `move` | `ids`, `x`, `y` | 병사들의 이동 목표 지정 |
-| `stop` | `ids` | 이동 목표 해제 |
+| `move` | `ids`, `x`, `y` | 병사들에게 이동 행동을 준다 (진행 중 행동을 덮음) |
+| `stop` | `ids` | 행동을 비운다 |
 | `posture` | `ids`, `posture` | 자세 바꾸기 (`stand`·`crouch`·`prone`) |
 
 무력화·사망·패닉인 병사는 명령을 받지 않는다. 혼란·위축된 병사는 `STRESS.orderDelay`(2초) 뒤에 따른다 (`Soldier.order`, 나중 명령이 덮음). 제압된 병사는 받아 두지만 풀릴 때까지 움직이지 않는다.
@@ -45,8 +45,8 @@
 
 `Snapshot { tick, time(초), viewer, soldiers: SoldierView[] }`, 세션에서 꺼내면 `paused`, `commands`(명령 수) 추가.
 
-`SoldierView`: `id, side, name, role, squad, team, x, y, facing, dest, posture, body?, contact?`
-- `body`: `{ status, health, stress, stressLevel, stamina, load, speed }` — `speed` 는 지금 낼 수 있는 속도 (m/s, 지형 배율 전).
+`SoldierView`: `id, side, name, role, squad, team, x, y, facing, dest(이동 행동의 목표), posture, body?, contact?`
+- `body`: `{ action(행동 종류), status, health, stress, stressLevel, stamina, load, speed }` — `speed` 는 지금 낼 수 있는 속도 (m/s, 지형 배율 전).
 - 보는 진영 병사: 전부 담김, `dest`·`body` 포함.
 - 적: `contacts` 에 있는 적만. 이름·직책·소속은 빈 문자열, `dest`·`body` 없음.
   `contact = "seen"` 이면 실제 위치·방향·자세, `"last"` 이면 마지막으로 본 위치 (`posture = null`).
