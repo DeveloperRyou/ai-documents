@@ -5,7 +5,8 @@
 
 | 문서 | 객체 | 코드 | 데이터 |
 |---|---|---|---|
-| [soldier.md](soldier.md) | 병사 `Soldier`, 몸 크기 `BodySize`, 휴대 장비 `LoadoutItem` | `types.ts`, `soldier.ts` (`BODY`) | 편제에서 생성 |
+| [soldier.md](soldier.md) | 병사 `Soldier`, 부상 `Wound`, 몸 크기 `BodySize`, 휴대 장비 `LoadoutItem` | `types.ts`, `soldier.ts` (`BODY`), `wound.ts` | 편제에서 생성 |
+| [rates.md](rates.md) | 늘고 주는 몸 수치 `RATES` (스트레스·지구력·출혈의 양과 확률 전환) | `rates.ts` | — |
 | [action.md](action.md) | 행동 `Action` (명령 → 임무 → 행동 → 장비 구조) | `action.ts` | — |
 | [equipment.md](equipment.md) | 화기 `Weapon`, 탄약 `Ammo`, 장구 `Gear` | `equipment.ts` | `content/equipment.json` |
 | [org.md](org.md) | 편제 `OrgTemplate` → 조 `OrgTeam` → 직책 `OrgMember` | `org.ts` | `content/orgs/*.json` |
@@ -28,4 +29,4 @@ Scenario ─ forces[] ─ ForceSpec ─ org id ─▶ OrgTemplate ─ teams[] �
 
 - 데이터 객체(장비·편제·시나리오)는 JSON 이고 id 로 서로 가리킨다. 병사는 장비를 id + 수량으로만 들고, 성능은 카탈로그에서 찾는다.
 - 상태가 바뀌는 객체는 `World` 안의 `Soldier`(행동 `Action` 포함)·`Contact` 뿐이고, `step` 안에서만 바뀐다.
-- 사격 판정은 아직 없다 (스트레스·부위 피해를 주는 쪽). 들어갈 자리는 [action.md](action.md) "장비 트리거"와 [`../DESIGN.md`](../DESIGN.md) "시뮬 모델".
+- 사격 판정은 [action.md](action.md) "사격 판정", 부상은 [soldier.md](soldier.md) "부상", 늘고 주는 수치는 [rates.md](rates.md).

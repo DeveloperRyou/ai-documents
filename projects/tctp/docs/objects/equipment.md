@@ -32,7 +32,7 @@
 | `explosive` | 폭발 여부 |
 | `blastRadius` | 폭발 살상 반경 (m). 폭발하지 않으면 0 |
 | `suppressionRadius` | 제압 반경 (m). 직사는 탄도선(총구 → 탄착점) 주변, 폭발은 탄착점 주변 |
-| `damage` | 피해 (체력). 직사는 맞은 부위에, 폭발은 살상 반경 안에서 |
+| `damage` | 상처 위력 (소총탄 ≈ 50 기준). 클수록 같은 부위도 더 심하게 다친다 (부상 정도 확률을 무거운 쪽으로 민다, [soldier.md](soldier.md) "부상"). 폭발 파편은 살상 반경 끝에서 × 0.4 |
 
 함수: `weaponIn(loadout, catalog, slot)` = 칸에 든 화기, `roundsOf(loadout, ammo)` = 지닌 탄 수(장전 탄 포함), `initialLoaded` = 처음 장전 (장전 수와 지닌 탄 중 작은 값). 사격 판정은 [action.md](action.md) "사격 판정".
 

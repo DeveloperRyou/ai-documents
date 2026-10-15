@@ -30,14 +30,16 @@ content/  (지도·시나리오 JSON)
 
 | 파일 | 내용 |
 |---|---|
-| `types.ts` | `World` (지도, 지형 격자, RNG, 정수 `tick`, `soldiers`, 진영별 `contacts`, `log`), `Soldier` (이름·직책·몸 크기·휴대 장비·하중·자세·상태·부위별 체력·스트레스·지구력·위치), `Contact`, `Side` |
+| `types.ts` | `World` (지도, 지형 격자, RNG, 정수 `tick`, `soldiers`, 진영별 `contacts`, `log`), `Soldier` (이름·직책·몸 크기·휴대 장비·하중·자세·상태·부상·혈액·스트레스·지구력·위치), `Wound`, `Contact`, `Side` |
 | `time.ts` | 시간 상수 `DT = 0.25`, `TICKS_PER_SEC = 4`, `secToTicks`. 튜닝 수치는 초 단위로 적고 틱으로 바꾼다 (DT 를 바꿔도 다른 상수는 그대로) |
 | `world.ts` | `createWorld`, `step` (시간 상수 재노출) |
 | `action.ts` | 병사 행동 `Action`(`move`·`fire`·`reload`), 종류별 처리 함수 표 `ACTIONS`, 매 틱 `updateActions`, `destOf`, 튜닝 상수 `MOVE`. 구조는 [objects/action.md](objects/action.md) |
 | `drills.ts` | 행동 확인장 드릴 `DRILLS` (작은 평지 + 배치 + 명령 기록 + 확인 항목), 진행기 `DrillRun`. vitest 와 브라우저 `?debug=drills` 가 같이 쓴다 |
 | `vary.ts` | 사건별 흔들림 `VARY` (반응 시간·걸음·서는 자리·조준 시간·점사·겨눔·재장전·스트레스), `vary`·`gauss`·`inDisk`. 능력치가 아닌 사건 잡음 |
 | `fire.ts` | 화기 트리거 `pullTrigger` → 탄도선 판정(사람·지물·땅), 근탄 제압, 폭발, 부위 피해. 튜닝 상수 `FIRE`, 조준점 `AimPoint` |
-| `soldier.ts` | 기본 몸 `BODY`, 휴대 무게 한도 `checkCarry`, 몸 상태: 자세별 높이·기본 속도, 심리 단계 `stressLevelOf`, 하중 `loadOf`, 속도 `speedOf`, `damage`·`addStress`, 매 틱 `updateBody` (지구력·상태·스트레스). 튜닝 상수 `POSTURE_HEIGHT`·`BASE_SPEED`·`LOAD`·`STAMINA`·`STRESS`·`HEALTH` |
+| `soldier.ts` | 기본 몸 `BODY`, 휴대 무게 한도 `checkCarry`, 몸 상태: 자세별 높이·기본 속도·약진 속도, 심리 단계 `stressLevelOf`, 하중 `loadOf`, 속도 `speedOf(s, gait)`, 매 틱 `updateBody` (출혈·지구력·상태·자세·스트레스). 튜닝 상수 `POSTURE_HEIGHT`·`BASE_SPEED`·`RUSH_SPEED`·`LOAD`·`STAMINA`·`STRESS` |
+| `wound.ts` | 부상: `rollWound`(부위·탄 위력·총탄/파편 → 정도·출혈), 부위 기능 `partLevel`·`armUse`·`legUse`, `isDead`·`isIncapacitated`·`isWeak`. 튜닝 상수 `WOUND` |
+| `rates.ts` | 늘고 주는 몸 수치: 스트레스(`threat`·`addStress`·`shock`·`buddyDown`·`updateStress`), 지구력 `updateStamina`, 출혈 `updateBlood`. 튜닝 상수 `RATES` ([objects/rates.md](objects/rates.md)) |
 | `command.ts` | `Command` 유니온(`move`, `stop`, `posture`), `TimedCommand`, `applyCommand`, 혼란 중 미룬 명령 `applyDueOrders` |
 | `replay.ts` | `runReplay`(명령 기록 재생), `stateHash`(FNV-1a 상태 지문) |
 | `rng.ts` | mulberry32 RNG. 상태가 숫자 하나라 해시·세이브에 그대로 담긴다 |
@@ -80,8 +82,8 @@ step(world, commands)
 ```
 
 - 명령은 상태를 직접 바꾸지 않고, 틱 시작 때 `step` 안에서만 적용된다. 그래서 `(지도, 시드, 초기 편성, TimedCommand[])` 만 있으면 같은 판을 다시 만들 수 있다.
-- `stateHash` 는 tick, RNG 상태, 병사 id·위치(mm 반올림)·자세·상태·스트레스·심리 단계·미뤄 둔 명령 틱·지구력·하중·부위별 체력, 진영별 contacts(id·틱·보임)를 섞는다. 상태에 새 필드를 넣으면 해시에도 넣어야 결정성 테스트가 그 필드를 검사한다.
-- `Soldier` 는 위치·방향·이동 목표·소속(분대/조)과 이름·직책·몸 크기·휴대 장비, 몸 상태(하중·자세·상태·부위별 체력·스트레스·지구력)를 가진다 ([objects/soldier.md](objects/soldier.md)). 장비는 id 로만 들고, 성능은 `ContentDb.equipment` 에서 찾는다 (하중은 편성 때 계산해 둔다).
+- `stateHash` 는 tick, RNG 상태, 병사 id·위치(mm 반올림)·자세·상태·스트레스·심리 단계·미뤄 둔 명령 틱·지구력·하중·혈액·부상·마지막 위협 틱, 진영별 contacts(id·틱·보임)를 섞는다. 상태에 새 필드를 넣으면 해시에도 넣어야 결정성 테스트가 그 필드를 검사한다.
+- `Soldier` 는 위치·방향·이동 목표·소속(분대/조)과 이름·직책·몸 크기·휴대 장비, 몸 상태(하중·자세·상태·부상·혈액·스트레스·지구력)를 가진다 ([objects/soldier.md](objects/soldier.md)). 장비는 id 로만 들고, 성능은 `ContentDb.equipment` 에서 찾는다 (하중은 편성 때 계산해 둔다).
 - 지형 격자는 지도에서만 만들어지고 바뀌지 않아 해시에 넣지 않는다. 1199 × 1001 칸 기준 굽기에 약 60ms.
 
 ## 클라이언트 (`packages/client/src`)

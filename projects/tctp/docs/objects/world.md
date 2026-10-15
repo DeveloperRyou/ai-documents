@@ -14,7 +14,7 @@
 | `shots` | 이번 틱에 쏜 탄 `Shot { by, x0, y0, x1, y1, hit, explosive }` (화면 효과용, 매 틱 비움, 해시 제외) |
 
 상태는 `step(world, commands)` 안에서만 바뀐다: 명령 적용 → 미뤄 둔 명령(`applyDueOrders`) → `tick++` → 행동(`updateActions`) → 몸 상태(`updateBody`: 지구력·상태·스트레스) → 시야.
-`stateHash` 는 tick·RNG·병사 위치·자세·상태·행동(종류·필드)·스트레스·심리 단계·미뤄 둔 명령 틱·지구력·하중·장전 탄·휴대 수량·부위별 체력·contacts 를 섞는다. 새 상태 필드를 넣으면 해시에도 넣는다.
+`stateHash` 는 tick·RNG·병사 위치·자세·상태·행동(종류·필드)·스트레스·심리 단계·미뤄 둔 명령 틱·지구력·하중·장전 탄·휴대 수량·혈액·부상(부위·정도·출혈·틱)·마지막 위협 틱·contacts 를 섞는다 (이동 행동의 걸음·이동사격 포함). 새 상태 필드를 넣으면 해시에도 넣는다.
 
 ## 아는 적 `Contact` (`types.ts`, 갱신은 `vision.ts`)
 | 필드 | 뜻 |
@@ -34,7 +34,7 @@
 ## 명령 `Command` (`command.ts`)
 | 종류 | 필드 | 뜻 |
 |---|---|---|
-| `move` | `ids`, `x`, `y` | 병사들에게 이동 행동을 준다 (진행 중 행동을 덮음) |
+| `move` | `ids`, `x`, `y`, `gait?`, `fire?`, `slot?` | 병사들에게 이동 행동을 준다 (진행 중 행동을 덮음). `gait`: `walk`(기본) 걷기 / `rush` 약진. `fire`: `{ target }` 또는 `{ x, y }` 이면 걸으며 쏜다 (이동사격, 조준사격·제압사격과 같은 `FIRE_ORDER`, 약진이면 무시) |
 | `stop` | `ids` | 행동을 비운다 |
 | `posture` | `ids`, `posture` | 자세 바꾸기 (`stand`·`crouch`·`prone`) |
 | `fire` | `ids`, `target`, `slot?` | 아는 적 한 명을 조준사격 (`FIRE_ORDER.aimed`: 화기 조준 시간을 다 쓰고 한 발씩) |
@@ -53,7 +53,7 @@
 `Snapshot { tick, time(초), viewer, soldiers: SoldierView[] }`, 세션에서 꺼내면 `paused`, `commands`(명령 수) 추가.
 
 `SoldierView`: `id, side, name, role, squad, team, x, y, facing, dest(이동 행동의 목표), posture, body?, contact?`
-- `body`: `{ action(행동 종류), status, health, stress, stressLevel, stamina, load, speed }` — `speed` 는 지금 낼 수 있는 속도 (m/s, 지형 배율 전).
+- `body`: `{ action(행동 종류), status, wounds([{ part, severity }]), blood(남은 혈액 비율 0~1), stress, stressLevel, stamina, load, speed }` — `speed` 는 지금 낼 수 있는 걷기 속도 (m/s, 지형 배율 전).
 - 보는 진영 병사: 전부 담김, `dest`·`body` 포함.
 - 적: `contacts` 에 있는 적만. 이름·직책·소속은 빈 문자열, `dest`·`body` 없음.
   `contact = "seen"` 이면 실제 위치·방향·자세, `"last"` 이면 마지막으로 본 위치 (`posture = null`).
