@@ -91,7 +91,7 @@ step(world, commands)
 | `main.ts` | 진입점. `?scenario=<id>` 가 있으면 게임, 없으면 메뉴 |
 | `content.ts` | `content/` 를 번들에 넣어 `ContentDb`·시나리오·캠페인으로 묶음. 지도는 시나리오를 고를 때 따로 불러옴 |
 | `menu.ts` | 메뉴 화면: 과정 고르기(TACTICAL·COMMAND·STAFF) → 제대 과정·훈련 목록·브리핑/편제/장비 탭 → 훈련 시작 |
-| `drills.ts` | 행동 확인장 화면 (`?debug=drills[&drill=<id>]`): 드릴 목록·전체 실행(e2e), 틱 재생·속도·한 틱, 탄 자취·조준선·스트레스 고리 덧그리기, 확인 항목·병사 표·기록. 디버그라 `World` 를 직접 읽는다 |
+| `drills.ts` | 행동 확인장 화면 (`?debug=drills[&drill=<id>][&seed=<n>]`, 시드를 주면 재생·전체 실행 모두 그 시드): 드릴 목록·전체 실행(e2e), 틱 재생·속도·한 틱, 탄 자취·조준선·스트레스 고리 덧그리기, 확인 항목·병사 표·기록. 디버그라 `World` 를 직접 읽는다 |
 | `game.ts` | 게임 화면: 시나리오로 병사를 세우고, 입력 → `Command`, `Session` 진행, HUD. 렌더러는 인터페이스로만 쓴다 |
 | `renderer.ts` | `Renderer` 인터페이스: `setMap`·`resize`·`draw(RenderView)`, 화면 ↔ 지도(`screenToMap`·`pickSoldier`), 시점(`lookAt`·`pan`·`zoomAt`). 카메라·투영은 구현이 가진다 |
 | `canvas2d.ts` | `Canvas2DRenderer`: 지금 쓰는 2D 탑뷰 구현. `Snapshot` 만 읽는다. 마지막 위치만 아는 적은 흐리게 (`contactAlpha`) |
