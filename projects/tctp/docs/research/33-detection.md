@@ -88,6 +88,6 @@
 
 사용자 결정 필요: 사람 표적의 N50 과 τ 목표를 추정으로 두고 가도 되는지, 아니면 사람 표적 N50 원문(NVESD 사람 탐지 연구)을 더 찾을지.
 
-## 반영
+## 반영 (2026-10-16, #33)
 
-없음.
+구현함: `perception/vision.ts` `detectFactors`(x·P∞·τ)·`searchStep`(탐색 계획), 식·상수·근거 `docs/calc/vision.md` 3절. 결정 1~4 그대로: N50·τ 는 추정, 조건이 바뀔 때만 굴림(P∞ → 지수 분포), 일시 단서는 `cueWindow` 동안만, 관측자마다 독립 계획. 값 출처 상태: Friedman 구조(확인), 나머지 `baseRange`·`baseSearchTime`·`curveExp`·`minDetect`·`sizeExp` 추정 (사람 표적 N50 원문·맨눈 τ 상수 공백, 별개 이슈로 분리).

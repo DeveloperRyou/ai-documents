@@ -74,7 +74,7 @@ content/  (지도·시나리오 JSON)
 | [`hearing.ts`](../packages/sim/src/perception/hearing.ts) | 듣기 (#35): 이번 틱 탄의 총성·폭발음 크기 `loudness`·`soundOf`, 모든 병사가 듣고 스트레스가 오르는 `updateHearing`, 가장 큰 적 소리 `loudestFoe` (돌아보기는 scan.ts) |
 | [`scan.ts`](../packages/sim/src/perception/scan.ts) | 경계(시선): 분대 안 자리별 경계 구역 `sectorOf`, 눈 방향 `look` 을 정하는 `updateScan`. 튜닝 상수 `SCAN` |
 | [`comms.ts`](../packages/sim/src/perception/comms.ts) | 접촉 보고 (#45): 목소리 인식률 `recognition`·소음·`voiceReaches`, 본 병사가 외치면(`sendReport`) 닿는 아군에게 지연(`VOICE.baseDelay`, 스트레스로 늘어남)·위치 오차와 함께 도착(`deliverReports`)하고 받은 병사가 다시 외쳐 퍼짐. 병사별 앎 `knownOf`, 통신 선 `commsEdges`(디버그, `SnapshotOptions.comms`). 튜닝 상수 `VOICE` |
-| [`vision.ts`](../packages/sim/src/perception/vision.ts) | 시선 `lineOfSight` (능선 차단·지물 감쇠, 끊긴 곳 `SightBlock` out), 시야각 `fovFactor`(눈 방향 `look` 기준), 발견 확률 `detectChance` (배율 분해 `detectFactors`), 매 틱 `updateVision` 으로 병사별 `known` 갱신(직접 본 것을 `comms.ts` 가 외쳐 퍼뜨림)·진영 합친 `contacts` 만듦 (두 병사가 지난 틱과 같은 자리·몸 높이면 시선 검사 결과를 `SightCache` 에서 재사용 — 계산 캐시라 `stateHash` 와 무관). 튜닝 상수 `VISION` |
+| [`vision.ts`](../packages/sim/src/perception/vision.ts) | 시선 `lineOfSight` (능선 차단·지물 감쇠, 끊긴 곳 `SightBlock` out), 시야각 `fovFactor`(눈 방향 `look` 기준), 발견 조건 `detectFactors`(x → 끝내 찾을 확률 P∞·평균 탐색 시간 τ, 계수 분해)와 탐색 계획 `searchStep`(조건이 바뀔 때만 굴림, `World.search`·`cue`, 전용 `searchRng`), 매 틱 `updateVision` 으로 병사별 `known` 갱신(직접 본 것을 `comms.ts` 가 외쳐 퍼뜨림)·진영 합친 `contacts` 만듦 (두 병사가 지난 틱과 같은 자리·몸 높이면 시선 검사 결과를 `SightCache` 에서 재사용 — 계산 캐시라 `stateHash` 와 무관). 튜닝 상수 `VISION` |
 
 ### [`terrain/`](../packages/sim/src/terrain) — 지도 형식과 지형 격자
 
@@ -134,9 +134,9 @@ step(world, commands)
   3b. updateHearing: 이번 틱 탄의 총성·폭발음을 병사마다 듣고 스트레스 (적 소리면 적어도 위협 인지 + heardTick, 상한 heardCap, #35)
   4. updateBody: 평온이 깨지면 휴식 그침, 지구력 소모·회복(휴식 중에만 제대로), status 결정 (제압·패닉·무력화면 엎드림, 위협 인지면 앉음), 스트레스 감소 → 심리 단계 갱신 → 기본 상태 전환 (감시 ↔ 휴식, `updateBaseState`, world.stateRng, #25)
   5. updateScan: 병사마다 볼 곳(lookAim)을 정하고 눈(look)을 그쪽으로 돌린다 — 사격 중이면 겨누는 쪽, 직사 탄이 스치면 반응 시간 뒤 어림한 쏜 쪽(곡사는 무시), 적 소리를 들었으면 소리 크기만큼의 확률로 그쪽(총구·폭발점), 아니면 보는 시간이 다 될 때 경계 구역 안 / 아는 적 쪽 (world.lookRng)
-  6. updateVision: 매 틱 진영별로 적을 본다 (무력화·패닉 병사는 관측자에서 빠지고, 발견 확률에 심리 단계 배율)
+  6. updateVision: 매 틱 진영별로 적을 본다 (무력화·패닉 병사는 관측자에서 빠지고, 발견 조건에 심리 단계 계수)
        이미 보던 적 → 아무 관측자나 시선 투과율 ≥ VISION.track 이면 계속 봄
-       아니면 관측자 id 순서로 detectChance 를 굴려 발견 (world.rng, 결정적)
+       아니면 관측자 id 순서로 탐색 계획(P∞ 로 끝내 찾는가 한 번, 찾으면 지수 분포 시각)을 굴려 시야 안에서 시간이 닿으면 발견 (world.searchRng, 결정적)
        못 보면 마지막 위치를 VISION.memory 틱 동안 기억, 처음 발견하면 log 에 남김
 ```
 
@@ -200,5 +200,5 @@ requestAnimationFrame:
 
 ## 테스트
 
-- Vitest, `packages/*/src/**/*.test.ts`. [`packages/sim/src/core/world.test.ts`](../packages/sim/src/core/world.test.ts) (이동·도착 정지, 같은 시드 + 같은 명령 기록 → 같은 해시), [`packages/sim/src/view/session.test.ts`](../packages/sim/src/view/session.test.ts) (고정 틱 분할·상한, 정지 중 명령 보류, 세션 기록 리플레이 = 같은 해시, 스냅샷 JSON 왕복·참조 분리·타 진영 `dest` 제외, 정보 안개), [`packages/sim/src/view/save.test.ts`](../packages/sim/src/view/save.test.ts) (저장 → 불러오기 = 같은 틱·해시·이어서 진행해도 같음, 옛·새·없는 버전 거부, 다른 판 거부), [`packages/sim/src/body/soldier.test.ts`](../packages/sim/src/body/soldier.test.ts) (하중 합·하중 속도 감소, 자세 속도·높이, 지구력 소모·멈춤 소량 회복·지친 속도, 휴식 회복·휴식 그침·평온 아니면 휴식 거부, 포복 소모, 심리 단계 문턱·패닉 회복 문턱, 위협 인지 앉기, 혼란 명령 지연, 제압 고착과 해제, 패닉 명령 거부·관측 불가, 심리 단계 발견 배율, 다리 부상 포복, 무력화·사망), [`packages/sim/src/perception/vision.test.ts`](../packages/sim/src/perception/vision.test.ts) (지형 굽기·고도 디코드, 시선 차단·감쇠·능선, 발견·등 뒤·건물 너머·기억과 망각, 통행 불가 칸), [`tools/src/content.test.ts`](../packages/tools/src/content.test.ts) (편제 인원 8·12, 전원 하중 ≤ 몸무게 × 0.45, 시나리오의 편제·장비 참조, 시작 위치 통행 가능, 이름 중복 없음). [`packages/sim/src/combat/fire.test.ts`](../packages/sim/src/combat/fire.test.ts) (조준사격·모르는 적·건물 차단·재장전·탄 소진·기관총 제압·엄폐·유탄·결정성), [`tools/src/drills.test.ts`](../packages/tools/src/drills.test.ts) (모든 드릴을 실제 장비로 끝까지 돌려 확인 항목 검사 — 새 행동은 드릴을 더해 확인). 공용 도우미는 [`packages/sim/src/drills/test-util.ts`](../packages/sim/src/drills/test-util.ts).
+- Vitest, `packages/*/src/**/*.test.ts`. [`packages/sim/src/core/world.test.ts`](../packages/sim/src/core/world.test.ts) (이동·도착 정지, 같은 시드 + 같은 명령 기록 → 같은 해시), [`packages/sim/src/view/session.test.ts`](../packages/sim/src/view/session.test.ts) (고정 틱 분할·상한, 정지 중 명령 보류, 세션 기록 리플레이 = 같은 해시, 스냅샷 JSON 왕복·참조 분리·타 진영 `dest` 제외, 정보 안개), [`packages/sim/src/view/save.test.ts`](../packages/sim/src/view/save.test.ts) (저장 → 불러오기 = 같은 틱·해시·이어서 진행해도 같음, 옛·새·없는 버전 거부, 다른 판 거부), [`packages/sim/src/body/soldier.test.ts`](../packages/sim/src/body/soldier.test.ts) (하중 합·하중 속도 감소, 자세 속도·높이, 지구력 소모·멈춤 소량 회복·지친 속도, 휴식 회복·휴식 그침·평온 아니면 휴식 거부, 포복 소모, 심리 단계 문턱·패닉 회복 문턱, 위협 인지 앉기, 혼란 명령 지연, 제압 고착과 해제, 패닉 명령 거부·관측 불가, 심리 단계 발견 조건 계수, 다리 부상 포복, 무력화·사망), [`packages/sim/src/perception/vision.test.ts`](../packages/sim/src/perception/vision.test.ts) (지형 굽기·고도 디코드, 시선 차단·감쇠·능선, 발견·등 뒤·건물 너머·기억과 망각, 통행 불가 칸), [`tools/src/content.test.ts`](../packages/tools/src/content.test.ts) (편제 인원 8·12, 전원 하중 ≤ 몸무게 × 0.45, 시나리오의 편제·장비 참조, 시작 위치 통행 가능, 이름 중복 없음). [`packages/sim/src/combat/fire.test.ts`](../packages/sim/src/combat/fire.test.ts) (조준사격·모르는 적·건물 차단·재장전·탄 소진·기관총 제압·엄폐·유탄·결정성), [`tools/src/drills.test.ts`](../packages/tools/src/drills.test.ts) (모든 드릴을 실제 장비로 끝까지 돌려 확인 항목 검사 — 새 행동은 드릴을 더해 확인). 공용 도우미는 [`packages/sim/src/drills/test-util.ts`](../packages/sim/src/drills/test-util.ts).
 - CI ([`.github/workflows/ci.yml`](../.github/workflows/ci.yml)): push·PR 마다 `npm run check` (typecheck + Biome + Vitest) 와 `npm run build`.

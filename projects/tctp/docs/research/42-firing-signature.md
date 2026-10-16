@@ -68,7 +68,7 @@
 
 | 항목 | 지금 | 조사 결과 |
 |---|---|---|
-| 쏘는 병사의 발견 확률 | `target.status === "firing"` 이면 `still` 계수만 1 (걷는 관측자에게 가만한 표적 패널티 면제). 불꽃이 따로 없다. `chance` = baseChance 0.36 × range × fov × shown × moving × still × observer × observe (`perception/vision.ts` `detectFactors`) | 불꽃은 보이면 정확한 위치를 주고(확인), 은폐물 뒤에서도 불꽃 자체는 가려질 수 있음. 완전 암흑에서 52 m, 별빛 15 m(확인). 낮 수치 없음 |
+| 쏘는 병사의 발견 확률 | `target.status === "firing"` 이면 `still` 계수만 1 (걷는 관측자에게 가만한 표적 패널티 면제). 불꽃이 따로 없다. 발견 조건 x 에 사격 계수 `cue` 3 이 쏘는 중과 쏜 뒤 3초 동안 붙는다 (#33, `perception/vision.ts` `detectFactors`) | 불꽃은 보이면 정확한 위치를 주고(확인), 은폐물 뒤에서도 불꽃 자체는 가려질 수 있음. 완전 암흑에서 52 m, 별빛 15 m(확인). 낮 수치 없음 |
 | 총성 | `soundRange` 로 소리 크기 `1 − 거리/들리는 거리`(선형) 를 계산해 스트레스·돌아보기(`SCAN.heardError` 25°, `hearFarErrorCoef` 2)만 만든다. 발견 확률·접촉(contacts)엔 안 들어감 | 25° 어긋남은 Dobbins 13~36°, Abouchacra ±15° 80% 와 같은 규모(확인, 인용). 소리는 위치가 아니라 시선 방향을 정해 주는 역할(확인) |
 | 거리 곡선 | 소리 선형 감소, 소총 1000 m | ADM: 조용한 시골 17 km, 시끄러운 곳 2.7 km 까지 들림(검출 거리, 조건 낙관적). 1000 m 는 보수적이고 배경 소음에 따라 달라짐 |
 
