@@ -95,6 +95,7 @@ content/  (지도·시나리오 JSON)
 | 파일 | 내용 |
 |---|---|
 | [`save.ts`](../packages/sim/src/view/save.ts) | 저장·불러오기 형식 `SaveData`(`SAVE_VERSION`, 시나리오 id·시드·틱·`stateHash`·명령 기록): `makeSave`, `parseSave`(옛·새 버전·빠진 항목은 `SaveError` 로 거부, 옮기기는 `migrate`), `restoreSession`(새 세계에 리플레이 → 해시가 다르면 거부, 정지 상태로) |
+| [`aar.ts`](../packages/sim/src/view/aar.ts) | 사후검토: `analyzeBattle`(처음 상태의 세계에 명령 기록을 재생하며 사건 `AarEvent` — 처음 발견 `contact`·무력화/사망 `casualty`·제압 `suppressed` — 와 병사별 노출 틱을 모음, 끝 `stateHash` 포함), `AarReplay`(시간축 `seek`: 앞으로는 이어 돌리고 뒤로는 처음부터 다시) |
 | [`session.ts`](../packages/sim/src/view/session.ts) | `Session`: 명령 접수(`issue`), 실제 시간 → 고정 틱 진행(`advance`, 상한 `LOOP.maxFrame`), `commandLog`, 일시정지 |
 | [`snapshot.ts`](../packages/sim/src/view/snapshot.ts) | `snapshot(world, viewer, {truth})`: 렌더러용 순수 데이터 (JSON 직렬화 가능, `World` 와 참조 공유 없음). 정보 안개: 모르는 적은 빠지고, 아는 적은 `contact` = seen(실제 위치)·last(마지막 위치), 적의 이름·직책은 비운다. `truth` 는 디버그용 |
 
@@ -155,6 +156,7 @@ step(world, commands)
 | [`drill-profile.ts`](../packages/client/src/drill-profile.ts) | 확인장 시선 단면도: 고른 병사 눈 → 적 겨냥 높이까지 1m 마다 지면(파인 칸은 바닥)·지물 높이(칸 종류 색)·시선·끊긴 곳과 까닭. 세로를 늘려(배율 표시) 수십 cm 차이를 보인다. 적은 지도의 시선선·시선 표 줄·단면도 위 고르기 막대(◀ #id ▶, 적이 둘 이상일 때)로 고르고, 안 고르면 가장 가까운 적 |
 | [`drill-timeline.ts`](../packages/client/src/drill-timeline.ts) | 확인장 시간축: 병사별 행동 줄, 고른 병사의 스트레스·지구력·혈액 그래프, 명령·판정 표시. 누르거나 끌면 그 틱으로 간다 (뒤로는 처음부터 다시 돌림) |
 | [`game.ts`](../packages/client/src/game.ts) | 게임 화면: 시나리오로 병사를 세우고, 입력 → `Command`, `Session` 진행, HUD. 렌더러는 인터페이스로만 쓴다 |
+| [`aar.ts`](../packages/client/src/aar.ts) | 사후검토 패널 (게임 중 R): 지금까지의 명령 기록을 `analyzeBattle` 로 다시 돌려 사건 목록(클릭하면 그 시각으로)·노출 시간·지문 일치 여부를 보이고, 슬라이더로 시간축을 오가며 "실제 위치 / 그 시각 아군이 알던 것" 을 전환. 열려 있는 동안 판은 멈추고 명령은 받지 않는다 |
 | [`saveload.ts`](../packages/client/src/saveload.ts) | 저장 칸 하나(localStorage `tctp.save`). 게임 중 Ctrl+S = 저장, Ctrl+O = `?load=1` 로 다시 열어 `startSavedGame` 이 리플레이로 복원. 실패하면 이유를 알리고 메뉴로 |
 | [`renderer.ts`](../packages/client/src/renderer.ts) | `Renderer` 인터페이스: `setMap`·`resize`·`draw(RenderView)`, 화면 ↔ 지도(`screenToMap`·`pickSoldier`), 시점(`lookAt`·`pan`·`zoomAt`). 카메라·투영은 구현이 가진다 |
 | [`canvas2d.ts`](../packages/client/src/canvas2d.ts) | `Canvas2DRenderer`: 지금 쓰는 2D 탑뷰 구현. `Snapshot` 만 읽는다. 마지막 위치만 아는 적은 흐리게 (`contactAlpha`). `showContours` 로 고도 격자 등고선 (기본 끔, 확인장만 켬) |
