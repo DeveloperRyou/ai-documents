@@ -91,6 +91,7 @@ content/  (지도·시나리오 JSON)
 
 | 파일 | 내용 |
 |---|---|
+| [`save.ts`](../packages/sim/src/view/save.ts) | 저장·불러오기 형식 `SaveData`(`SAVE_VERSION`, 시나리오 id·시드·틱·`stateHash`·명령 기록): `makeSave`, `parseSave`(옛·새 버전·빠진 항목은 `SaveError` 로 거부, 옮기기는 `migrate`), `restoreSession`(새 세계에 리플레이 → 해시가 다르면 거부, 정지 상태로) |
 | [`session.ts`](../packages/sim/src/view/session.ts) | `Session`: 명령 접수(`issue`), 실제 시간 → 고정 틱 진행(`advance`, 상한 `LOOP.maxFrame`), `commandLog`, 일시정지 |
 | [`snapshot.ts`](../packages/sim/src/view/snapshot.ts) | `snapshot(world, viewer, {truth})`: 렌더러용 순수 데이터 (JSON 직렬화 가능, `World` 와 참조 공유 없음). 정보 안개: 모르는 적은 빠지고, 아는 적은 `contact` = seen(실제 위치)·last(마지막 위치), 적의 이름·직책은 비운다. `truth` 는 디버그용 |
 
@@ -142,7 +143,7 @@ step(world, commands)
 
 | 파일 | 내용 |
 |---|---|
-| [`main.ts`](../packages/client/src/main.ts) | 진입점. `?scenario=<id>` 가 있으면 게임, 없으면 메뉴 |
+| [`main.ts`](../packages/client/src/main.ts) | 진입점. `?scenario=<id>` 가 있으면 게임, `?load=1` 이면 저장한 판, 없으면 메뉴 |
 | [`content.ts`](../packages/client/src/content.ts) | `content/` 를 번들에 넣어 `ContentDb`·시나리오·캠페인으로 묶음. 지도는 시나리오를 고를 때 따로 불러옴 |
 | [`menu.ts`](../packages/client/src/menu.ts) | 메뉴 화면: 과정 고르기(TACTICAL·COMMAND·STAFF) → 제대 과정·훈련 목록·브리핑/편제/장비 탭 → 훈련 시작 |
 | [`drills/drills.ts`](../packages/sim/src/drills/drills.ts) | 행동 확인장 화면 (`?debug=drills[&drill=<id>][&seed=<n>]`, 시드를 주면 재생·전체 실행 모두 그 시드): 드릴 목록(묶음별 접기·묶음 실행)·전체 실행(e2e, 통과 수·실패 항목), 재생·속도·한 틱 앞/뒤, 탄 자취·조준선·스트레스 고리·행동 이름표·고른 병사 시야(선 사람을 계속 볼 수 있는 거리, 광선별 `lineOfSight`)·적마다 시선선(투과율·끊긴 곳·발견 %/초)·등고선 덧그리기, 지도 호버 시 지형 값, 확인 항목(판정 시각·지금 값·참/거짓), 병사 카드(자세·상태·행동·스트레스/지구력/혈액/탄창 막대, 고르면 행동 진행·몸·위치·장비·아는 적·적마다 시선과 발견 배율·원본 값, 방금 바뀐 값 강조)·명령 기록·기록. 디버그라 `World` 를 직접 읽는다 |
@@ -150,6 +151,7 @@ step(world, commands)
 | [`drill-profile.ts`](../packages/client/src/drill-profile.ts) | 확인장 시선 단면도: 고른 병사 눈 → 적 겨냥 높이까지 1m 마다 지면(파인 칸은 바닥)·지물 높이(칸 종류 색)·시선·끊긴 곳과 까닭. 세로를 늘려(배율 표시) 수십 cm 차이를 보인다. 적은 지도의 시선선·시선 표 줄·단면도 위 고르기 막대(◀ #id ▶, 적이 둘 이상일 때)로 고르고, 안 고르면 가장 가까운 적 |
 | [`drill-timeline.ts`](../packages/client/src/drill-timeline.ts) | 확인장 시간축: 병사별 행동 줄, 고른 병사의 스트레스·지구력·혈액 그래프, 명령·판정 표시. 누르거나 끌면 그 틱으로 간다 (뒤로는 처음부터 다시 돌림) |
 | [`game.ts`](../packages/client/src/game.ts) | 게임 화면: 시나리오로 병사를 세우고, 입력 → `Command`, `Session` 진행, HUD. 렌더러는 인터페이스로만 쓴다 |
+| [`saveload.ts`](../packages/client/src/saveload.ts) | 저장 칸 하나(localStorage `tctp.save`). 게임 중 Ctrl+S = 저장, Ctrl+O = `?load=1` 로 다시 열어 `startSavedGame` 이 리플레이로 복원. 실패하면 이유를 알리고 메뉴로 |
 | [`renderer.ts`](../packages/client/src/renderer.ts) | `Renderer` 인터페이스: `setMap`·`resize`·`draw(RenderView)`, 화면 ↔ 지도(`screenToMap`·`pickSoldier`), 시점(`lookAt`·`pan`·`zoomAt`). 카메라·투영은 구현이 가진다 |
 | [`canvas2d.ts`](../packages/client/src/canvas2d.ts) | `Canvas2DRenderer`: 지금 쓰는 2D 탑뷰 구현. `Snapshot` 만 읽는다. 마지막 위치만 아는 적은 흐리게 (`contactAlpha`). `showContours` 로 고도 격자 등고선 (기본 끔, 확인장만 켬) |
 | [`iso25d.ts`](../packages/client/src/iso25d.ts) | `Iso25DRenderer`: 2.5D 등각 투영 POC. 시뮬과 같은 고도(`elevAt`)로 지형·지물·병사를 들고 건물은 고정 높이로 세운다. 가림 처리는 묶음별 먼 것부터 그리기뿐이다 |
@@ -164,10 +166,10 @@ requestAnimationFrame:
   snapshot = session.snapshot(scenario.player) → renderer.draw({snapshot, selected}) → HUD
 ```
 
-- 조작: 좌클릭 = 분대 선택 (한 명을 누르면 같은 분대 전원), 우클릭 = 이동, 휠 = 확대, 가운데 드래그 = 지도 이동, Space = 일시정지, Esc = 메뉴.
-- `commandLog` 는 리플레이·버그 재현용으로 쌓기만 하고, 아직 저장하거나 내보내지는 않는다.
-- 사격 조작: 아는 적 위 우클릭 = 조준사격 (`fire`), Shift+우클릭 = 그 지점 제압사격 (`suppress`, 다시 하면 지점 전환), X = 고른 분대의 사격 그침 (사격·재장전 중인 병사에게 `stop`, 이동사격은 건드리지 않음). 고른 병사의 사격 목표(`fireAt`)는 점선으로, 탄은 `Snapshot.shots` 로 `drawShots`(`renderer.ts`, 2D·2.5D 공용)가 그린다 (탄 자취 `SHOT_FX.tracerSec`, 탄착, 폭발 원). 3D 렌더러는 아직 탄을 그리지 않는다.
+- 조작: 좌클릭 = 분대 선택 (한 명을 누르면 같은 분대 전원), 우클릭 = 이동, 휠 = 확대, 가운데 드래그 = 지도 이동, Space = 일시정지, Ctrl+S = 저장, Ctrl+O = 불러오기, Esc = 메뉴.
+- 저장은 시나리오 id + 시드 + `commandLog` 만 적는다 (스냅샷 없음). 불러오기는 처음부터 리플레이하므로 긴 판일수록 느려진다 — 느려지면 스냅샷을 더하고 `SAVE_VERSION` 을 올린다.
 - 시드는 URL `?seed=` 로 받는다 (기본 = 시나리오의 seed). `?truth=1` 이면 정보 안개를 끄고 모르는 적도 흐리게 그린다 (디버그).
+- 사격 조작: 아는 적 위 우클릭 = 조준사격 (`fire`), Shift+우클릭 = 그 지점 제압사격 (`suppress`, 다시 하면 지점 전환), X = 고른 분대의 사격 그침 (사격·재장전 중인 병사에게 `stop`, 이동사격은 건드리지 않음). 고른 병사의 사격 목표(`fireAt`)는 점선으로, 탄은 `Snapshot.shots` 로 `drawShots`(`renderer.ts`, 2D·2.5D 공용)가 그린다 (탄 자취 `SHOT_FX.tracerSec`, 탄착, 폭발 원). 3D 렌더러는 아직 탄을 그리지 않는다.
 - 렌더러는 URL `?view=` 로 고른다: `2d` (기본), `iso` (2.5D POC), `3d` (`@tctp/render3d` POC, Q/E 회전·R/F 기울기), `split` (둘을 나란히, 같은 세션·선택을 공유).
 
 ## 도구 (`packages/tools/src`)
@@ -190,5 +192,5 @@ requestAnimationFrame:
 
 ## 테스트
 
-- Vitest, `packages/*/src/**/*.test.ts`. [`packages/sim/src/core/world.test.ts`](../packages/sim/src/core/world.test.ts) (이동·도착 정지, 같은 시드 + 같은 명령 기록 → 같은 해시), [`packages/sim/src/view/session.test.ts`](../packages/sim/src/view/session.test.ts) (고정 틱 분할·상한, 정지 중 명령 보류, 세션 기록 리플레이 = 같은 해시, 스냅샷 JSON 왕복·참조 분리·타 진영 `dest` 제외, 정보 안개), [`packages/sim/src/body/soldier.test.ts`](../packages/sim/src/body/soldier.test.ts) (하중 합·하중 속도 감소, 자세 속도·높이, 지구력 소모·멈춤 소량 회복·지친 속도, 휴식 회복·휴식 그침·평온 아니면 휴식 거부, 포복 소모, 심리 단계 문턱·패닉 회복 문턱, 위협 인지 앉기, 혼란 명령 지연, 제압 고착과 해제, 패닉 명령 거부·관측 불가, 심리 단계 발견 배율, 다리 부상 포복, 무력화·사망), [`packages/sim/src/perception/vision.test.ts`](../packages/sim/src/perception/vision.test.ts) (지형 굽기·고도 디코드, 시선 차단·감쇠·능선, 발견·등 뒤·건물 너머·기억과 망각, 통행 불가 칸), [`tools/src/content.test.ts`](../packages/tools/src/content.test.ts) (편제 인원 8·12, 전원 하중 ≤ 몸무게 × 0.45, 시나리오의 편제·장비 참조, 시작 위치 통행 가능, 이름 중복 없음). [`packages/sim/src/combat/fire.test.ts`](../packages/sim/src/combat/fire.test.ts) (조준사격·모르는 적·건물 차단·재장전·탄 소진·기관총 제압·엄폐·유탄·결정성), [`tools/src/drills.test.ts`](../packages/tools/src/drills.test.ts) (모든 드릴을 실제 장비로 끝까지 돌려 확인 항목 검사 — 새 행동은 드릴을 더해 확인). 공용 도우미는 [`packages/sim/src/drills/test-util.ts`](../packages/sim/src/drills/test-util.ts).
+- Vitest, `packages/*/src/**/*.test.ts`. [`packages/sim/src/core/world.test.ts`](../packages/sim/src/core/world.test.ts) (이동·도착 정지, 같은 시드 + 같은 명령 기록 → 같은 해시), [`packages/sim/src/view/session.test.ts`](../packages/sim/src/view/session.test.ts) (고정 틱 분할·상한, 정지 중 명령 보류, 세션 기록 리플레이 = 같은 해시, 스냅샷 JSON 왕복·참조 분리·타 진영 `dest` 제외, 정보 안개), [`packages/sim/src/view/save.test.ts`](../packages/sim/src/view/save.test.ts) (저장 → 불러오기 = 같은 틱·해시·이어서 진행해도 같음, 옛·새·없는 버전 거부, 다른 판 거부), [`packages/sim/src/body/soldier.test.ts`](../packages/sim/src/body/soldier.test.ts) (하중 합·하중 속도 감소, 자세 속도·높이, 지구력 소모·멈춤 소량 회복·지친 속도, 휴식 회복·휴식 그침·평온 아니면 휴식 거부, 포복 소모, 심리 단계 문턱·패닉 회복 문턱, 위협 인지 앉기, 혼란 명령 지연, 제압 고착과 해제, 패닉 명령 거부·관측 불가, 심리 단계 발견 배율, 다리 부상 포복, 무력화·사망), [`packages/sim/src/perception/vision.test.ts`](../packages/sim/src/perception/vision.test.ts) (지형 굽기·고도 디코드, 시선 차단·감쇠·능선, 발견·등 뒤·건물 너머·기억과 망각, 통행 불가 칸), [`tools/src/content.test.ts`](../packages/tools/src/content.test.ts) (편제 인원 8·12, 전원 하중 ≤ 몸무게 × 0.45, 시나리오의 편제·장비 참조, 시작 위치 통행 가능, 이름 중복 없음). [`packages/sim/src/combat/fire.test.ts`](../packages/sim/src/combat/fire.test.ts) (조준사격·모르는 적·건물 차단·재장전·탄 소진·기관총 제압·엄폐·유탄·결정성), [`tools/src/drills.test.ts`](../packages/tools/src/drills.test.ts) (모든 드릴을 실제 장비로 끝까지 돌려 확인 항목 검사 — 새 행동은 드릴을 더해 확인). 공용 도우미는 [`packages/sim/src/drills/test-util.ts`](../packages/sim/src/drills/test-util.ts).
 - CI ([`.github/workflows/ci.yml`](../.github/workflows/ci.yml)): push·PR 마다 `npm run check` (typecheck + Biome + Vitest) 와 `npm run build`.
