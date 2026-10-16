@@ -9,6 +9,7 @@
 | [soldier.md](soldier.md) | 병사 `Soldier`, 부상 `Wound`, 몸 크기 `BodySize`, 휴대 장비 `LoadoutItem` | [`core/types.ts`](../../packages/sim/src/core/types.ts), [`body/soldier.ts`](../../packages/sim/src/body/soldier.ts) (`BODY`), [`body/wound.ts`](../../packages/sim/src/body/wound.ts) | 편제에서 생성 |
 | [action.md](action.md) | 행동 `Action` (명령 → 임무 → 행동 → 장비 구조) | [`command/action.ts`](../../packages/sim/src/command/action.ts) | — |
 | [equipment.md](equipment.md) | 화기 `Weapon`, 탄약 `Ammo`, 장구 `Gear` | [`content/equipment.ts`](../../packages/sim/src/content/equipment.ts) | [`content/equipment.json`](../../content/equipment.json) |
+| [comms.md](comms.md) | 통신: 수단(목소리·워키토키·배낭 무전기)·통신 그래프·보고 전파 | [`perception/comms.ts`](../../packages/sim/src/perception/comms.ts) | [`content/equipment.json`](../../content/equipment.json) (무전기) |
 | [org.md](org.md) | 편제 `OrgTemplate` → 조 `OrgTeam` → 직책 `OrgMember` | [`content/org.ts`](../../packages/sim/src/content/org.ts) | [`content/orgs/*.json`](../../content/orgs) |
 | [scenario.md](scenario.md) | 시나리오 `Scenario`, 부대 배치 `ForceSpec`, 브리핑, 캠페인 | [`content/scenario.ts`](../../packages/sim/src/content/scenario.ts), `client/content.ts` | [`content/scenarios/*.json`](../../content/scenarios), [`content/campaign.json`](../../content/campaign.json), [`content/names.json`](../../content/names.json) |
 | [terrain.md](terrain.md) | 지형 격자 `Terrain`, 칸 성질 `TerrainProps` | [`terrain/terrain.ts`](../../packages/sim/src/terrain/terrain.ts) | 지도(`content/maps`)에서 생성 |

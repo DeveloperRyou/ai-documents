@@ -1,4 +1,4 @@
-# 장비 — 화기 `Weapon`, 탄약 `Ammo`, 장구 `Gear`
+# 장비 — 화기 `Weapon`, 탄약 `Ammo`, 장구 `Gear`, 무전기 `Radio`
 
 코드: [`packages/sim/src/content/equipment.ts`](../../packages/sim/src/content/equipment.ts). 데이터: [`content/equipment.json`](../../content/equipment.json) (`{ note, items: Equipment[] }`).
 `catalogOf(file)` 가 id → 장비 사전(`EquipmentCatalog`)으로 바꾼다. 수치는 공개 자료 기준 대략값이고 튜닝 대상이다.
@@ -69,6 +69,25 @@
 | `rok-kit` 국군 개인 전투장구 | 15 kg | 방탄모·방탄복(방탄판 포함)·전투조끼·수통 2·방독면·구급낭 |
 | `kpa-kit` 북한군 개인 전투장구 | 6 kg | 철모·탄입대·수통·방독면·잡낭 (방탄복 없음) |
 
+## 무전기 `Radio` (`kind: "radio"`, #45)
+
+무전기는 장비(무게·휴대)다. 같은 그물에 맞춘 무전기끼리 거리 안에서 통신 선이 이어진다 ([comms.md](comms.md)). 값은 모두 `추정`, 근거는 `docs/research/45-59-comms.md` §3·§6.
+
+| 필드 | 뜻 |
+|---|---|
+| `id`, `name`, `mass` | 식별자, 표시 이름, 무게 (kg) |
+| `class` | `handheld`(워키토키) / `backpack`(배낭 무전기). 통신 선 수단 이름이 된다 |
+| `r50`, `rmax`, `k` | 알아듣는 비율 1 / (1 + (d / `r50`)^`k`), `rmax` 이상은 0 |
+| `nets` | 한 대가 동시에 연결해 둘 수 있는 그물 수 |
+| `baseDelay` | 기준 보고 시간 (초) |
+
+| 무전기 | 무게 | `r50` | `rmax` | `k` | `nets` | `baseDelay` |
+|---|---|---|---|---|---|---|
+| `walkie` 휴대 무전기 | 0.84 kg (PRC-148, 2차) | 800 m | 1.6 km | 4 | 1 | 4초 |
+| `backpack-radio` 배낭 무전기 | 10 kg (추정) | 6 km | 12 km | 4 | 2 | 6초 |
+
+어느 그물에 맞췄는지는 `LoadoutItem.nets`(그물 이름 목록, 무전기 한 대의 `nets` × 수량까지만 셈). 없으면 어느 그물에도 닿지 않는다.
+
 ## 줍기 (#8)
 
 쓰러진 병사의 `loadout`(화기·탄약·장구 모두)을 `collect` 명령 또는 스스로 줍기로 가져올 수 있다. 규칙은 [action.md](action.md) `collect`. 화기 칸(`WEAPON_SLOTS`)이 차 있으면 화기는 맞바꾼다.
@@ -105,4 +124,4 @@
 
 ## 추가하는 법
 [`content/equipment.json`](../../content/equipment.json) 의 `items` 에 한 줄 넣는다. 화기는 `slot` 을 정하고, `ammo` 가 가리키는 탄약도 있어야 한다 ([`tools/src/content.test.ts`](../../packages/tools/src/content.test.ts) 가 검사).
-화기 없이 던지거나 다른 성질이 필요한 장비(수류탄이 그렇게 들어왔다)는 `kind` 를 늘리는 쪽으로 (지금은 `weapon`·`ammo`·`grenade`·`gear` 넷).
+화기 없이 던지거나 다른 성질이 필요한 장비(수류탄이 그렇게 들어왔다)는 `kind` 를 늘리는 쪽으로 (지금은 `weapon`·`ammo`·`grenade`·`gear`·`radio` 다섯).

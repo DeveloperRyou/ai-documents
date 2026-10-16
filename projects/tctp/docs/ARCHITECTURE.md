@@ -73,7 +73,7 @@ content/  (지도·시나리오 JSON)
 |---|---|
 | [`hearing.ts`](../packages/sim/src/perception/hearing.ts) | 듣기 (#35): 이번 틱 탄의 총성·폭발음 크기 `loudness`·`soundOf`, 모든 병사가 듣고 스트레스가 오르는 `updateHearing`, 가장 큰 적 소리 `loudestFoe` (돌아보기는 scan.ts) |
 | [`scan.ts`](../packages/sim/src/perception/scan.ts) | 경계(시선): 분대 안 자리별 경계 구역 `sectorOf`, 눈 방향 `look` 을 정하는 `updateScan`. 튜닝 상수 `SCAN` |
-| [`comms.ts`](../packages/sim/src/perception/comms.ts) | 접촉 보고 (#45): 목소리 인식률 `recognition`·소음·`voiceReaches`, 본 병사가 외치면(`sendReport`) 닿는 아군에게 지연(`VOICE.baseDelay`, 스트레스로 늘어남)·위치 오차와 함께 도착(`deliverReports`)하고 받은 병사가 다시 외쳐 퍼짐. 병사별 앎 `knownOf`, 통신 선 `commsEdges`(디버그, `SnapshotOptions.comms`). 튜닝 상수 `VOICE` |
+| [`comms.ts`](../packages/sim/src/perception/comms.ts) | 접촉 보고 (#45): 목소리 인식률 `recognition`·소음·`voiceReaches`, 본 병사가 외치면(`sendReport`) 닿는 아군에게 지연(`VOICE.baseDelay`, 스트레스로 늘어남)·위치 오차와 함께 도착(`deliverReports`)하고 받은 병사가 다시 외쳐 퍼짐. 병사별 앎 `knownOf`, 무전기(워키토키·배낭, `Radio`) 선 `radioLink`, 통신 선 `commsEdges`(수단별 voice·walkie·radio, 디버그, `SnapshotOptions.comms`). 튜닝 상수 `VOICE` |
 | [`vision.ts`](../packages/sim/src/perception/vision.ts) | 시선 `lineOfSight` (능선 차단·지물 감쇠, 끊긴 곳 `SightBlock` out), 시야각 `fovFactor`(눈 방향 `look` 기준), 발견 조건 `detectFactors`(x → 끝내 찾을 확률 P∞·평균 탐색 시간 τ, 계수 분해)와 탐색 계획 `searchStep`(조건이 바뀔 때만 굴림, `World.search`·`cue`, 전용 `searchRng`), 매 틱 `updateVision` 으로 병사별 `known` 갱신(직접 본 것을 `comms.ts` 가 외쳐 퍼뜨림)·진영 합친 `contacts` 만듦 (두 병사가 지난 틱과 같은 자리·몸 높이면 시선 검사 결과를 `SightCache` 에서 재사용 — 계산 캐시라 `stateHash` 와 무관). 튜닝 상수 `VISION` |
 
 ### [`terrain/`](../packages/sim/src/terrain) — 지도 형식과 지형 격자
