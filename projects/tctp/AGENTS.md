@@ -13,6 +13,7 @@ npm run format       # Biome 자동 수정
 npm run build        # 클라이언트 빌드 (CI 는 check + build)
 npx vitest run packages/sim/src/core/world.test.ts   # 테스트 파일 하나 (-t "<이름>" 으로 골라 돌리기)
 npm run headless -- 1 --n 10 --sec 120 [--scenario id]
+npm run bench:vision -- [--n 20,100,700] [--move]   # 병사 수별 틱당 ms·시야 비용 (대부대 성능)
 npm run charts       # docs/calc/img/*.svg 다시 그리기 (튜닝 상수·식을 바꾼 뒤)
 npm run fetch-map -- <id> <남> <서> <북> <동> [이름]   # content/maps/<id>.json (--from-cache, --no-elev)
 ```

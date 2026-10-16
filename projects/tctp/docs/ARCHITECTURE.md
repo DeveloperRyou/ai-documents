@@ -70,7 +70,7 @@ content/  (지도·시나리오 JSON)
 |---|---|
 | [`hearing.ts`](../packages/sim/src/perception/hearing.ts) | 듣기 (#35): 이번 틱 탄의 총성·폭발음 크기 `loudness`·`soundOf`, 모든 병사가 듣고 스트레스가 오르는 `updateHearing`, 가장 큰 적 소리 `loudestFoe` (돌아보기는 scan.ts) |
 | [`scan.ts`](../packages/sim/src/perception/scan.ts) | 경계(시선): 분대 안 자리별 경계 구역 `sectorOf`, 눈 방향 `look` 을 정하는 `updateScan`. 튜닝 상수 `SCAN` |
-| [`vision.ts`](../packages/sim/src/perception/vision.ts) | 시선 `lineOfSight` (능선 차단·지물 감쇠, 끊긴 곳 `SightBlock` out), 시야각 `fovFactor`(눈 방향 `look` 기준), 발견 확률 `detectChance` (배율 분해 `detectFactors`), 매 틱 `updateVision` 으로 `contacts` 갱신. 튜닝 상수 `VISION` |
+| [`vision.ts`](../packages/sim/src/perception/vision.ts) | 시선 `lineOfSight` (능선 차단·지물 감쇠, 끊긴 곳 `SightBlock` out), 시야각 `fovFactor`(눈 방향 `look` 기준), 발견 확률 `detectChance` (배율 분해 `detectFactors`), 매 틱 `updateVision` 으로 `contacts` 갱신 (두 병사가 지난 틱과 같은 자리·몸 높이면 시선 검사 결과를 `SightCache` 에서 재사용 — 계산 캐시라 `stateHash` 와 무관). 튜닝 상수 `VISION` |
 
 ### [`terrain/`](../packages/sim/src/terrain) — 지도 형식과 지형 격자
 
@@ -181,6 +181,7 @@ requestAnimationFrame:
 | [`content.ts`](../packages/tools/src/content.ts) | | `content/` 를 파일 경로로 읽어 `ContentDb`·시나리오·지도로 (`loadDb`, `loadScenario`, `loadMap`) |
 | [`calc-charts.ts`](../packages/tools/src/calc-charts.ts) | `npm run charts` | 튜닝 상수로 수치 계산 그래프를 그려 `docs/calc/img/*.svg` 로 쓴다 (식은 시뮬과 같게 옮김) |
 | [`headless.ts`](../packages/tools/src/headless.ts) | `npm run headless` | 시나리오(`--scenario`, 기본 배틀 드릴 1)를 시드마다 돌려 `stateHash`, 진영별 첫 발견 시각, 아는 적 수, 소요 시간을 출력. 명령은 임시로 "플레이어 부대 전원이 적 부대 위치로 이동" |
+| [`bench-vision.ts`](../packages/tools/src/bench-vision.ts) | `npm run bench:vision -- [--sec 초] [--n 20,100,700] [--move]` | 실제 지도에 병사 N명(양 진영 격자)을 깔고 틱당 시뮬 시간·시야 비용·실시간 배수·`stateHash` 를 출력. 기본은 제자리(감시), `--move` 는 파랑 전원 이동(시선 캐시가 안 듣는 최악). 시야 비용 줄이기 전후 해시 비교에 쓴다 |
 
 ## 데이터
 
