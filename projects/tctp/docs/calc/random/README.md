@@ -26,10 +26,11 @@
 |---|---|---|
 | `World.rng` | 시나리오 시드 (`?seed=` 로 덮어씀) | 명령 반응·이동·사격·폭발·부상·스트레스·지구력·탐지. 시뮬 대부분 |
 | `World.lookRng` | 시드 XOR `0x5ca9` (`LOOK_SEED`) | 경계 시선만 ([`perception/scan.ts`](../../../packages/sim/src/perception/scan.ts)). 시선 규칙을 고쳐도 사격·피해 흐름이 흔들리지 않게 |
+| `World.stateRng` | 시드 XOR `0x57a7` (`STATE_SEED`) | 기본 상태 전환만 (감시 → 휴식 지연, 쉬다 일어나는 반응 시간, [`body/soldier.ts`](../../../packages/sim/src/body/soldier.ts)) (#25). 휴식 규칙을 고쳐도 사격·시선 흐름이 흔들리지 않게 |
 | 이름 | `시드 × 31 + 부대 순번`, 부대마다 새 생성기 | `buildSoldiers` 이름 고르기 (판 시작 전에 끝남) |
 
 - 같은 흐름 안에서 꺼내는 순서는 [../README.md](../README.md) "한 틱 순서" 와 병사 id 순서로 고정이다. 순서를 바꾸는 변경(새 굴림 추가, 처리 순서 변경)은 같은 시드의 결과를 바꾸므로, 드릴·테스트의 기대값이 시드에 기대고 있으면 함께 확인한다.
-- `stateHash` 는 두 흐름의 상태(`rng.state`, `lookRng.state`)를 섞는다 → 굴린 횟수가 하나라도 다르면 해시가 달라진다.
+- `stateHash` 는 세 흐름의 상태(`rng.state`, `lookRng.state`, `stateRng.state`)를 섞는다 → 굴린 횟수가 하나라도 다르면 해시가 달라진다.
 
 ## 분포 도우미 ([`core/vary.ts`](../../../packages/sim/src/core/vary.ts))
 
