@@ -124,8 +124,8 @@ step(world, commands)
   2. world.tick++
   3. updateActions: 행동할 수 있는 병사(무력화·제압·패닉 아님)만 id 순서로 행동 처리 함수를 한 걸음 진행, 끝나면 행동 비움
        move: 목표 쪽으로 speedOf(자세·하중·지구력·다리) × 선 칸의 move 배율 × DT 만큼 직선 이동. 다음 칸이 통행 불가면 그 자리, MOVE.arrive 안이면 끝
-  3b. updateHearing: 이번 틱 탄의 총성·폭발음을 병사마다 듣고 스트레스 (적 소리면 적어도 위협 인지 + heardTick, 상한 heardCap, #35)
      → separate: 겹친 병사를 SPACING.min 으로 떼어 놓음 (걷는 병사가 비킴)
+  3b. updateHearing: 이번 틱 탄의 총성·폭발음을 병사마다 듣고 스트레스 (적 소리면 적어도 위협 인지 + heardTick, 상한 heardCap, #35)
   4. updateBody: 평온이 깨지면 휴식 그침, 지구력 소모·회복(휴식 중에만 제대로), status 결정 (제압·패닉·무력화면 엎드림, 위협 인지면 앉음), 스트레스 감소 → 심리 단계 갱신
   5. updateScan: 병사마다 볼 곳(lookAim)을 정하고 눈(look)을 그쪽으로 돌린다 — 사격 중이면 겨누는 쪽, 직사 탄이 스치면 반응 시간 뒤 어림한 쏜 쪽(곡사는 무시), 적 소리를 들었으면 소리 크기만큼의 확률로 그쪽(총구·폭발점), 아니면 보는 시간이 다 될 때 경계 구역 안 / 아는 적 쪽 (world.lookRng)
   6. updateVision: 매 틱 진영별로 적을 본다 (무력화·패닉 병사는 관측자에서 빠지고, 발견 확률에 심리 단계 배율)

@@ -59,7 +59,6 @@
 - 그 밖의 적 탄은 폭발이거나, 아군을 맞혔거나, 탄도선이 아군 `SHOT_VIEW.nearMiss`(10m) 안을 지났을 때만 탄착만 (`from = null`). 나머지는 빠진다. truth 디버그는 전부 총구까지.
 - `snapshot(world, viewer)` 는 이번 틱 `World.shots` 만 담는다. `Session.snapshot` 은 `advance` 동안 모은 최근 `LOOP.shotSec`(1초) 탄을 넘겨 화면이 흐려 가며 그릴 수 있게 한다.
 
-
 `SoldierView`: `id, side, name, role, squad, team, x, y, facing, look, dest(이동 행동의 목표), fireAt?(사격 목표: 제압 지점 {x, y} 또는 조준 표적 {target}; 재장전 뒤 이어 쏠 것·이동사격 포함, 보는 진영만), posture, body?, contact?`
 - `body`: `{ action(행동 종류), status, wounds([{ part, severity }]), blood(남은 혈액 비율 0~1), stress, stressLevel, stamina, load, speed }` — `speed` 는 지금 낼 수 있는 걷기 속도 (m/s, 지형 계수 전).
 - 보는 진영 병사: 전부 담김, `dest`·`body` 포함.
