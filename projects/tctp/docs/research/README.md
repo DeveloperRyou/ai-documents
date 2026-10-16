@@ -22,6 +22,12 @@
 | [53-hydration.md](53-hydration.md) | #53 | 수분·열 | TB MED 507 작업별 물 섭취·작업/휴식 (전재본), 저하율 곡선 없음 |
 | [67-org-bd1.md](67-org-bd1.md) | #67 | 국군 8인 분대·BD1 원문 | BD1 확인(2016 단계·2024 이름), 국군 편제 2차 |
 | [73-74-indirect-buildings.md](73-74-indirect-buildings.md) | #72 #73 #74 | 간접사격·건물 | 박격포 안전 구역·층고 13피트·벽 구멍 확인, 치명 반경 못 찾음 |
+| [40-armor.md](40-armor.md) | #40 | 방탄 장구 | 2차만 (표준 원문 못 열음) |
+| [46-47-light-optics.md](46-47-light-optics.md) | #46 #47 | 조도·광학 | 조도·PSO-1 2차, 인식 거리 못 찾음 |
+| [54-55-morale-panic.md](54-55-morale-panic.md) | #54 #55 | 사기·패닉 | 못 찾음 (Marshall 수치는 부정확 판정) |
+| [66-bd3-ambush.md](66-bd3-ambush.md) | #66 | BD3 매복 대응 절차 | 2007 판 단계 확인, 2016/2024 번호 충돌 |
+| [70-trees.md](70-trees.md) | #70 | 나무 밀도 | 줄기 밀도 2차, 굵은 줄기 분포 없음 |
+| [unresearched.md](unresearched.md) | #18 #21 #22 #42 #68 #69 #75 | 미조사·종속 | 이유 표 |
 
 ## 원문 받기
 
