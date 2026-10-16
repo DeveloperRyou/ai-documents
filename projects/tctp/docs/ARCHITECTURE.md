@@ -113,7 +113,7 @@ content/  (지도·시나리오 JSON)
 - 프런트엔드는 `World` 를 직접 읽지 않는다. 오가는 것은 `Command`·`Snapshot`·`MapData` 뿐이고 셋 다 JSON 이다.
 - 같은 TS 안에서 그리는 방식만 바꿀 때 (Three.js 2.5D 등): 클라이언트의 `Renderer` 구현을 새로 만들어 [`main.ts`](../packages/client/src/main.ts) 에서 바꿔 끼운다.
 - 다른 언어로 렌더링할 때: sim 을 Node(또는 JS 엔진 내장) 호스트에서 `Session` 으로 돌리고, 위 세 JSON 을 WebSocket·IPC 로 주고받는다. 아직 이 호스트는 없다.
-- `Snapshot` 의 이동 목표(`dest`, 이동 행동의 목표)는 보는 진영 병사만 담긴다.
+- `Snapshot` 의 이동 목표(`dest`, 이동 행동의 목표)와 남은 경유점(`via`)은 보는 진영 병사만 담긴다.
 
 ### 1틱의 흐름
 
@@ -166,7 +166,7 @@ requestAnimationFrame:
   snapshot = session.snapshot(scenario.player) → renderer.draw({snapshot, selected}) → HUD
 ```
 
-- 조작: 좌클릭 = 분대 선택 (한 명을 누르면 같은 분대 전원), 우클릭 = 이동, 휠 = 확대, 가운데 드래그 = 지도 이동, Space = 일시정지, Ctrl+S = 저장, Ctrl+O = 불러오기, Esc = 메뉴.
+- 조작: 좌클릭 = 분대 선택 (한 명을 누르면 같은 분대 전원), 우클릭 = 이동, Ctrl+우클릭 = 지금 이동 경로 끝에 경유점 이어 붙이기 (`via`, 선택 병사의 경로는 경유점을 지나는 꺾은선으로 그림), 휠 = 확대, 가운데 드래그 = 지도 이동, Space = 일시정지, Ctrl+S = 저장, Ctrl+O = 불러오기, Esc = 메뉴.
 - 저장은 시나리오 id + 시드 + `commandLog` 만 적는다 (스냅샷 없음). 불러오기는 처음부터 리플레이하므로 긴 판일수록 느려진다 — 느려지면 스냅샷을 더하고 `SAVE_VERSION` 을 올린다.
 - 시드는 URL `?seed=` 로 받는다 (기본 = 시나리오의 seed). `?truth=1` 이면 정보 안개를 끄고 모르는 적도 흐리게 그린다 (디버그).
 - 사격 조작: 아는 적 위 우클릭 = 조준사격 (`fire`), Shift+우클릭 = 그 지점 제압사격 (`suppress`, 다시 하면 지점 전환), X = 고른 분대의 사격 그침 (사격·재장전 중인 병사에게 `stop`, 이동사격은 건드리지 않음). 고른 병사의 사격 목표(`fireAt`)는 점선으로, 탄은 `Snapshot.shots` 로 `drawShots`(`renderer.ts`, 2D·2.5D 공용)가 그린다 (탄 자취 `SHOT_FX.tracerSec`, 탄착, 폭발 원). 3D 렌더러는 아직 탄을 그리지 않는다.
