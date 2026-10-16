@@ -7,6 +7,9 @@
 | 파일 | 이슈 | 주제 | 상태 |
 |---|---|---|---|
 | [23-suppression.md](23-suppression.md) | #23 | 구경별 제압 반경, 제압 유지 사격률 | 1972 DARPA 보고서 확인(선형 감소·화기별 점수), 반경 m 값은 2차 |
+| [30-dispersion.md](30-dispersion.md) | #30 | 소총·MG 분산 | 기록사격 합격선(23/40)·MG 사격률 확인, 분산 mrad·탄착 지대 치수는 못 찾음 |
+| [31-explosives.md](31-explosives.md) | #31 #37 | 수류탄·40 mm 폭발 | M67 5/15 m·4~5초·35 m 확인, 40 mm 사상 반경은 교범 안에서도 5 m/130 m 충돌 |
+| [32-bleeding.md](32-bleeding.md) | #32 | 출혈·사망 시간 | 2차만 (1차 본문 못 열음) |
 | [33-detection.md](33-detection.md) | #33 | 발견 임계·탐색 시간 분포 | 식 꼴 확인(Friedman 2019), 맨눈 τ·P∞ 상수 미확보 |
 | [43-vital-hit.md](43-vital-hit.md) | #43 | 몸통 피격 즉시/지연 무력화 | 부위·장기별 치명 확인(WDMET), 시간 분포 미확보 |
 | [49-slope.md](49-slope.md) | #49 | 경사 속도·체력 | 교범 확인(7% 문턱·오르내림 모두 느림), 곡선은 2차 |
