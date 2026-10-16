@@ -62,4 +62,4 @@
 
 ## 반영
 
-없음 (이 단계에서는 비워 둠).
+브리핑 부제·drill·source(bd1 시나리오), rok-rifle-squad source/note, DESIGN 29·63·70행 — 이슈 #67 커밋. 국군 편제 1차 출처는 미확보(추정 표시).
