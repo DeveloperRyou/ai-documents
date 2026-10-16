@@ -46,7 +46,9 @@ content/  (지도·시나리오 JSON)
 
 | 파일 | 내용 |
 |---|---|
-| [`command.ts`](../packages/sim/src/command/command.ts) | `Command` 유니온(`move`, `stop`, `posture`), `TimedCommand`, `applyCommand`, 혼란 중 미룬 명령 `applyDueOrders` |
+| [`leader.ts`](../packages/sim/src/command/leader.ts) | 리더 로직: 분대·조 임무 `OrderSpec` 을 조원 개인 명령으로 나눔, 교전 규칙 `Roe`(hold·return·free)로 사격 고름 `updateLeaders`, 지휘 권한(`World.control`) |
+| [`command.ts`](../packages/sim/src/command/command.ts) | `Command` 유니온(개인 명령 `Individual` + 부대 명령 `order`·`roe`), `applyIndividual`, `TimedCommand`, `applyCommand`, 혼란 중 미룬 명령 `applyDueOrders` |
+| [`path.ts`](../packages/sim/src/command/path.ts) | 경로 탐색 `planRoute`: 이동 명령 때 거친 격자 A* → 줄 당겨 펴기 → 시드 난수로 휘기, 튜닝 상수 `PATH`. 식은 [calc/movement.md](calc/movement.md) "경로 탐색" |
 | [`spacing.ts`](../packages/sim/src/command/spacing.ts) | 병사 사이 최소 간격: 겹친 짝 떼기 `separate`(step 이 행동 뒤에 부름), 목표 둘레 먼저 선 병사 곁에서 멈추기 `blockedNear`, 여럿을 한 점으로 보낼 때의 자리 `slotOffset`, 튜닝 상수 `SPACING`. 식은 [calc/movement.md](calc/movement.md) |
 | [`action.ts`](../packages/sim/src/command/action.ts) | 병사 행동 `Action`(`move`·`fire`·`reload`·`rest`), 종류별 처리 함수 표 `ACTIONS`, 매 틱 `updateActions`, `destOf`, 튜닝 상수 `MOVE`. 구조는 [objects/action.md](objects/action.md) |
 
