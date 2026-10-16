@@ -72,7 +72,8 @@ content/  (지도·시나리오 JSON)
 |---|---|
 | [`hearing.ts`](../packages/sim/src/perception/hearing.ts) | 듣기 (#35): 이번 틱 탄의 총성·폭발음 크기 `loudness`·`soundOf`, 모든 병사가 듣고 스트레스가 오르는 `updateHearing`, 가장 큰 적 소리 `loudestFoe` (돌아보기는 scan.ts) |
 | [`scan.ts`](../packages/sim/src/perception/scan.ts) | 경계(시선): 분대 안 자리별 경계 구역 `sectorOf`, 눈 방향 `look` 을 정하는 `updateScan`. 튜닝 상수 `SCAN` |
-| [`vision.ts`](../packages/sim/src/perception/vision.ts) | 시선 `lineOfSight` (능선 차단·지물 감쇠, 끊긴 곳 `SightBlock` out), 시야각 `fovFactor`(눈 방향 `look` 기준), 발견 확률 `detectChance` (배율 분해 `detectFactors`), 매 틱 `updateVision` 으로 `contacts` 갱신 (두 병사가 지난 틱과 같은 자리·몸 높이면 시선 검사 결과를 `SightCache` 에서 재사용 — 계산 캐시라 `stateHash` 와 무관). 튜닝 상수 `VISION` |
+| [`comms.ts`](../packages/sim/src/perception/comms.ts) | 접촉 보고 (#45): 목소리 인식률 `recognition`·소음·`voiceReaches`, 본 병사가 외치면(`sendReport`) 닿는 아군에게 지연(`VOICE.baseDelay`, 스트레스로 늘어남)·위치 오차와 함께 도착(`deliverReports`)하고 받은 병사가 다시 외쳐 퍼짐. 병사별 앎 `knownOf`. 튜닝 상수 `VOICE` |
+| [`vision.ts`](../packages/sim/src/perception/vision.ts) | 시선 `lineOfSight` (능선 차단·지물 감쇠, 끊긴 곳 `SightBlock` out), 시야각 `fovFactor`(눈 방향 `look` 기준), 발견 확률 `detectChance` (배율 분해 `detectFactors`), 매 틱 `updateVision` 으로 병사별 `known` 갱신(직접 본 것을 `comms.ts` 가 외쳐 퍼뜨림)·진영 합친 `contacts` 만듦 (두 병사가 지난 틱과 같은 자리·몸 높이면 시선 검사 결과를 `SightCache` 에서 재사용 — 계산 캐시라 `stateHash` 와 무관). 튜닝 상수 `VISION` |
 
 ### [`terrain/`](../packages/sim/src/terrain) — 지도 형식과 지형 격자
 
@@ -138,7 +139,7 @@ step(world, commands)
 ```
 
 - 명령은 상태를 직접 바꾸지 않고, 틱 시작 때 `step` 안에서만 적용된다. 그래서 `(지도, 시드, 초기 편성, TimedCommand[])` 만 있으면 같은 판을 다시 만들 수 있다.
-- `stateHash` 는 tick, RNG 상태, 병사 id·위치(mm 반올림)·자세·상태·스트레스·심리 단계·미뤄 둔 명령 틱·지구력·하중·혈액·부상·마지막 위협 틱, 진영별 contacts(id·틱·보임)를 섞는다. 상태에 새 필드를 넣으면 해시에도 넣어야 결정성 테스트가 그 필드를 검사한다.
+- `stateHash` 는 tick, RNG 상태, 병사 id·위치(mm 반올림)·자세·상태·스트레스·심리 단계·미뤄 둔 명령 틱·지구력·하중·혈액·부상·마지막 위협 틱, 병사별 `known`(id·틱·보임·위치)과 전해지는 중인 `reports` 를 섞는다. 상태에 새 필드를 넣으면 해시에도 넣어야 결정성 테스트가 그 필드를 검사한다.
 - `Soldier` 는 위치·방향·이동 목표·소속(분대/조)과 이름·직책·몸 크기·휴대 장비, 몸 상태(하중·자세·상태·부상·혈액·스트레스·지구력)를 가진다 ([objects/soldier.md](objects/soldier.md)). 장비는 id 로만 들고, 성능은 `ContentDb.equipment` 에서 찾는다 (하중은 편성 때 계산해 둔다).
 - 지형 격자는 지도에서만 만들어지고 바뀌지 않아 해시에 넣지 않는다. 1199 × 1001 칸 기준 굽기에 약 60ms.
 
