@@ -1,27 +1,80 @@
 # #51 자세 바꾸는 시간
 
-조사일 2026-10-16. 지금: 자세 변경 0초.
+조사일 2026-10-16 (2차 조사: 1차 원문 확보). 지금: 자세 변경 0초 (`command.ts` 의 `posture` 명령이 `s.posture` 를 바로 바꾼다. 제압 때 자동 엎드림 `soldier.ts:166-180`, 약진 도착 엎드림 `action.ts:243`, 약진 출발 서기 `action.ts:246`도 즉시).
 
-## 찾은 것
+## 확인 (1차 원문을 열어 본 것)
 
-| 항목 | 값 | 등급 | 출처 |
+둘 다 USARIEM(미 육군 환경의학연구소, Natick) 보고서. 걷다가 신호를 받고 "엎드렸다가 다시 일어서기"까지의 왕복 시간이다. 반응 시간은 포함되지 않는다 (신호 뒤 시작; 보고서가 반응 시간 제외를 명시하지는 않음 -> 아래 판단 참고).
+
+**A. Harman 외, USARIEM Technical Report T99-4 (1999-02), DTIC [ADA361454](https://apps.dtic.mil/sti/pdfs/ADA361454.pdf)** (Wayback 사본으로 받음)
+- 대상: 남자 11명, 몸무게 평균 84.9 kg (SD 12.0), 키 179 cm (표 1, PDF 쪽 17 부근).
+- 시험: "normal marching speed 로 걷다가 구두 신호 후 지면에 prone 으로 엎드렸다가 다시 일어섬" (PDF 쪽 18-19).
+- 짐 (표 2, PDF 쪽 14): 전투 짐(fighting load; BDU·방탄복·헬멧·탄띠·조끼·모의 수류탄·탄창·모의 M-16) 37.4~37.8 lb (≈17 kg). 접근 짐(approach load; 전투 짐 + 배낭 20 lb) 65.8~69.5 lb (≈30~31.5 kg).
+- 표 6 (PDF 쪽 23, 인쇄 쪽 13), 엎드렸다 일어서기 왕복, 평균 s (SD):
+
+| 짐 | MOLLE | MLS | ALICE(이전 실험, 다른 대상) |
 |---|---|---|---|
-| 포격 아래 엎드리기 | 첫 탄착 때 서 있음 58%, 2초 뒤 29%만 서 있고 56% 엎드림+엄폐, 8초 뒤 전원 엎드림 | 2차 | [Wikipedia "Time on target"](https://en.wikipedia.org/wiki/Time_on_target) ← Hogan·Wilson, "Massed Fires — Room for Improvement", *Field Artillery* 1990-10, pp.13–16 ← 1970년대 미 육군 "Troop Reaction and Posture Sequencing" 시험 |
-| 엎드림→일어서기 | 엎드린 네 자세 모두에서 1초 이하로 일어섬 (경찰 신병, 프레임 분석, 군장 없음) | 2차 | [Force Science 2018](https://www.forcescience.com/2018/02/new-force-science-studies-the-stand-up-speed-of-proned-out-suspects-plus-the-impact-of-physical-exertion-on-shooting-performance/) |
-| 사격 자세 바꾸기 | 미 육군 신 사격 평가: 탄창 교환+자세 변경 간격 8~10초 | 2차, 측정값 아님 | [army.mil 2019](https://www.army.mil/article/227278/soldiers_test_new_combat_focused_marksmanship_qualification) |
-| 동작 모델 | 서기↔엎드리기 동작을 관절 토크로 예측 (시간 상수 없음) | 참고 | [Springer, Going Prone / Get Up from Prone](https://link.springer.com/chapter/10.1007/978-3-319-41627-4_5) |
+| 짐 없음 | 2.10 (0.28) | | |
+| 전투 짐 | 2.42 (0.34) | 2.44 (0.40) | 2.49 (0.29) |
+| 접근 짐 | 3.15 (0.49) | 3.04 (0.52) | 3.00 (0.29) |
 
-## 판단
+  전투 짐 vs 접근 짐은 유의차(p<0.05), 장비 종류 간 차이는 없음.
+- 표 7: 배낭을 벗고 엎드리기 MOLLE 3.81 (1.43) s, ALICE 1.66 (0.35) s (접근 짐, 각각 다른 집단; 퀵릴리스 끈 찾기 지연). 표 15: 엎드려 3회 구르고 조준 BDU 4.06 / MOLLE 전투 짐 4.48 / MLS 4.33 / ALICE 4.77 s.
 
-- 반응 시간을 빼면 서→엎드림은 약 1~2초(2초 안에 다수가 엎드림)로 볼 수 있지만, 반응 시간과 동작 시간이 섞인 자료라 `추정`이다.
-- 엎드림→서기 1초 이하는 군장 없는 경찰 자료다. 군장(부하 계수)을 곱해 늘리는 것은 `추정`.
-- 무릎쏴 전환 시간 자료는 못 찾았다.
+**B. Harman 외, 여군 12명, DTIC [ADA365448](https://apps.dtic.mil/sti/pdfs/ADA365448.pdf)** (같은 USARIEM 팀, T99-4 를 인용; 보고서 번호는 OCR 이 깨져 못 읽음)
+- 대상: 여자 12명, 몸무게 평균 59.4 kg (SD 6.3), 키 162.5 cm (표 1, PDF 쪽 12 부근).
+- 짐 (표 2): 전투 짐 37.2~38.6 lb (≈17 kg), 접근 짐 63.5~67.9 lb (≈29~31 kg).
+- 표 8 (PDF 쪽 23): 엎드렸다 일어서기 왕복 s (SD). 짐 없음 2.37 (0.23). 전투 짐 MOLLE 3.55 (0.73) / ALICE 3.28 (0.51). 접근 짐 MOLLE 5.04 (0.74) / ALICE 4.66 (0.74). 본문: 짐이 클수록 느림, 배낭 무게중심이 높으면 일어서기가 느림 (발을 축으로 한 모멘트 팔이 길어서, 쪽 22 본문).
+- 표 9: 배낭 벗고 엎드리기 MOLLE 2.82 / ALICE 3.69 s. 표 10: 엎드려 3회 구르고 조준 5.11 (짐 없음) / 5.49 / 5.12 s.
 
-## 다음에 볼 곳
+**짐 계수 (A·B 표 6·8 에서 계산한 비. 계산은 내 것)**
 
-- *Field Artillery* 1990-10 원문 (fieldartillery.org 아카이브)
-- ARL HRED / Natick 군장 기동성 시험(예: "rush", "get up and down" 시간), 3~5초 약진 교범 근거
+| 대상 | 짐/몸무게 | 왕복 시간 ÷ 짐 없음 |
+|---|---|---|
+| 남 전투 짐 | 17/84.9 ≈ 0.20 | 2.42~2.49 / 2.10 ≈ 1.15~1.19 |
+| 남 접근 짐 | 30/84.9 ≈ 0.35 | 3.00~3.15 / 2.10 ≈ 1.43~1.50 |
+| 여 전투 짐 | 17/59.4 ≈ 0.29 | 3.28~3.55 / 2.37 ≈ 1.38~1.50 |
+| 여 접근 짐 | 30/59.4 ≈ 0.50 | 4.66~5.04 / 2.37 ≈ 1.97~2.13 |
+
+짐/몸무게(상대 하중)가 클수록 왕복이 비선형으로 늘어난다.
+
+## 2차 (원문 못 연 것)
+
+| 항목 | 값 | 출처 |
+|---|---|---|
+| 포격 아래 엎드리기 | 첫 탄착 때 서 있음 58%, 2초 뒤 29%만 서 있고 56% 엎드림, 8초 뒤 전원 엎드림 (반응 시간 포함) | [Wikipedia "Time on target"](https://en.wikipedia.org/wiki/Time_on_target) <- *Field Artillery* 1990-10 pp.13-16 "Massed Fires - Room for Improvement" (저자 표기는 미확인) <- 1970년대 미 육군 "Troop Reaction and Posture Sequencing" 시험 |
+| 엎드림 -> 일어서기 | 엎드린 네 자세에서 모두 약 1~2초 이하 (경찰, 군장 없음) | [Force Science 2018](https://www.forcescience.com/2018/02/new-force-science-studies-the-stand-up-speed-of-proned-out-suspects-plus-the-impact-of-physical-exertion-on-shooting-performance/) ; Sanchez 외 2022 학회 논문(요약만) |
+| 사격 자세 바꾸기 | 신 사격 평가: 탄창 교환+자세 변경 간격 8~10초 (측정값 아님) | [army.mil 2019](https://www.army.mil/article/227278/soldiers_test_new_combat_focused_marksmanship_qualification) |
+| 약진 교범 | 미 육군 약진 = "3~5초 약진", 엎드린 데서 일어나 뛰고 다시 엎드림 | [Wikipedia Individual movement techniques](https://en.wikipedia.org/wiki/Individual_movement_techniques) <- FM 3-21.8 (2007) |
+
+## 추정 (내가 고른 것)
+
+- **왕복을 엎드림/일어서기로 가르기**: 보고서는 왕복만 잰다. 내림:올림 = 약 45:55 로 놓으면 짐 없는 남자 엎드림 ≈ 0.95 s, 일어서기 ≈ 1.15 s. 일어서기가 더 길다는 것은 A·B 의 "배낭이 높으면 일어서기가 느림" 본문과 Force Science 의 "약 1~2초 이하"에 맞춘 값일 뿐, 가름 비율을 직접 잰 자료는 없다.
+- **앉기(무릎) 전환**: 자료를 못 찾았다. 서기<->앉기는 서기<->엎드림의 절반 정도(높이 차 0.4 vs 0.8, `POSTURE_HEIGHT` 서기 1 / 앉아 0.6 / 엎드려 0.2)로 비례해 어림하는 것이 가장 단순하지만 `추정`이다. 앉기<->엎드림도 같다.
+- **다리 부상·피로 계수**: 직접 측정 자료 없음. 걷기에 쓰는 `leg` 계수(`soldier.ts` 다리 계수)를 그대로 재사용하는 것이 가장 적은 새 가정이다. 다리 하나 못 쓰면(`legs === "out"`) 엎드리기는 되고 일어서기는 늘리거나 포복 수준으로 하는 설계 결정이 필요하다.
+- **반응 시간**: 위 측정은 신호 뒤 동작 시간이다 (A·B 가 반응 시간을 떼었는지는 본문에서 못 확인; 신호 뒤 stopwatch/움직임 센서 시작으로 읽힘). TCTP 는 반응을 `SCAN.reaction` 0.3~1초로 이미 따로 둔다. 2차 포격 시험의 "2초 안에 다수 엎드림"은 반응 0.3~1초 + 동작 약 1초로 A 와 모순되지 않는다.
+
+## 접근 실패·다음에 볼 곳
+
+- `apps.dtic.mil` 직접 다운로드는 403/점검 페이지. `web.archive.org/web/2024.../https://apps.dtic.mil/sti/pdfs/<AD>.pdf`(`if_`) 로 받아 해결.
+- *Field Artillery* 1990-10 원문 못 구함 (TRADOC Fires Bulletin 아카이브에서 호별 PDF 가 있을 가능성).
+- FM 3-21.75(Warrior Tasks) / ATP 3-21.8 의 약진·엎드리기 단계 문구 원문 미확인 (armypubs.army.mil Wayback 색인).
+- 앉기/무릎 전환, 다리 부상 영향, 지친 상태 영향은 자료 없음. 후보: ARL/Natick "get up and down" 시험, 장애물 코스 dive-to-prone 비중 (ARL 2018 슬라이드, 시간 값 없음).
+- 이 연구는 걷다가 엎드리는 동작 한 가지다. 달리다 엎드리는(약진 도착) 시간은 따로 없다.
 
 ## 반영
 
-없음.
+(비움)
+
+## 제안 (코드 미수정)
+
+현재: 자세 전환 0초, 높이가 즉시 바뀜.
+
+1. **자세 전환 행동** `posture` 를 즉시 대입에서 짧은 행동으로 바꾼다. 상수(초 단위, `secToTicks`): `POSTURE_CHANGE.baseTime` 에 엎드림(서->엎) ≈ 1.0, 일어서기(엎->서) ≈ 1.1 (A 짐 없음 왕복 2.10 s 를 나눔, 가름은 `추정`), 앉기 관련은 위의 비례 `추정`. 단위는 "짐 없는 남자 기준".
+2. **하중 계수** (`…Coef`, 새 이름 예 `postureLoadCoef`): 상대 하중 r = 짐/몸무게 에 대해 `1 + 4·r²` 가 A·B 네 점을 ±0.1 안에 맞춘다 (남 0.20->1.16, 0.35->1.49; 여 0.29->1.34, 0.50->2.00). 4점 맞춤이므로 `추정`(경험식), 표 값 자체가 `확인`이다. 현재 `LOAD.freeRatio` 0.15 아래는 1 을 유지하는 기존 하중 계수와 이어 붙일지 결정 필요.
+3. **다리 부상·지침**: 이동 `legCoef`·`staminaCoef` 를 재사용하고, 다리 하나를 못 쓰면 일어서기 거부 또는 포복 수준 (결정 필요).
+4. **전환 중**: 시작 틱에 사격 불가(`canFire` 에서 거부), 몸 높이는 `POSTURE_HEIGHT` 사이를 선형 보간 (보이고 맞을 수 있음), 이동 불가 또는 포복 속도. 완료 틱에 `posture` 확정. 제압·패닉 자동 엎드림도 같은 행동을 쓰되 `수정 필요`: 무력화(쓰러짐)는 즉시.
+5. **약진**: 출발 서기/도착 엎드림도 전환 시간을 쓰면 약진 한 번이 서기 1.1 + 뛰기 + 엎드림 1.0 으로 늘어 교범 "3~5초 약진"과 맞물린다. 약진 중 서 있는 시간 상한은 별도 이슈로 다룰지 결정 필요.
+6. **영향 받는 docs**: `docs/objects/soldier.md` 자세, `docs/objects/action.md`, `docs/calc/movement.md` (새 절 "자세 전환"), `docs/calc/random/rolls.md` (난수 없으면 해당 없음), `calc-charts.ts` + `npm run charts`.
+7. **수락 기준 대응**: (a) 엎드림·일어서기 각각 위 시간, 전환 중 사격 거부 드릴. (b) 하중·다리 부상 드릴 (같은 병사, 짐 0 / 전투 짐 / 접근 짐 -> 1.0 : 1.2 : 1.5 배 근처). (c) 같은 시드·명령 기록 `stateHash` 동일 (난수 없음).
+8. **결정 필요**: 앉기 전환 시간(자료 없음 `추정`), 다리 부상 규칙, 기본 시나리오의 `posture` 명령 대기 중 UI 표시.

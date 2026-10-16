@@ -16,7 +16,7 @@
 | [33-detection.md](33-detection.md) | #33 | 발견 임계·탐색 시간 분포 | 식 꼴 확인(Friedman 2019), 맨눈 τ·P∞ 상수 미확보 |
 | [39-61-aid.md](39-61-aid.md) | #39 #61 | 응급처치·후송 | 지혈대·지혈 거즈 3분 확인, 시간·끌기 속도 못 찾음 |
 | [41-penetration.md](41-penetration.md) | #41 | 탄 관통 | FM 3-06.11 표 7-2·7-3 확인 (5.56 소요탄·7.62 관통 인치) |
-| [43-vital-hit.md](43-vital-hit.md) | #43 | 몸통 피격 즉시/지연 무력화 | 부위·장기별 치명 확인(WDMET), 시간 분포 미확보 |
+| [43-vital-hit.md](43-vital-hit.md) | #43 | (#32 로 통합) | 내용은 32-bleeding.md "통합: #43" 절 |
 | [49-slope.md](49-slope.md) | #49 | 경사 속도·체력 | 교범 확인(7% 문턱·오르내림 모두 느림), 곡선은 2차 |
 | [51-posture.md](51-posture.md) | #51 | 자세 바꾸는 시간 | 2차 근사치만 |
 | [53-hydration.md](53-hydration.md) | #53 | 수분·열 | TB MED 507 작업별 물 섭취·작업/휴식 (전재본), 저하율 곡선 없음 |
