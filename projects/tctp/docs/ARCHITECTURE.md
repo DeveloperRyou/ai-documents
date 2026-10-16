@@ -123,6 +123,7 @@ content/  (지도·시나리오 JSON)
 step(world, commands)
   1. commands 를 순서대로 applyCommand  ← 상태를 바꾸는 입구는 여기뿐
      applyDueOrders: 혼란·위축으로 미뤄 둔 명령 중 때가 된 것 적용
+     updateLeaders: 교전 규칙(hold·return·free)에 따라 할 일 없는 병사에게 사격 행동 부여
   2. world.tick++
   3. updateActions: 행동할 수 있는 병사(무력화·제압·패닉 아님)만 id 순서로 행동 처리 함수를 한 걸음 진행, 끝나면 행동 비움
        move: 목표 쪽으로 speedOf(자세·하중·지구력·다리) × 선 칸의 move 배율 × DT 만큼 직선 이동. 다음 칸이 통행 불가면 그 자리, MOVE.arrive 안이면 끝
