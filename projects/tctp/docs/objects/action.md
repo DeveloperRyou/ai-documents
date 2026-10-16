@@ -21,7 +21,7 @@ Command (플레이어·AI 입력, commandLog 에 기록, 리플레이 대상)
 
 | 종류 | 필드 | 처리 (`ACTIONS`) | 끝 |
 |---|---|---|---|
-| `move` | `x`, `y` (목표, m), `pace` (걸음 계수), `gait` (`walk` 걷기 / `rush` 약진), `fire` (이동사격: 사격 행동 또는 null) | 목표 쪽으로 `speedOf(gait) × 선 칸 move 계수 × pace × 틱 흔들림 × DT` 만큼 직선 이동, 방향을 목표로. 다음 위치가 통행 불가면 그 자리 (경로 탐색 없음). **약진**: 서서 뛰고 (3.5 m/s × 하중·지구력, 지구력 소모 큼) 도착하면 엎드린다. 다리를 다쳤거나 약해졌으면 걷는다. **이동사격** (걷기 + `fire`): 걸음 × `MOVE.fireSpeed`(0.5), 같은 틱에 `fire` 를 한 걸음 진행 (산포 × 2). 속도 식은 [../calc/movement.md](../calc/movement.md). 표적을 놓치거나 탄창이 비면 사격만 그친다 (걸으며 재장전하지 않음) | 목표 `MOVE.arrive`(0.5m) 안 |
+| `move` | `x`, `y` (목표, m), `pace` (걸음 계수), `gait` (`walk` 걷기 / `rush` 약진), `fire` (이동사격: 사격 행동 또는 null) | 목표 쪽으로 `speedOf(gait) × 선 칸 move 계수 × pace × 틱 흔들림 × DT` 만큼 직선 이동, 방향을 목표로. 다음 위치가 통행 불가면 그 자리 (경로 탐색 없음). **약진**: 서서 뛰고 (3.5 m/s × 하중·지구력, 지구력 소모 큼) 도착하면 엎드린다. 다리를 다쳤거나 약해졌으면 걷는다. **이동사격** (걷기 + `fire`): 걸음 × `MOVE.fireSpeed`(0.5), 같은 틱에 `fire` 를 한 걸음 진행 (산포 × 2). 속도 식은 [../calc/movement.md](../calc/movement.md). 표적을 놓치거나 탄창이 비면 사격만 그친다 (걸으며 재장전하지 않음) | 목표 `MOVE.arrive`(0.5m) 안, 또는 목표 5m 안에서 먼저 멈춘 병사에 닿음 (`blockedNear`). 다른 병사와 겹치면 `separate` 가 떼어 놓는다 ([../calc/movement.md](../calc/movement.md)) |
 | `fire` | `slot`, `at`(조준점: 아는 적 `{soldier, id}` / 지점 `{point, x, y}`), `aim`(초, 화기 기준 조준 시간 × 명령의 조준 계수), `burst`(발), `sweep`(m), 진행 `aimed`·`need`·`left`·`shot`·`ox`·`oy` | 조준점을 향해 `aim` × 조준 시간 계수(심리 `FIRE.stressAim` × 팔 × 실혈, ± `VARY.aim`) 초 조준 → 점사 `burst` (2발 이상이면 ± 1) 발 (한 틱에 `max(1, round(rof × DT / 60))` 발) → 다시 조준. 점사마다 조준점 둘레 `sweep` 안의 한 점 + 겨눔 어긋남(`VARY.hold`)을 겨눈다. 탄창이 비면 재장전 행동으로 바꾸고 끝나면 이어 쏜다 | 겨눈 적이 진영에 안 보이거나 **사수 본인 눈에 안 보임**(`canAimAt`: 표적 쪽으로 돌아섰을 때 시선 투과 < `VISION.track`), 죽음, 탄이 다 떨어짐, 두 팔을 다 못 씀 |
 | `reload` | `slot`, `until`(틱), `then`(이어 갈 사격) | `until` 에 장전 수만큼 (모자라면 남은 만큼) 채우고 `then` 으로 | `then` 이 없으면 채운 뒤 |
 | `rest` | (없음) | 아무것도 하지 않는다. 이 행동 중에 지구력이 제대로 회복 (멈춰만 있으면 `RATES.stamina.idleCoef` 배 빠르기, [../calc/rates.md](../calc/rates.md) "지구력") | 평온(`calm`)이 깨지면 (`updateBody`) |
@@ -50,7 +50,7 @@ Command (플레이어·AI 입력, commandLog 에 기록, 리플레이 대상)
 ## 명령과의 관계
 | 명령 | 행동 |
 |---|---|
-| `move` | `{ kind: "move", x, y, pace, gait, fire }` 로 바꿈 (진행 중 행동을 덮음). 목표는 명령 지점 둘레 `VARY.dest` 안, `pace` = 1 ± `VARY.pace`. `gait` = 명령의 걸음 (기본 walk), `fire` = 명령의 `fire` 로 만든 사격 행동 (걷기일 때만) |
+| `move` | `{ kind: "move", x, y, pace, gait, fire }` 로 바꿈 (진행 중 행동을 덮음). 목표는 명령 지점 + 명령 `ids` 순서로 받은 자리(`slotOffset`, 육각 고리 2m 간격) + `VARY.dest` 흔들림, `pace` = 1 ± `VARY.pace`. `gait` = 명령의 걸음 (기본 walk), `fire` = 명령의 `fire` 로 만든 사격 행동 (걷기일 때만) |
 | `stop` | 행동 비움 |
 | `posture` | 행동은 그대로, 자세만 바꿈 |
 
