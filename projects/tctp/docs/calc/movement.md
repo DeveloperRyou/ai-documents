@@ -30,13 +30,44 @@
 ## 한 틱에 가는 거리 (`ACTIONS.move`)
 
 ```
-걸음 = speedOf × 선 칸 move 계수 × pace × (이동사격이면 0.5) × stride × DT
+걸음 = speedOf × 선 칸 move 계수 × 경사 계수 × pace × (이동사격이면 0.5) × stride × DT
 ```
 - `pace`: 이동 명령을 받을 때 한 번 굴린 1 ± 10% (`VARY.pace`). `stride`: 틱마다 1 ± 5% (`VARY.stride`). [random/rolls.md](random/rolls.md).
 - 선 칸 `move` 계수: 지형 표 ([../objects/terrain.md](../objects/terrain.md)). 도로 1.1, 숲 0.7, 덤불 0.6, 참호 0.4 …
 - 목표까지 남은 거리보다 길면 목표에서 멈춘다. 남은 거리가 `MOVE.arrive` 0.5m 안이면 도착 (약진이면 엎드림). 목표 `SPACING.crowd` 5m 안에서 자기보다 목표에 가까이 멈춰 선 병사에 닿으면(중심 거리 ≤ `SPACING.min` + `SPACING.touch`) 그 자리에서도 도착 (`blockedNear`).
 - 다음 위치 칸의 `move` 가 0 (건물·물·강)이면 그 틱은 움직이지 않는다. 길은 명령 때 경로 탐색(아래)이 막힌 칸을 돌아 구해 두므로, 목표에 닿을 길이 아예 없을 때만 막혀 그 자리에서 행동이 계속된다.
 - 약진은 출발 틱에 서고, 걷기는 자세를 그대로 둔다. 이동사격은 걷기에만 붙는다 (`MOVE.fireSpeed` 0.5).
+
+## 경사 (#49)
+
+코드: [`body/soldier.ts`](../../packages/sim/src/body/soldier.ts) `SLOPE`, `slopeCoef`, [`command/action.ts`](../../packages/sim/src/command/action.ts) `slopeStep`, [`terrain/terrain.ts`](../../packages/sim/src/terrain/terrain.ts) `slopeAhead`, [`body/rates.ts`](../../packages/sim/src/body/rates.ts) `updateStamina`. 조사: [research/49-slope.md](research/49-slope.md).
+
+```
+경사 S      = (고도(앞 SLOPE.lookahead m) − 고도(지금)) ÷ lookahead   (걸어가는 방향, 오르막 +)
+경사 계수   = min(1, exp(−steep × |S + peak|) ÷ exp(−steep × peak)) = min(1, exp(−3.5·|S + 0.05|) ÷ exp(−0.175))
+한계        = |S| ≥ SLOPE.limit(0.6) 이면 계수 0 (그 방향으로 한 걸음도 못 감)
+지구력 소모 = 기준 소모 × (1 + 하중 …) × (1 + upDrainCoef × max(0, S))        (오르막만)
+```
+- 이동·줍기 이동·도주(panic)가 곱한다. 고도 격자가 없는 지도(평지)는 S = 0 이라 영향이 없다. 난수 없음, 같은 지도·명령이면 같은 값.
+- 속도: Tobler 걷기 함수를 평지 1 로 맞춘 것. 내리막이 평지보다 빨라지는 부분(−5% 부근)은 1 로 자른다 — 교범은 오르막·내리막 모두 느려진다고만 하고(ATP 3-21.18 1-27, 7% 부터), 논문이 Tobler 의 완만한 내리막 과대 예측을 지적한다. 7% 문턱은 따로 두지 않고 곡선만 쓴다 (+7% → 0.78배).
+- 지구력: Santee 외 2003 오르막 식을 짐 포함 100 kg 으로 계산하면 +10% → 평지의 2.15배, +20% → 3.3배라 `upDrainCoef` 11.5 (질량이 다르면 비율이 달라짐 → 추정). 내리막 소모는 아직 평지와 같다 (Santee 내리막 식의 원문 확인 전).
+- 한계를 넘는 비탈 앞에서 병사는 서서 기다린다 (통행 불가 칸과 같은 처리, 지구력도 안 쓴다). 경로 탐색은 아직 경사를 보지 않아 한계 비탈을 가로지르는 길을 낼 수 있다 (#24 에서 같은 계수를 비용으로 쓴다).
+
+![경사 속도 계수: 평지 1, 오르막은 가파를수록 급히 줄고, 내리막은 1 에서 멈췄다가 가파르면 줄어든다](img/move-slope.svg)
+*경사 속도 계수: 평지 1, 오르막은 가파를수록 급히 줄고, 내리막은 1 에서 멈췄다가 가파르면 줄어든다*
+
+| 경사 S | +0.07 | +0.10 | +0.30 | −0.10 | −0.30 | ±0.60 이상 |
+|---|---|---|---|---|---|---|
+| 속도 계수 | 0.78 | 0.71 | 0.35 | 1 | 0.50 | 0 (못 감) |
+| 오르막 소모 계수 | 1.8 | 2.15 | 4.5 | 1 | 1 | — |
+
+| 상수 | 값 | 하는 일 | 키우면 | 등급 |
+|---|---|---|---|---|
+| `SLOPE.steep` | 3.5 | Tobler 식의 기울기 민감도 | 경사에 더 크게 느려짐 | 확인 (논문이 옮긴 식) |
+| `SLOPE.peak` | 0.05 | Tobler 식에서 가장 빠른 경사 (약 3° 내리막) | 내리막 쪽으로 기울어짐 | 확인 (같은 곳) |
+| `SLOPE.upDrainCoef` | 11.5 | 오르막 경사 1.0 당 지구력 소모 증가 | 오르막에서 더 빨리 지침 | 추정 (Santee, 100 kg) |
+| `SLOPE.limit` | 0.6 | 이 경사(절댓값) 이상은 못 걸어 들어감 | 더 가파른 비탈도 오름 | 추정 (출처 없음, 튜닝 대상) |
+| `SLOPE.lookahead` | 3 m | 경사를 재는 앞쪽 거리 | 잔 요철에 덜 흔들림 | 추정 |
 
 ## 경로 탐색 (`planRoute`, `command/path.ts`, #15)
 
