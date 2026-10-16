@@ -7,6 +7,7 @@
 ## 명령어
 ```bash
 npm run dev          # 클라이언트 http://localhost:5175 — 메뉴. 게임 직행 ?scenario=bd1-react-to-contact (&seed=7 &view=2d|iso|3d|split &truth=1)
+                     # 게임 화면 키: B 위성(실제 지도) · C 등고선 · G 격자(50m) · L 범례
                      # 행동 확인장 ?debug=drills (&drill=<id>) — sim/src/drills/drills.ts 의 드릴을 틱 단위로 재생
 npm run check        # typecheck + lint(Biome) + test(Vitest). 커밋 전 통과시킬 것
 npm run format       # Biome 자동 수정
@@ -27,7 +28,7 @@ npm run fetch-map -- <id> <남> <서> <북> <동> [이름]   # content/maps/<id>
 - `packages/tools`: Node 전용 도구. `content/` 를 읽고 쓴다.
 - `content/maps/raw/` 는 OSM·고도 원본 캐시 (git 제외).
 - 틱 흐름: 상태는 `step(world, cmds)`([`packages/sim/src/core/world.ts`](packages/sim/src/core/world.ts)) 안에서만 바뀌고, 명령은 `applyCommand`([`command/command.ts`](packages/sim/src/command/command.ts))로 들어가 병사 행동(`Action`, [`command/action.ts`](packages/sim/src/command/action.ts))이 되고, 행동이 매 틱 진행된다 (구조: [`docs/objects/action.md`](docs/objects/action.md)). 클라이언트는 틱마다 낸 명령을 `commandLog` 에 쌓은 뒤 `step` 을 부른다. 테스트·headless 는 `runReplay` + `stateHash`([`core/replay.ts`](packages/sim/src/core/replay.ts))로 결정성을 비교한다.
-- 콘텐츠: [`content/campaign.json`](content/campaign.json)(과정 사다리) → `scenarios/*.json` → `orgs/*.json`(편제) → `equipment.json`(화기·탄약). 병사는 `buildSoldiers`([`content/scenario.ts`](packages/sim/src/content/scenario.ts))로 편제에서 세운다. 지도는 `rasdorf.json` 하나.
+- 콘텐츠: [`content/campaign.json`](content/campaign.json)(과정 사다리) → `scenarios/*.json` → `orgs/*.json`(편제) → `equipment.json`(화기·탄약). 병사는 `buildSoldiers`([`content/scenario.ts`](packages/sim/src/content/scenario.ts))로 편제에서 세운다. 지도는 `rasdorf.json`(마을)·`gamaksan.json`(산지, bd1).
 - 정보 안개: `World.contacts`(진영별 아는 적, [`perception/vision.ts`](packages/sim/src/perception/vision.ts)) → `snapshot` 이 거른다. 렌더러에 실제 적 위치를 넘기지 말 것 (`?truth=1` 디버그만).
 - `CLAUDE.md`, `AGENTS.md`, `docs/`, `.claude/` 는 ai-documents 레포(`projects/tctp/`)를 가리키는 심볼릭 링크다. 수정은 링크를 따라가 그쪽 레포에서 커밋·푸시한다.
 
