@@ -2,25 +2,40 @@
 
 조사일 2026-10-16. 지금 값: 5.56mm 3m · 7.62×39 4m · 7.62×54R 5m (출처 없는 포럼 인용에서 옴).
 
-## 찾은 것
+## 1차: Mellonics/Litton, DARPA 1972 (DTIC AD519874)
 
-| 항목 | 값 | 등급 | 출처 |
+"The Identification of Objective Relationships Between Small Arms Characteristics and Effectiveness of Suppressive Fire", Litton Systems Mellonics, ARPA 계약 DAAD05-71-C-0216, 1972-04, 432쪽. [DTIC](https://apps.dtic.mil/sti/tr/pdf/AD0519874.pdf) (점검 중이면 Wayback).
+
+| 항목 | 값 | 등급 | 쪽 |
 |---|---|---|---|
-| 50% 제압 빗나감 거리 | 5.56mm·.45ACP 약 3m, 7.62mm 약 6m, .50BMG 약 24m (사거리 150m 가정) | 2차 | [Towards a "600 m" lightweight General Purpose Cartridge, part II](https://www.researchgate.net/publication/306344619_Towards_a_600_m_lightweight_General_Purpose_Cartridge_part_II) — 탄약 설계 논문이 재인용, 원 시험 자료 미확인. 지금 "3m/6m" 값의 출처일 가능성이 큼 |
-| 빗나감 거리와 제압 | 측방 빗나감 거리가 늘면 제압이 선형으로 줄고, 지각된 소리 크기가 크면 선형으로 늘며, 소리+시각 단서가 소리만보다 더 제압한다 | 2차(초록) | DTIC [AD519874](https://apps.dtic.mil/sti/tr/pdf/AD0519874.pdf) (베트남전 시기 야외 실험 5건) — 본문 403 |
-| 탄의 물리량 | 지나가는 탄의 지각 소리 크기와 엮인 운동에너지가 행동에 영향을 주는 주된 물리량 | 2차(검색 요약) | 1979 미 육군 기술 보고서, 번호 미확인 |
-| 제압 범위·사격률 | 표적 윤곽에서 약 1m 안으로 지나가야 함. 3~5초에 3~5발이면 제압, 이후 3초에 1발이면 유지 | 2차 | Jim Storr, "Suppression: the real role of small arms in combat", *RUSI Defence Systems* 2009-06 ([재게시](https://roadstothegreatwar-ww1.blogspot.com/2021/08/suppression-real-role-of-small-arms-in.html)) |
+| 주요 제압 요인 | 지나가는 탄의 소리 크기, 탄의 근접도와 수, 탄착 신호 | 확인 | 초록 i–ii |
+| 빗나감 거리 | 실험한 거리 안에서는 측방 빗나감 거리가 늘수록 제압이 **선형으로** 준다. 실험 거리는 0·3·6m(0m는 머리 위 약 2m 높이) | 확인 | 초록 ii, 5-22 |
+| 위험 지각 거리 | 0~15m 범위에서 빗나감 거리에 따라 위험 지각이 선형으로 변한다(원문에는 "increase"로 적혀 있으나 오기로 보임). 모든 화기에서 같다 | 확인(문구 모호) | 6-3 |
+| 사격량 | 실험한 발수 안에서는 사격량이 늘수록 제압이 선형으로 는다 | 확인 | 초록 ii |
+| 소리+시각 | 근탄의 소리와 시각 신호를 함께 주면 소리만 줄 때보다 더 제압된다 | 확인 | 초록 ii |
+| 화기별 평균 제압 점수 (0–100, 실사격 정책 포착 실험) | XM19 플레셰트 29.8 · M16 35.1 · AK47 36.4 · M60 43.3 · .50구경 61.0 / 반자동 소총 30.1 · 자동 소총 37.7 · 기관총 52.0 | 확인 | 표 5-7, 5-34 |
+| 점수 해석 | M16과 AK47의 차이(35.1 vs 36.4)는 통계로는 유의하지만 실용적 의미는 의문이라고 원문이 경고 | 확인 | 5-35 |
+| 개인 차 | 안전이 보장된 실험 조건에서는 지능·학력·복무·전투 경험 같은 개인 변수가 화기·상황 변수보다 제압 행동과 더 관련 있었다 | 확인 | 6-1–6-2 |
+| 당시 실험 규칙(IRUS, CDCEC) | 소총탄 2발이 표적 2m 안을 0.04분(2.4초) 안에 지나가면 표적이 0.06분(3.6초) 숙임. 추가 근탄마다 0.01분(0.6초) 연장. 수류탄은 5m 안 1발이면 숙임 | 확인(다른 실험의 규칙을 재인용) | 2-12 (PDF 39쪽) |
+| 일화 | 숙련병은 기관총탄이 25야드 안에 오면 엄폐한다(질문지 연구 재인용) | 2차(원문이 재인용) | 2-11 |
+
+## 2차
+
+| 항목 | 값 | 출처 |
+|---|---|---|
+| 50% 제압 빗나감 거리 | 5.56mm·.45ACP 약 3m, 7.62mm 약 6m, .50BMG 약 24m (사거리 150m 가정) | [Towards a "600 m" lightweight General Purpose Cartridge, part II](https://www.researchgate.net/publication/306344619) — 지금 값의 출처일 가능성이 크다. 원 시험 자료는 못 봄 |
+| 제압 범위·사격률 | 표적 윤곽에서 약 1m 안. 3~5초에 3~5발이면 제압, 이후 3초에 1발이면 유지 | Jim Storr, *RUSI Defence Systems* 2009-06 ([재게시](https://roadstothegreatwar-ww1.blogspot.com/2021/08/suppression-real-role-of-small-arms-in.html)) |
 
 ## 판단
 
-- 구경별 반경을 "확인"으로 올릴 1차 자료는 아직 없다. 5.56mm 3m 와 7.62mm 6m 는 같은 2차 출처에서 나왔고, 7.62×39 와 7.62×54R 을 나눈 근거는 찾지 못했다(지금의 4m·5m 는 `추정`).
-- Storr 의 "1m 안·3초에 1발 유지" 는 #17 단일 병사 목표(3초에 1발이면 유지)와 맞는다.
+- 1972 보고서는 **딱 끊기는 반경이 아니라 거리에 따라 선형으로 주는 효과**를 지지한다. 측정 범위는 0~6m(위험 지각은 0~15m)다. 지금의 "반경 안/밖" 모델을 "거리에 따라 선형으로 주는 기여"로 바꿀 근거가 된다.
+- 구경 차이는 "소리 크기(운동에너지)"로 설명된다. 화기별 상대 제압은 표 5-7(M16 35 : AK47 36 : M60 43 : .50 61)이 유일한 1차 수치다. 다만 반경(m)으로 바꿔 주지는 않는다. 그러니 반경 값 자체는 여전히 `2차`(3m/6m)이거나 `추정`(4m/5m)이다.
+- IRUS 규칙(2.4초 안에 2m 안 2발 → 3.6초 숙임)은 당시 미군 시험장이 쓴 규칙이다. 측정값은 아니지만 드릴 기준의 비교 대상으로 쓸 만하다.
 
 ## 다음에 볼 곳
 
-- AD519874 본문(브라우저로 받기), 1979 보고서(Kushnick 계열 추정) 번호 찾기
-- ARL-TR-9277 (2021, 소화기 신호 제압의 인간 요인), DTIC [AD1147939](https://apps.dtic.mil/sti/trecms/pdf/AD1147939.pdf) "Quantitative Human Factors for Small Arms Suppression Field…"
-- Dstl 제압 연구 (검색에서 안 나옴)
+- 1979 미 육군 보고서(운동에너지-소리 크기-행동), ARL-TR-9277 (2021), DTIC AD1147939
+- 600m 탄약 논문의 원 인용(3m/6m 의 출처 실험)
 
 ## 반영
 

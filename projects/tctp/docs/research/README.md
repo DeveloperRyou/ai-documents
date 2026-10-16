@@ -6,14 +6,13 @@
 
 | 파일 | 이슈 | 주제 | 상태 |
 |---|---|---|---|
-| [23-suppression.md](23-suppression.md) | #23 | 구경별 제압 반경, 제압 유지 사격률 | 2차만, 1차 미확보 |
-| [33-detection.md](33-detection.md) | #33 | 발견 임계·탐색 시간 분포 | 식 꼴 2차, 상수 미확보 |
-| [43-vital-hit.md](43-vital-hit.md) | #43 | 몸통 피격 즉시/지연 무력화 | 2차, 시간 분포 미확보 |
-| [49-slope.md](49-slope.md) | #49 | 경사 속도·체력 | 식 2차(Tobler·Pandolf) |
+| [23-suppression.md](23-suppression.md) | #23 | 구경별 제압 반경, 제압 유지 사격률 | 1972 DARPA 보고서 확인(선형 감소·화기별 점수), 반경 m 값은 2차 |
+| [33-detection.md](33-detection.md) | #33 | 발견 임계·탐색 시간 분포 | 식 꼴 확인(Friedman 2019), 맨눈 τ·P∞ 상수 미확보 |
+| [43-vital-hit.md](43-vital-hit.md) | #43 | 몸통 피격 즉시/지연 무력화 | 부위·장기별 치명 확인(WDMET), 시간 분포 미확보 |
+| [49-slope.md](49-slope.md) | #49 | 경사 속도·체력 | 교범 확인(7% 문턱·오르내림 모두 느림), 곡선은 2차 |
 | [51-posture.md](51-posture.md) | #51 | 자세 바꾸는 시간 | 2차 근사치만 |
-| [67-org-bd1.md](67-org-bd1.md) | #67 | 국군 8인 분대·BD1 원문 | 2차, 원문 미확보 |
+| [67-org-bd1.md](67-org-bd1.md) | #67 | 국군 8인 분대·BD1 원문 | BD1 확인(2016 단계·2024 이름), 국군 편제 2차 |
 
-## 공통 접근 문제
+## 원문 받기
 
-- `apps.dtic.mil` PDF 는 WebFetch 403, curl 은 봇 확인 HTML 을 돌려준다. 브라우저(playwright)로 받거나 사용자에게 파일을 받아야 한다.
-- 이 환경에 `pdftotext`·`pypdf` 가 없다. PDF 본문을 읽으려면 도구 설치가 먼저다.
+`pdf-text` 스킬(`.claude/skills/pdf-text/run.sh <url>`)을 쓴다. curl, headless Chromium, Wayback 순으로 시도한다. `apps.dtic.mil` 은 2026-10-16 기준 "Under Maintenance" 상태라 Wayback 으로 받았다.

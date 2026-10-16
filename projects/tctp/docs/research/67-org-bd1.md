@@ -14,7 +14,19 @@
 - 공식(육군·국방부) 1차 출처는 못 찾았다. 직책별 인원 수(소총수 몇 명, 유탄수 몇 명)는 여전히 `추정`.
 - 다음: 국방일보·육군 공식 발표의 2020 분대 편제 기사, 국방백서, 아미타이거 분대 편제 발표.
 
-## Battle Drill 1 (ATP 3-21.8)
+## Battle Drill 1 (ATP 3-21.8) — 1차
+
+- **2024판** (ATP 3-21.8, 2024-01-11, ARN40007, [Wayback](https://web.archive.org/web/2024/https://armypubs.army.mil/epubs/DR_pubs/DR_a/ARN40007-ATP_3-21.8-000-WEB-1.pdf)) 부록 E-2 (`확인`): 드릴 목록만 싣고, 단계는 Army Training Network·Central Army Registry 에서 보라고 한다.
+  - BD 1 "React to Direct Fire Contact While Dismounted – Platoon" (07-PLT-D9501)
+  - **BD 1A "React to Direct Fire Contact While Dismounted – Squad" (07-SQD-D9501)**
+  - BD 2/2A 소대·분대 돌격, BD 3/3A 접촉 단절, BD 4/4A 매복 대응
+  - 2016판을 대체한다.
+- **2016판 + 변경 1** (ARN13842, [Wayback](https://web.archive.org/web/2022/https://armypubs.army.mil/epubs/DR_pubs/DR_a/ARN13842-ATP_3-21.8-001-WEB-4.pdf)) 부록 J-2~J-4 "BATTLE DRILL 1: React to Direct Fire Contact (07-3-D9501)" (`확인`):
+  - 조건: 부대가 이동 중이거나 정지 중이고, 적이 직사화기로 접촉을 시작한다. 단서: 적이 직사화기 접촉을 시작할 때 드릴이 시작된다.
+  - 기준: 접촉 제대가 즉시 응사하고 엄폐를 찾는다. 적 위치를 찾아 조준 사격한다. 지휘자는 적 위치의 절반 이상과 화기 종류(소화기·경기관총 등)를 지목하고, 상급 부대에 접촉을 보고한다.
+  - 단계(요약): 1 즉시 조준 응사 → 2 가장 가까운 엄폐·은폐 위치로 → 3 조장이 적 위치를 찾아 조준 사격하고 정보를 전파 → 4 표준 사격 명령(경고·화기·표적·방향·거리·방법·통제·실행·종료)으로 사격 통제 → 5–6 좌우 병사·조장과 접촉 유지, 적 위치 알리기 → 7 지휘자가 인원 상태 확인 → 8 조장은 지휘자와 시각 접촉 유지 → 9 지휘자가 접촉 제대로 이동해 그 조장과 연결 → 10 교전 지역을 벗어나야 하는지 판단 → 11 접촉 제대만으로 제압을 얻고 유지할 수 있는지 판단 → 12 상황 평가(적 위치·장애물, 적 규모, 취약한 측방, 엄폐된 우회로) → 13 돌격·우회·접촉 단절 중 결정 → 14 상급 부대에 보고하고 기동 시작.
+
+## Battle Drill 1 — 2차
 
 | 항목 | 내용 | 등급 | 출처 |
 |---|---|---|---|
@@ -24,8 +36,8 @@
 | 기준 (2016판) | 접촉한 제대가 즉시 응사하고 엄폐, 적 위치를 찾아 조준 사격, 지휘자가 적 위치 절반 이상과 화기 종류를 식별해 상급 부대에 보고 | 2차 | 같은 곳 |
 | 3D 보고 | 접촉 조가 분대장에게 방향·거리·내용 보고, 예 "12시, 50m, 적 소총 3" | 2차(교육 슬라이드) | [Course Hero BD1 슬라이드](https://www.coursehero.com/file/164140838/BD-1-React-to-Direct-Fire-Contact.pptx/) |
 
-- 2024판 BD 1A 의 단계 원문은 못 봤다. 공개 ATP 3-21.8 PDF([tamucc](https://tamucc.edu/education/departments/rotc/files/atp_3-21.8.pdf))는 목차만 나왔다. 원문은 Army Training Network·Central Army Registry 에 있다.
-- 시나리오 브리핑은 BD 1A(분대판) 번호·이름으로 맞추는 것이 맞다(2차 근거).
+- 2024판 BD 1A 의 단계는 ATN·CAR 에만 있다(로그인 필요, 못 봄). 2016판 단계와 다를 수 있다.
+- 시나리오 브리핑은 2024판 이름 "BD 1A React to Direct Fire Contact While Dismounted – Squad"로 맞춘다. 단계는 2016판 J-2~J-4를 인용하고 판 차이를 적는다.
 
 ## 반영
 
