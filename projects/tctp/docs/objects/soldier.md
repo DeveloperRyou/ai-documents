@@ -70,7 +70,7 @@
 | `watching` | 그 밖 (할 일 없이 깨어 둘레를 살핌) | 경계 구역을 제대로 훑는다 |
 
 ### 부상 `Wound` ([`body/wound.ts`](../../packages/sim/src/body/wound.ts))
-체력 숫자는 없다. 맞을 때마다 부상 하나를 굴려 `wounds` 에 쌓는다: `{ part, severity, bleed (mL/초), tick }`.
+체력 숫자는 없다. 맞을 때마다 부상 하나를 굴려 `wounds` 에 쌓는다: `{ part, severity, bleed (mL/초), tick, fatal? }`. `fatal` = 총탄 가슴·복부 치명상이 즉사 굴림에 걸림 (`isDead`). 머리 치명상은 `fatal` 없이도 늘 즉사.
 - 부위 `part`: `head`, `torso`, `abdomen`, `leftArm`, `rightArm`, `leftLeg`, `rightLeg`. 급소(`WOUND.vital`) = 머리·가슴·복부.
 - 정도 `severity`: `graze` 찰과 / `light` 경상 / `severe` 중상 / `critical` 치명. 확률표(`WOUND.bullet`, `WOUND.fragment`)에서 부위별로 굴린다.
   - **총탄이 급소에 맞으면 찰과·경상이 없다** → 언제나 중상 이상이라 바로 무력화된다. 머리 치명상(0.9)은 즉사하고, 가슴·복부는 처치가 없으면 출혈로 수 분 안에 죽는다.

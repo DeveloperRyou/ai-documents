@@ -12,7 +12,7 @@
 | [23-suppression.md](23-suppression.md) | #23 | 구경별 제압 반경, 제압 유지 사격률 | 1972 DARPA 보고서 확인(선형 감소·화기별 점수), 반경 m 값은 2차 |
 | [30-dispersion.md](30-dispersion.md) | #30 | 소총·MG 분산 | 기록사격 합격선(23/40)·MG 사격률 확인, 분산 mrad·탄착 지대 치수는 못 찾음 |
 | [31-explosives.md](31-explosives.md) | #31 #37 | 수류탄·40 mm 폭발 | M67 5/15 m·4~5초·35 m 확인, 40 mm 사상 반경은 교범 안에서도 5 m/130 m 충돌 |
-| [32-bleeding.md](32-bleeding.md) | #32 | 출혈·사망 시간 | 2차만 (1차 본문 못 열음) |
+| [32-bleeding.md](32-bleeding.md) | #32 | 출혈·사망 시간 (#43·#81 통합) | 문턱은 ATLS 표 확인, 출혈·즉사 값은 추정 (반영함) |
 | [33-detection.md](33-detection.md) | #33 | 발견 임계·탐색 시간 분포 | 식 꼴 확인(Friedman 2019), 맨눈 τ·P∞ 상수 미확보 |
 | [39-61-aid.md](39-61-aid.md) | #39 #61 | 응급처치·후송 | 지혈대·지혈 거즈 3분 확인, 시간·끌기 속도 못 찾음 |
 | [41-penetration.md](41-penetration.md) | #41 | 탄 관통 | FM 3-06.11 표 7-2·7-3 확인 (5.56 소요탄·7.62 관통 인치) |
