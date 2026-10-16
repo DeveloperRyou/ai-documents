@@ -15,7 +15,7 @@ Command (플레이어·AI 입력, commandLog 에 기록, 리플레이 대상)
   예) 조준사격과 제압사격의 명중률 차이는 행동에 붙은 보정치가 아니라, 조준점·조준 시간·발 수가 달라서 화기 산포 계산에서 나온다.
 - 행동은 순수 데이터다 (클래스 아님). 그래서 `stateHash`·`Snapshot`·리플레이에 그대로 들어간다. 처리 규칙은 종류별 함수 표(`ACTIONS`)에 둔다.
 - 지금은 명령이 행동을 바로 준다 (`move` 명령 → `move` 행동). 플레이어는 분대·조에 임무(`order`)를 줄 수도 있고, 리더 로직([`command/leader.ts`](../../packages/sim/src/command/leader.ts))이 조원에게 개인 명령을 나눠 준다. 리더 로직은 시뮬 안에서 결정적으로 돌아 기록하지 않는다 (`commandLog` 에는 임무·교전 규칙 명령만 남고, 조원 행동과 교전 규칙이 고른 사격은 리플레이가 다시 만든다).
-- 자세는 행동이 아니라 몸 상태다 (`posture` 명령이 바로 바꾼다. 이동 중에도 유지). 자세 바꾸는 데 시간이 걸리게 하려면 그때 짧은 행동으로 만든다.
+- 자세는 행동이 아니라 몸 상태다 (`posture` 명령이 `Soldier.shift` 를 세워 시간이 지나면 바뀐다, #51. 이동 중에도 유지). 바꾸는 동안 행동은 그대로 이어지되 사격은 멈추고 이동은 포복 속도가 된다.
 
 ## 종류
 
@@ -59,7 +59,7 @@ Command (플레이어·AI 입력, commandLog 에 기록, 리플레이 대상)
 |---|---|
 | `move` | `{ kind: "move", x, y, via, route, pace, gait, fire }` 로 바꿈 (`route` = `planRoute`, [../calc/movement.md](../calc/movement.md) "경로 탐색") (진행 중 행동을 덮음). 명령의 `via`(경유점)가 `MOVE.maxVia`(8)개를 넘으면 명령을 거부한다. 경유점에도 목표와 같은 자리 어긋남을 더해 분대 모양이 경로 내내 유지된다. 목표는 명령 지점 + 명령 `ids` 순서로 받은 자리(`slotOffset`, 육각 고리 2m 간격) + `VARY.dest` 흔들림, `pace` = 1 ± `VARY.pace`. `gait` = 명령의 걸음 (기본 walk), `fire` = 명령의 `fire` 로 만든 사격 행동 (걷기일 때만) |
 | `stop` | 행동 비움 |
-| `posture` | 행동은 그대로, 자세만 바꿈 |
+| `posture` | 행동은 그대로, 자세만 바꾸기 시작 (`Soldier.shift`, 시간은 [../calc/movement.md](../calc/movement.md) "자세 바꾸기"). 이미 그 자세거나 제압당해 일어설 수 없으면 무시 |
 | `conceal` / `cover` | 위협 지점 `(x, y)` 을 알려 주면 `findShelter`([`command/shelter.ts`](../../packages/sim/src/command/shelter.ts))가 선 자리 둘레 `SHELTER.radius`(15m) 안에서 은폐(칸의 은폐 값) / 엄폐(칸의 엄폐 값)가 가장 좋은 칸을 골라, 약진 이동 행동(`gait: rush`, 도착하면 엎드림)을 준다. 선 칸보다 `SHELTER.minGain`(0.2) 이상 나은 칸이 없으면 이동 없이 그 자리에 엎드린다. 별도 "숨음" 상태는 없다 — 보호는 지형과 자세에서만 나온다. 점수·간격은 [../calc/movement.md](../calc/movement.md) "은폐·엄폐 찾기" |
 | `collect` | `{ kind: "collect", from, item, until: null }`. `from` 이 쓰러져 있지 않거나, 자기 자신이거나, 가져올 게 없으면 거부 |
 

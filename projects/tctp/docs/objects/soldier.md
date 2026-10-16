@@ -15,7 +15,8 @@
 | `loadout` | `LoadoutItem[]` | 휴대 장비 (편제 공통 장구 `kit` + 직책별) |
 | `load` | number | 하중 (kg) = `loadOf(loadout)`. 편성 때 계산, 탄을 쓰면 줄인다 |
 | `loaded` | `Record<WeaponSlot, number>` | 화기 칸별 장전된 탄 수 (`loadout` 의 탄 수에 포함). 쏘면 둘 다 1 씩 준다 |
-| `posture` | `"stand" \| "crouch" \| "prone"` | 자세: 서기 / 앉아·무릎 / 엎드려 |
+| `posture` | `"stand" \| "crouch" \| "prone"` | 자세: 서기 / 앉아·무릎 / 엎드려. 바꾸는 중이면 바꾸기 전 자세 |
+| `shift` | `{ to, left, total } \| null` | 자세를 바꾸는 중 (#51): 목표 자세, 남은 틱, 전체 틱. 없으면 null. 도중에는 몸 높이가 두 자세 높이 사이를 선형으로 오가고, 사격을 못 하며, 포복 속도로만 움직인다 |
 | `status` | `SoldierStatus` | 상태 (아래). 매 틱 `updateBody` 가 정한다 |
 | `wounds` | `Wound[]` | 부상 목록 (아래). 맞을 때마다 하나씩 쌓인다 |
 | `blood` | number | 혈액량 (mL, 처음 5000). 출혈로 준다 |
@@ -119,7 +120,8 @@
 
 ### 자세 `posture`
 - 몸 높이 = `size.h × POSTURE_HEIGHT` (서기 1, 앉아 0.6, 엎드려 0.2). 시야의 눈높이·피탄 높이가 이 값을 쓴다 (엎드리면 덜 보이고 덜 본다).
-- 바꾸는 명령: `{ kind: "posture", ids, posture }`. 제압·패닉·무력화되면 저절로 엎드리고, 위협을 느끼면 서서 멈춘 병사는 앉는다. 약진하는 동안은 서고, 도착하면 엎드린다.
+- 바꾸는 명령: `{ kind: "posture", ids, posture }`. 제압·패닉되면 저절로 엎드리고, 위협을 느끼면 서서 멈춘 병사는 앉는다. 약진하는 동안은 서고, 도착하면 엎드린다. 무력화(쓰러짐)는 바로 엎드리고, 나머지는 모두 시간이 든다 (#51).
+- 자세 바꾸기는 바로 되지 않는다: `setPosture` 가 `shift` 를 세우고, 바꾸는 시간이 지난 틱에 `posture` 가 확정된다. 시간은 짐 없는 남자 기준 서기→엎드림 1.0초, 엎드림→서기 1.1초 × 하중·지구력·다리·실혈 계수 ([../calc/movement.md](../calc/movement.md) "자세 바꾸기"). 도중에는 사격(조준 포함)하지 못하고 포복 속도로만 움직이며, 몸은 보이고 맞을 수 있다(높이는 선형 보간). 제압당한 병사는 엎드리라는 명령만 받는다.
 - 엎드린 몸은 바라보는 방향으로 길게 눕는다 (발 → 머리 = `facing`). 피탄 판정이 이 방향을 쓴다 ([../calc/fire.md](../calc/fire.md) "맞은 부위").
 
 ### 경계 (시선) `look` — [`perception/scan.ts`](../../packages/sim/src/perception/scan.ts)
