@@ -4,6 +4,6 @@
 - 이 프로젝트의 e2e = 드릴: [`packages/sim/src/drills/drills.ts`](../../packages/sim/src/drills/drills.ts) 에 더하면 [`packages/tools/src/drills.test.ts`](../../packages/tools/src/drills.test.ts) 가 `npm run check` 에서 전부 돌리고, `?debug=drills` 로 틱 단위 재생해 볼 수 있다.
 - 고친 동작마다 정상 경로 드릴 하나, 예외(그치는 조건·거부되는 조건·한계)마다 드릴 하나. 기대 결과는 드릴 `title`·`desc` 에 쉬운 말로 적는다.
 - 동작이 바뀌지 않는 변경(문서, 이름 바꾸기, 순수 리팩터, 확인장 UI 표시만)은 예외다. 그때는 최종 보고에 "e2e 해당 없음 — 이유" 한 줄을 남긴다.
-- 동작을 바꾼 뒤에는 커밋 전에 매번 확인장(`npm run dev` → `?debug=drills&drill=<id>`)을 브라우저(playwright)로 열어 고친 드릴을 실제로 재생하고, 바뀐 동작이 화면에서 눈으로 확인되는지 본다. 테스트 통과만으로 끝내지 않는다.
+- 동작을 바꾼 뒤에는 커밋 전에 매번 확인장(`npm run dev` → `?debug=drills&drill=<id>`)을 브라우저로 열어 (`run-tctp` 스킬: `.claude/skills/run-tctp/run.sh drill <id> --end`) 고친 드릴을 실제로 재생하고, 바뀐 동작이 화면에서 눈으로 확인되는지 본다. 테스트 통과만으로 끝내지 않는다.
 - 화면에서 확인할 수 없으면(새 상태값이 지도·병사 상세에 안 나옴, 너무 작아 안 보임 등) 확인장 표시를 같은 작업에서 추가한다. 확인장 표시 추가는 요청 외 UI 변경 금지의 예외다.
 - 최종 보고에 "확인장 확인: <드릴 id> — 무엇을 봤는지" 한 줄을 남긴다.
