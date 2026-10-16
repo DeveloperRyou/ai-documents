@@ -59,6 +59,7 @@ Command (플레이어·AI 입력, commandLog 에 기록, 리플레이 대상)
 | `move` | `{ kind: "move", x, y, via, route, pace, gait, fire }` 로 바꿈 (`route` = `planRoute`, [../calc/movement.md](../calc/movement.md) "경로 탐색") (진행 중 행동을 덮음). 명령의 `via`(경유점)가 `MOVE.maxVia`(8)개를 넘으면 명령을 거부한다. 경유점에도 목표와 같은 자리 어긋남을 더해 분대 모양이 경로 내내 유지된다. 목표는 명령 지점 + 명령 `ids` 순서로 받은 자리(`slotOffset`, 육각 고리 2m 간격) + `VARY.dest` 흔들림, `pace` = 1 ± `VARY.pace`. `gait` = 명령의 걸음 (기본 walk), `fire` = 명령의 `fire` 로 만든 사격 행동 (걷기일 때만) |
 | `stop` | 행동 비움 |
 | `posture` | 행동은 그대로, 자세만 바꿈 |
+| `conceal` / `cover` | 위협 지점 `(x, y)` 을 알려 주면 `findShelter`([`command/shelter.ts`](../../packages/sim/src/command/shelter.ts))가 선 자리 둘레 `SHELTER.radius`(15m) 안에서 은폐(칸의 은폐 값) / 엄폐(칸의 엄폐 값)가 가장 좋은 칸을 골라, 약진 이동 행동(`gait: rush`, 도착하면 엎드림)을 준다. 선 칸보다 `SHELTER.minGain`(0.2) 이상 나은 칸이 없으면 이동 없이 그 자리에 엎드린다. 별도 "숨음" 상태는 없다 — 보호는 지형과 자세에서만 나온다. 점수·간격은 [../calc/movement.md](../calc/movement.md) "은폐·엄폐 찾기" |
 | `collect` | `{ kind: "collect", from, item, until: null }`. `from` 이 쓰러져 있지 않거나, 자기 자신이거나, 가져올 게 없으면 거부 |
 
 ## 임무 `Order`와 교전 규칙 `Roe` (리더 로직)

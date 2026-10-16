@@ -124,3 +124,29 @@
 | `VARY.pace` | ± 10% | 이동 명령마다 한 번 굴리는 그 병사의 걸음 빠르기 (대형이 조금씩 흩어짐) | 같은 명령에도 도착 시각이 더 벌어짐 |
 | `VARY.stride` | ± 5% | 틱마다 걸음 흔들림 | 걸음이 더 들쭉날쭉 |
 | 지형 `move` | 칸마다 ([../objects/terrain.md](../objects/terrain.md)) | 선 칸의 통행 계수. 0 이면 들어갈 수 없음 | 그 지형이 빨라짐 |
+
+## 은폐·엄폐 찾기 (#11)
+
+명령 `conceal` / `cover` (위협 지점 `from`). 병사 한 명마다 `findShelter`([`command/shelter.ts`](../../packages/sim/src/command/shelter.ts)), 난수 없음.
+
+```
+후보 칸 = 선 자리에서 SHELTER.radius 안, SHELTER.step 간격, 통행 계수 > 0
+값(칸)   = min(칸, 칸 둘레 SHELTER.margin 네 방향)의 엄폐 값 (엄폐) 또는 은폐 값 (은폐)
+조건     = 값(칸) ≥ 값(선 칸) + SHELTER.minGain, 다른 병사가 선·가는 자리에서 SHELTER.spread 이상
+점수     = 값(칸) − distCoef × 거리/반경 − towardCoef × max(0, 위협 쪽으로 다가선 거리)/반경
+```
+
+점수가 가장 큰 칸으로 약진해 엎드린다. 후보가 없으면 제자리에 엎드린다.
+
+| 상수 | 값 | 뜻 |
+|---|---|---|
+| `SHELTER.radius` | 15 m | 찾는 반경 |
+| `SHELTER.minGain` | 0.2 | 선 칸보다 이만큼 나아야 옮겨 감 (덤불의 엄폐 0.1 은 안 쳐 줌) |
+| `SHELTER.margin` | 0.7 m | 칸 안쪽에 서도록 둘레를 같이 봄 |
+| `SHELTER.step` | 1 m | 훑는 간격 |
+| `SHELTER.distCoef` | 0.3 | 먼 칸 감점 계수 |
+| `SHELTER.towardCoef` | 0.5 | 위협 쪽으로 다가서는 칸 감점 계수 |
+| `SHELTER.spread` | 2 m | 분대원 사이 최소 간격 (`2 × SPACING.min`) |
+
+한계: 위협 방향은 위 감점으로만 쓴다 — 칸 "뒤에 숨는" 시선 차단·방향별 엄폐는 아직 없다 (칸 값은 방향과 무관).
+
