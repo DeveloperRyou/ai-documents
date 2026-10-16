@@ -16,6 +16,7 @@
 | `reports` | 아직 닿지 않은 접촉 보고 `Report[]` (보낼 때 정한 순서). 받는 병사 `to`·적 `id`·오차 낀 위치·처음 본 틱·닿는 틱 `at`·전해진 단계 `hops` |
 | `log` | `LogEntry { tick, side \| "system", text }` — 시작, 적 발견, 피격·전사 등 |
 | `grenades` | 던져서 터지기를 기다리는 수류탄 `LiveGrenade { by, item, x0, y0, x, y, z, explodeTick }` (던진 순서, 터지면 빠짐. 해시에 들어감 — 비어 있으면 지문에 영향 없음) |
+| `caches` | 보급소 `Cache { id, side, x, y, loadout }` (id = 순번, 시나리오 `caches`, #38). 내용물이 해시에 들어간다 — 비어 있으면 지문에 영향 없음 |
 | `shots` | 이번 틱에 쏜 탄 `Shot { by, x0, y0, x1, y1, hit, explosive, indirect, sound, blastSound }` (indirect = 곡사, 맞는 쪽은 쏜 곳을 모름. sound·blastSound = 총성·폭발음이 들리는 거리 m, 듣기 #35) (화면 효과용, 매 틱 비움, 해시 제외) |
 
 상태는 `step(world, commands)` 안에서만 바뀐다: 명령 적용 → 미뤄 둔 명령(`applyDueOrders`) → `tick++`·`shots` 비움 → 행동(`updateActions`) → 신관이 다 탄 수류탄 폭발(`updateGrenades`) → 듣기 → 몸 상태(`updateBody`: 출혈·지구력·상태·자세·스트레스) → 경계 시선(`updateScan`) → 탐지(`updateVision`). 순서와 각 단계의 난수는 [../calc/README.md](../calc/README.md) "한 틱 순서".
@@ -56,7 +57,7 @@
 ## 화면용 `Snapshot` ([`view/snapshot.ts`](../../packages/sim/src/view/snapshot.ts))
 렌더러는 `World` 대신 이것만 읽는다. 순수 데이터 (JSON 직렬화 가능, `World` 와 참조 공유 없음).
 
-`Snapshot { tick, time(초), viewer, soldiers: SoldierView[], shots: ShotView[] }`, 세션에서 꺼내면 `paused`, `commands`(명령 수) 추가.
+`Snapshot { tick, time(초), viewer, soldiers: SoldierView[], caches: CacheView[], shots: ShotView[] }`, 세션에서 꺼내면 `paused`, `commands`(명령 수) 추가.
 
 `ShotView { tick(쏜 틱), from(총구 {x, y} 또는 null), x, y(탄착), hit, explosive, own }` — `shotViews` 가 보는 진영이 알 수 있는 만큼 거른다:
 - 아군 탄: 총구까지. 적 탄: 쏜 적이 지금 보이고(`contact.visible`) 곡사가 아니면 총구까지.
@@ -68,4 +69,5 @@
 - 보는 진영 병사: 전부 담김, `dest`·`body` 포함.
 - 적: `contacts` 에 있는 적만. 이름·직책·소속은 빈 문자열, `dest`·`body` 없음.
   `contact = "seen"` 이면 실제 위치·방향·자세, `"last"` 이면 마지막으로 본 위치 (`posture = null`).
+- `caches`: `CacheView { id, x, y, loadout }` — 보는 진영이 아는(`Cache.side`) 보급소 중 남은 게 있는 것만 (truth 면 전부).
 - `snapshot(world, viewer, { truth: true })` (디버그 `?truth=1`): 모든 적을 실제 상태로, 모르는 적은 `contact = "hidden"`.

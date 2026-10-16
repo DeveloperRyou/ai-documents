@@ -50,6 +50,7 @@ content/  (지도·시나리오 JSON)
 | [`command.ts`](../packages/sim/src/command/command.ts) | `Command` 유니온(개인 명령 `Individual` + 부대 명령 `order`·`roe`), `applyIndividual`, `TimedCommand`, `applyCommand`, 혼란 중 미룬 명령 `applyDueOrders` |
 | [`path.ts`](../packages/sim/src/command/path.ts) | 경로 탐색 `planRoute`: 이동 명령 때 거친 격자 A* → 줄 당겨 펴기 → 시드 난수로 휘기, 튜닝 상수 `PATH`. 식은 [calc/movement.md](calc/movement.md) "경로 탐색" |
 | [`spacing.ts`](../packages/sim/src/command/spacing.ts) | 병사 사이 최소 간격: 겹친 짝 떼기 `separate`(step 이 행동 뒤에 부름), 목표 둘레 먼저 선 병사 곁에서 멈추기 `blockedNear`, 여럿을 한 점으로 보낼 때의 자리 `slotOffset`, 튜닝 상수 `SPACING`. 식은 [calc/movement.md](calc/movement.md) |
+| [`collect.ts`](../packages/sim/src/command/collect.ts) · [`give.ts`](../packages/sim/src/command/give.ts) | 장비 옮기기: 줍기 `collectStep`(쓰러진 전우·보급소에서, `planTake`·`transfer`·호환 탄 `canUseAmmo`, 튜닝 `COLLECT`), 건네기·받기 `giveStep`·`receiveStep`(전우끼리 양쪽 묶임·끊기면 거기까지, 튜닝 `GIVE`). 규칙은 [objects/action.md](objects/action.md) |
 | [`action.ts`](../packages/sim/src/command/action.ts) | 병사 행동 `Action`(`move`·`fire`·`reload`·`rest`), 종류별 처리 함수 표 `ACTIONS`, 매 틱 `updateActions`, `destOf`, 튜닝 상수 `MOVE`. 구조는 [objects/action.md](objects/action.md) |
 
 ### [`body/`](../packages/sim/src/body) — 몸 상태: 자세·속도·심리, 부상, 늘고 주는 수치
