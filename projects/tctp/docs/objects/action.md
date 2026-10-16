@@ -25,6 +25,11 @@ Command (플레이어·AI 입력, commandLog 에 기록, 리플레이 대상)
 | `fire` | `slot`, `at`(조준점: 아는 적 `{soldier, id}` / 지점 `{point, x, y}`), `aim`(초, 화기 기준 조준 시간 × 명령의 조준 계수), `burst`(발), `sweep`(m), 진행 `aimed`·`need`·`left`·`shot`·`ox`·`oy` | 조준점을 향해 `aim` × 조준 시간 계수(심리 `FIRE.stressAim` × 팔 × 실혈, ± `VARY.aim`) 초 조준 → 점사 `burst` (2발 이상이면 ± 1) 발 (한 틱에 `max(1, round(rof × DT / 60))` 발) → 다시 조준. 점사마다 조준점 둘레 `sweep` 안의 한 점 + 겨눔 어긋남(`VARY.hold`)을 겨눈다. 탄창이 비면 재장전 행동으로 바꾸고 끝나면 이어 쏜다 | 겨눈 적이 진영에 안 보이거나 **사수 본인 눈에 안 보임**(`canAimAt`: 표적 쪽으로 돌아섰을 때 시선 투과 < `VISION.track`), 죽음, 탄이 다 떨어짐, 두 팔을 다 못 씀 |
 | `reload` | `slot`, `until`(틱), `then`(이어 갈 사격) | `until` 에 장전 수만큼 (모자라면 남은 만큼) 채우고 `then` 으로 | `then` 이 없으면 채운 뒤 |
 | `rest` | `wake` (교전을 알아채 일어날 틱, 모르면 null) | 아무것도 하지 않는다. 이 행동 중에 지구력이 제대로 회복 (멈춰만 있으면 `RATES.stamina.idleCoef` 배 빠르기, [../calc/rates.md](../calc/rates.md) "지구력"). 명령으로도, 할 일 없이 평온하면 저절로도 든다 (`startRest`: 서 있으면 앉음, [soldier.md](soldier.md) "기본 상태 전환"). 느슨하게 둘러본다 (보는 시간 × 2, 발견 × 0.5) | 평온(`calm`)이 깨지면 바로 (`updateBody`), 교전(`combatFloor > 0`)이 생기면 `wake` 틱 (0 ~ `VARY.reaction` 뒤) |
+| `collect` | `from` (줄 쪽 병사 id), `item` (가져올 장비 id, null = 지닌 것 전부), `until` (줍기를 끝낼 틱, 곁에 닿기 전엔 null) | 쓰러진(무력화·사망) 병사 `from` 곁(`COLLECT.reach` 1.5m)까지 직선으로 걸어가 (속도·통행·하중·지구력은 이동 행동과 같다), 닿은 틱에 줍는 시간을 정하고, 그 시간이 지나면 [`collect.ts`](../../packages/sim/src/command/collect.ts) `transfer` 로 옮긴다. 가져오는 목록은 `planTake`: `item` 이 없으면 줄 쪽이 지닌 것 전부 (이미 칸이 찬 화기는 빼고), 화기 id 면 그 화기 (칸이 차 있으면 내 화기와 맞바꿔 옛 화기는 줄 쪽에 남음) 와 그 탄약 전부, 그 밖의 id 면 그 장비 전부. 무게가 `LOAD.maxRatio`(0.7) × 몸무게를 넘는 줄은 건너뛴다. 옮기면 양쪽 `load`·`loaded` 를 다시 센다: 새로 든 화기는 한 탄창 장전, 탄이 떨어져 있던 화기가 탄을 받으면 이어서 재장전 행동에 든다. 걷는 동안 줄 쪽이 치워졌거나 가져올 게 사라져도 그만둔다 | 옮기고 나서 (재장전이 이어지면 그 행동으로), 또는 가져올 게 없어졌을 때 |
+
+줍는 시간 = (`COLLECT.baseTime` 3초 + 가져오는 무게 1kg 당 `COLLECT.perKg` 1초) × (1 ± `COLLECT.vary` 20%). 줄 쪽은 지금 쓰러진 병사뿐이고, 보급소는 같은 `planTake`·`transfer` 에 출처만 더해 붙인다 (미구현, 후속). 비화기 장비(장구 등)도 같은 방식으로 줍는다; 무전기처럼 줍는 것만으로 할 수 있는 일이 늘어나는 장비는 통신(#45)이 생길 때 붙인다.
+
+**스스로 줍기** (`autoCollect`, 매 `COLLECT.auto.every`(4)틱, 병사마다 id 로 어긋남, 병사가 아는 것만 쓴다): 행동이 없거나 쉬는 중이고, 받을 명령이 없고, 심리가 평상·위협 인지이고, 마지막 위협 뒤 `auto.quiet`(10초)가 지났고, 곁 `auto.range`(15m)에 쓰러진 같은 편 전우가 있을 때, 가까운 전우부터 (a) 내 주화기 탄이 떨어졌고 그가 같은 탄을 지녔으면 그 탄을, (b) 내게 지원화기(탄창 ≥ `auto.supportMagazine` 100)가 없고 그가 임자 없는 지원화기와 그 탄을 지녔으면 그 화기를 줍는다. 다른 병사가 이미 그를 줍는 중이면 건드리지 않는다. 걸어가는 명령·사격·재장전 중이거나 총알을 맞는 중이면 하지 않는다. 난수는 줍는 시간 흔들림(`World.rng`)만 쓴다. 외부 판단 모델 쓸지는 #75.
 
 조준사격·제압사격은 같은 `fire` 행동이다 (명령이 `FIRE_ORDER` 로 조준 시간·발 수·반경만 달리 넣는다, [world.md](world.md)).
 조준사격(적 한 명)은 사수 본인이 그 적을 볼 때만 된다 — 다른 아군만 보는 적은 명령 때 거부(행동을 바꾸지 않음)되고, 쏘는 중에 가려지면 그친다 (이동사격은 사격만 그친다). 못 보는 적의 알려진 자리는 제압사격(지점)으로 쏜다.
@@ -53,6 +58,7 @@ Command (플레이어·AI 입력, commandLog 에 기록, 리플레이 대상)
 | `move` | `{ kind: "move", x, y, via, pace, gait, fire }` 로 바꿈 (진행 중 행동을 덮음). 명령의 `via`(경유점)가 `MOVE.maxVia`(8)개를 넘으면 명령을 거부한다. 경유점에도 목표와 같은 자리 어긋남을 더해 분대 모양이 경로 내내 유지된다. 목표는 명령 지점 + 명령 `ids` 순서로 받은 자리(`slotOffset`, 육각 고리 2m 간격) + `VARY.dest` 흔들림, `pace` = 1 ± `VARY.pace`. `gait` = 명령의 걸음 (기본 walk), `fire` = 명령의 `fire` 로 만든 사격 행동 (걷기일 때만) |
 | `stop` | 행동 비움 |
 | `posture` | 행동은 그대로, 자세만 바꿈 |
+| `collect` | `{ kind: "collect", from, item, until: null }`. `from` 이 쓰러져 있지 않거나, 자기 자신이거나, 가져올 게 없으면 거부 |
 
 혼란·위축된 병사는 명령을 늦게 받는다 (`Soldier.order`, [soldier.md](soldier.md)).
 
