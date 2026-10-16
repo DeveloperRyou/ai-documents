@@ -28,13 +28,15 @@
 | `bearing` | 바라보는 방위각 (도, 0 = 북, 시계방향) |
 | `formation` | `"column"` 앞뒤 일렬 (맨 앞이 편제 첫 사람) / `"line"` 좌우 일렬 |
 | `spacing` | 사람 간격 (m) |
+| `teams` | (선택) 편제 중 이 조들만 세운다. 조 이름 배열(`["1조"]`). 없으면 전 편제. 편제에 없는 조 이름은 `checkScenario` 가 알림 |
+| `posture` | (선택) 시작 자세 `stand`·`crouch`·`prone`. 없으면 `stand` |
 
 `buildSoldiers(scenario, db)` 가 부대마다 편제 순서대로 병사를 만들고 대형 자리에 놓는다. `checkScenario` 는 편제·장비 참조 오류를 돌려준다.
 `ContentDb` = `{ equipment: EquipmentCatalog, orgs: id → OrgTemplate, names: NamePool }`, `contentDb(...)` 로 묶는다.
 `NamePool` = `{ surnames, given }` — 성 + 이름 조합 (실존 인물과 무관).
 
 ### 현재 시나리오
-`bd1-react-to-contact` — 배틀 드릴 1 접적 시 행동 (ATP 3-21.8). 라스도르프, 국군 소총분대 `1분대` 종대(방위 25°, 5m 간격) vs 북한군 보병분대 `적 분대` 횡대(방위 205°, 4m 간격), 거리 약 220m.
+`bd1-react-to-contact` — 배틀 드릴 1 접적 시 행동 (ATP 3-21.8). 라스도르프 서쪽 숲길 이동 중 조우: 국군 소총분대 `1분대` 종대(방위 247°, 5m 간격)가 길을 따라 서남서로 가는 중, 길 북쪽 숲가에 북한군 보병분대 중 `1조`(4명)만 엎드린 채 매복(`적 1개 조`, 횡대 방위 70°, 4m 간격), 거리 약 70m. 지도에 산지는 없어 숲(`wood`)이 낀 오솔길로 대신함.
 
 ## 캠페인 `campaign.json`
 
