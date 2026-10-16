@@ -39,7 +39,7 @@ content/  (지도·시나리오 JSON)
 | [`time.ts`](../packages/sim/src/core/time.ts) | 시간 상수 `DT = 0.25`, `TICKS_PER_SEC = 4`, `secToTicks`, 초당 확률 → 틱 확률 `perSecChance`. 튜닝 수치는 초 단위로 적고 틱으로 바꾼다 (DT 를 바꿔도 다른 상수는 그대로) |
 | [`world.ts`](../packages/sim/src/core/world.ts) | `createWorld`, `step` (시간 상수 재노출) |
 | [`rng.ts`](../packages/sim/src/core/rng.ts) | mulberry32 RNG. 상태가 숫자 하나라 해시·세이브에 그대로 담긴다 |
-| [`vary.ts`](../packages/sim/src/core/vary.ts) | 사건별 흔들림 `VARY` (반응 시간·걸음·서는 자리·조준 시간·점사·겨눔·재장전·스트레스), `vary`·`gauss`·`inDisk`. 능력치가 아닌 사건 잡음 |
+| [`vary.ts`](../packages/sim/src/core/vary.ts) | 사건별 흔들림 `VARY` (반응 시간·걸음·서는 자리·조준 시간·겨눔·재장전·스트레스), `vary`·`gauss`·`inDisk`. 능력치가 아닌 사건 잡음 |
 | [`replay.ts`](../packages/sim/src/core/replay.ts) | `runReplay`(명령 기록 재생), `stateHash`(FNV-1a 상태 지문) |
 
 ### [`command/`](../packages/sim/src/command) — 입력 → 병사 행동
@@ -66,6 +66,7 @@ content/  (지도·시나리오 JSON)
 
 | 파일 | 내용 |
 |---|---|
+| [`volume.ts`](../packages/sim/src/combat/volume.ts) | 사격량: 명령의 `FireVolume`(단계·발 수)과 거리·표적 뚜렷함·심리·남은 탄·방아쇠 조절·템포로 한 번 당길 발 수와 쉼을 정하는 `planPull`. 튜닝 상수 `FIRE_VOLUME` |
 | [`fire.ts`](../packages/sim/src/combat/fire.ts) | 화기 트리거 `pullTrigger` → 탄도선 판정(사람·지물·땅), 근탄 제압, 폭발, 부위 피해. 튜닝 상수 `FIRE`, 조준점 `AimPoint` |
 
 ### [`perception/`](../packages/sim/src/perception) — 보는 것: 경계 시선, 시야·탐지
@@ -201,5 +202,5 @@ requestAnimationFrame:
 
 ## 테스트
 
-- Vitest, `packages/*/src/**/*.test.ts`. [`packages/sim/src/core/world.test.ts`](../packages/sim/src/core/world.test.ts) (이동·도착 정지, 같은 시드 + 같은 명령 기록 → 같은 해시), [`packages/sim/src/view/session.test.ts`](../packages/sim/src/view/session.test.ts) (고정 틱 분할·상한, 정지 중 명령 보류, 세션 기록 리플레이 = 같은 해시, 스냅샷 JSON 왕복·참조 분리·타 진영 `dest` 제외, 정보 안개), [`packages/sim/src/view/save.test.ts`](../packages/sim/src/view/save.test.ts) (저장 → 불러오기 = 같은 틱·해시·이어서 진행해도 같음, 옛·새·없는 버전 거부, 다른 판 거부), [`packages/sim/src/body/soldier.test.ts`](../packages/sim/src/body/soldier.test.ts) (하중 합·하중 속도 감소, 자세 속도·높이, 지구력 소모·멈춤 소량 회복·지친 속도, 휴식 회복·휴식 그침·평온 아니면 휴식 거부, 포복 소모, 심리 단계 문턱·패닉 회복 문턱, 위협 인지 앉기, 혼란 명령 지연, 제압 고착과 해제, 패닉 명령 거부·관측 불가, 심리 단계 발견 조건 계수, 다리 부상 포복, 무력화·사망), [`packages/sim/src/perception/vision.test.ts`](../packages/sim/src/perception/vision.test.ts) (지형 굽기·고도 디코드, 시선 차단·감쇠·능선, 발견·등 뒤·건물 너머·기억과 망각, 통행 불가 칸), [`tools/src/content.test.ts`](../packages/tools/src/content.test.ts) (편제 인원 8·12, 전원 하중 ≤ 몸무게 × 0.45, 시나리오의 편제·장비 참조, 시작 위치 통행 가능, 이름 중복 없음). [`packages/sim/src/combat/fire.test.ts`](../packages/sim/src/combat/fire.test.ts) (조준사격·모르는 적·건물 차단·재장전·탄 소진·기관총 제압·엄폐·유탄·결정성), [`tools/src/drills.test.ts`](../packages/tools/src/drills.test.ts) (모든 드릴을 실제 장비로 끝까지 돌려 확인 항목 검사 — 새 행동은 드릴을 더해 확인). 공용 도우미는 [`packages/sim/src/drills/test-util.ts`](../packages/sim/src/drills/test-util.ts).
+- Vitest, `packages/*/src/**/*.test.ts`. [`packages/sim/src/core/world.test.ts`](../packages/sim/src/core/world.test.ts) (이동·도착 정지, 같은 시드 + 같은 명령 기록 → 같은 해시), [`packages/sim/src/view/session.test.ts`](../packages/sim/src/view/session.test.ts) (고정 틱 분할·상한, 정지 중 명령 보류, 세션 기록 리플레이 = 같은 해시, 스냅샷 JSON 왕복·참조 분리·타 진영 `dest` 제외, 정보 안개), [`packages/sim/src/view/save.test.ts`](../packages/sim/src/view/save.test.ts) (저장 → 불러오기 = 같은 틱·해시·이어서 진행해도 같음, 옛·새·없는 버전 거부, 다른 판 거부), [`packages/sim/src/body/soldier.test.ts`](../packages/sim/src/body/soldier.test.ts) (하중 합·하중 속도 감소, 자세 속도·높이, 지구력 소모·멈춤 소량 회복·지친 속도, 휴식 회복·휴식 그침·평온 아니면 휴식 거부, 포복 소모, 심리 단계 문턱·패닉 회복 문턱, 위협 인지 앉기, 혼란 명령 지연, 제압 고착과 해제, 패닉 명령 거부·관측 불가, 심리 단계 발견 조건 계수, 다리 부상 포복, 무력화·사망), [`packages/sim/src/perception/vision.test.ts`](../packages/sim/src/perception/vision.test.ts) (지형 굽기·고도 디코드, 시선 차단·감쇠·능선, 발견·등 뒤·건물 너머·기억과 망각, 통행 불가 칸), [`tools/src/content.test.ts`](../packages/tools/src/content.test.ts) (편제 인원 8·12, 전원 하중 ≤ 몸무게 × 0.45, 시나리오의 편제·장비 참조, 시작 위치 통행 가능, 이름 중복 없음). [`packages/sim/src/combat/fire.test.ts`](../packages/sim/src/combat/fire.test.ts) (조준사격·모르는 적·건물 차단·재장전·탄 소진·기관총 제압·엄폐·유탄·결정성), [`packages/sim/src/combat/volume.test.ts`](../packages/sim/src/combat/volume.test.ts) (사격량: 기준 발 수·6발 명령 둘레 퍼짐·탄 부족·거리/뚜렷함/심리·조준사격 한 발·같은 시드 같은 해시), [`tools/src/drills.test.ts`](../packages/tools/src/drills.test.ts) (모든 드릴을 실제 장비로 끝까지 돌려 확인 항목 검사 — 새 행동은 드릴을 더해 확인). 공용 도우미는 [`packages/sim/src/drills/test-util.ts`](../packages/sim/src/drills/test-util.ts).
 - CI ([`.github/workflows/ci.yml`](../.github/workflows/ci.yml)): push·PR 마다 `npm run check` (typecheck + Biome + Vitest) 와 `npm run build`.

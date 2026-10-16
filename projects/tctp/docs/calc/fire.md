@@ -1,18 +1,20 @@
 # 사격 계산
 
-코드: [`command/action.ts`](../../packages/sim/src/command/action.ts) `fireStep` (조준·점사), [`combat/fire.ts`](../../packages/sim/src/combat/fire.ts) `pullTrigger` (한 발), [`body/wound.ts`](../../packages/sim/src/body/wound.ts) `rollWound` (부상).
+코드: [`command/action.ts`](../../packages/sim/src/command/action.ts) `fireStep` (조준·당김), [`combat/volume.ts`](../../packages/sim/src/combat/volume.ts) `planPull` (사격량), [`combat/fire.ts`](../../packages/sim/src/combat/fire.ts) `pullTrigger` (한 발), [`body/wound.ts`](../../packages/sim/src/body/wound.ts) `rollWound` (부상).
 행동 필드는 [../objects/action.md](../objects/action.md), 화기·탄약 값은 [../objects/equipment.md](../objects/equipment.md). 난수 쓰는 곳은 [random/rolls.md](random/rolls.md).
 
 탄 하나하나를 날리지 않는다. 방아쇠를 당긴 틱에 탄도선을 그어 바로 판정하고, 결과는 `World.shots`(화면 효과용)에 남긴다.
 
-## 1. 명령 → 조준 계수·발 수 (`FIRE_ORDER`, [`command/command.ts`](../../packages/sim/src/command/command.ts))
+## 1. 명령 → 조준 계수·사격량 (`FIRE_ORDER`, [`command/command.ts`](../../packages/sim/src/command/command.ts))
 
-| 명령 | 조준 시간 `aim` = 기준 조준 시간 × 조준 계수 | 점사 `burst` | 쓸어 쏘는 영역 |
+| 명령 | 조준 시간 `aim` = 기준 조준 시간 × 조준 계수 | 사격량 (§2c) | 쓸어 쏘는 영역 |
 |---|---|---|---|
-| `fire` 조준사격 (아는 적) | 화기 `baseAimTime` × 1 | 1 | 0 |
-| `suppress` 제압사격 (지점) | 화기 `baseAimTime` × 0.25 | 화기 `burst` | 사격 부대가 정함 (§2a) |
-| `suppress` 곡사 화기 | 화기 `baseAimTime` × 1 | 화기 `burst` (유탄 1) | 없음 (지점 그대로) |
+| `fire` 조준사격 (아는 적) | 화기 `baseAimTime` × 1 | 기준 한 발 (낮은 사격량) | 0 |
+| `suppress` 제압사격 (지점) | 화기 `baseAimTime` × 0.25 | 연사 속도에서 나온 기준 발 수 | 사격 부대가 정함 (§2a) |
+| `suppress` 곡사 화기 | 화기 `baseAimTime` × 1 | 기준 한 발 | 없음 (지점 그대로) |
 | `move` + `fire` 이동사격 | 위와 같음 (표적이면 조준, 지점이면 제압) | | |
+
+세 사격 명령(`fire`·`suppress`·`move`+`fire`)과 부대 임무 `suppress` 는 `volume`(사격량)을 줄 수 있다 (§2c). 빼면 기준 그대로.
 
 ## 2. 조준 (`fireStep`)
 
@@ -23,9 +25,10 @@
 ```
 - `FIRE.stressAim`: 평상·위협 1, 혼란 1.6, 제압·패닉 3. 팔 `WOUND.arm`: 저하 1.4, 한 팔 2.
 - 조준사격은 q ≈ 1 (흔들림으로 0.75 ~ 1), 제압사격은 q ≈ 0.25.
-- 다 조준하면 점사 발 수를 정한다: `burst` > 1 이면 `burst ± 1` (최소 1), 아니면 그대로.
+- 다 조준하면 이번 당김의 발 수와 당김 뒤 쉴 틱 수를 정한다 (§2c). 화기마다 정해 둔 점사 상수는 없다.
+- 제압사격은 당김이 끝나면 쉼 틱을 센 뒤 다시 조준한다 (쉼은 조준 정도 q 에 들어가지 않는다).
 - 겨눌 자리 = 조준점 + 쓸어 쏘는 영역에서 고른 점 (§2a, 조준사격은 0) + 겨눔 어긋남 (가로·세로 각각 정규, 표준편차 `VARY.hold 0.5 × dispersion × 거리`). 점사 하나 안의 탄은 같은 자리를 겨눈다.
-- 한 틱에 당기는 발 수 = `max(1, round(rof ÷ 60 × 0.25))`: K2 3, K15 3, AK 3, RPD 3, SVD·유탄·RPG 1. 점사가 끝나거나 탄창이 비면 다시 조준부터.
+- 한 틱에 당기는 발 수 = `max(1, round(rof ÷ 60 × 0.25))`: K2 3, K15 3, AK 3, RPD 3, SVD·유탄·RPG 1. 당김이 끝나거나 탄창이 비면 다시 조준부터.
 
 ![조준을 덜 할수록 산포가 커진다 (제압사격 ≈ × 4.75)](img/fire-aim.svg)
 *조준을 덜 할수록 산포가 커진다 (제압사격 ≈ × 4.75)*
@@ -66,6 +69,34 @@
 - 자세(엎드림 등)는 바꾸지 않고, 엄폐·명령 영역 안에 머무는지는 아직 보지 않는다 (비켜 서는 거리가 최대 4.5 m 라 작다).
 - 상수: `LINE.baseMargin` 0.75 m, `spreadCoef` 3, `minAlong` 0.8 m, `steps` [1.5, 3, 4.5] m. 모두 추정값 (조사 근거 없음).
 - 난수를 굴리지 않는다 (`random/rolls.md` 변화 없음).
+
+## 2c. 사격량 (`FIRE_VOLUME`, [`combat/volume.ts`](../../packages/sim/src/combat/volume.ts) `planPull`, #26)
+
+명령이 기준 사격량을 주고, 병사가 상황·상태·방아쇠 조절로 한 번 당길 발 수와 당김 사이 쉼을 정한다. 능력치는 쓰지 않는다 (명령·상황·상태·시드 잡음뿐).
+
+```
+명령 volume : 단계 slow / normal / rapid (발 수 계수·쉼 계수)  또는  한 번에 당길 발 수(숫자). 빼면 normal
+기준 발 수 nominal = 숫자면 그 값
+                   = 아니면 (제압사격 ? max(1, rof ÷ 60 × basePull 0.3) : 1) × 단계 발 수 계수
+상황 계수 = 거리 계수 × 표적 뚜렷함 계수 × 심리 계수          (아래 표, 발 수 계수·쉼 계수 각각)
+아낌 계수 ammoCoef = 지닌 탄 ≥ 30발이면 1, 아니면 0.4 + 0.6 × 지닌 탄 ÷ 30
+템포 cadence      = clamp(1 + (직전 − 1) × 0.7 + gauss × 0.15, 0.6, 1.6)     제압사격 당김마다 서서히 흔들림
+발 수 rounds = max(1, round(nominal × 상황 발 수 계수 × ammoCoef × cadence × exp(gauss × 0.25)))
+쉼 틱 pause  = round(basePause 0.25 × 단계 쉼 계수 × 상황 쉼 계수 ÷ (ammoCoef × cadence) × exp(gauss × 0.5) × 4)   제압사격만
+```
+- 기준이 한 발(조준사격·곡사·저격총)이고 숫자로 주지 않았으면 발 수는 굴리지 않고 1발이다 (한 발씩 신중하게). 쉼과 템포는 제압사격(`judge`)만 굴린다.
+- 단계: slow 발 수 × 0.5 · 쉼 × 2, normal 1 · 1, rapid 발 수 × 2 · 쉼 × 0.4. 숫자(예 6)는 단계 계수를 안 쓰고 그 발 수를 기준으로 한다.
+- 방아쇠 조절: 로그 표준편차 0.25 라서 기준 6발이면 대략 4 ~ 9발에 몰린다. 지닌 탄은 장전된 탄을 포함한 그 화기 탄약 수.
+
+| 상황 | 발 수 계수 | 쉼 계수 |
+|---|---|---|
+| 겨눌 자리까지 50 m 안 (가까움) | 1.3 | 0.8 |
+| 200 m 너머 (멂) | 0.8 | 1.2 |
+| 쏠 근거가 전부 지금 보임 (`exposed`: 한 점·한 덩어리 접촉이 다 visible) | 1.2 | 0.9 |
+| 쏠 근거가 없음 (`unclear`: 지점 둘레 모호 반경) | 0.85 | 1.15 |
+| 위축(`shaken`)·제압(`suppressed`) | 1.3 | 0.8 |
+
+모든 수치는 추정이다 (공개 교범에서 확인한 값이 아니다). 근거가 일부만 보이면(`mixed`) 계수 1. 조준사격은 표적이 보이니 `exposed` 로 본다.
 
 ## 3. 산포 (`pullTrigger`)
 
@@ -250,9 +281,22 @@ scale = (1 − d / R) × 구경 계수 × (1 − 0.6 × 발밑 엄폐) × (움�
 | `FIRE.leadError` | 0.3 | 표적 속도 1 m/s 당 더해지는 산포 (앞질러 겨누는 어긋남) | 움직이는 표적이 더 맞기 어려움 |
 | `WOUND.arm.impaired` / `one` | 산포 1.8 · 조준 1.4 · 재장전 1.8 / 4 · 2 · 3 | 팔 경상 / 한 팔 못 씀일 때 사격 계수. 두 팔 다 못 쓰면 쏘지 못함 | 팔 다친 병사가 더 못 쏨 |
 | `WOUND.weak.spread` / `aim` | 1.5 / 1.3 | 피를 30% 넘게 잃었을 때 산포·조준 시간 계수 | 실혈한 병사가 더 못 쏨 |
-| `VARY.aim` | ± 25% | 점사마다 조준 시간 흔들림 | 사격 간격이 더 들쭉날쭉 |
-| `VARY.burst` | ± 1 발 | 점사 발 수 흔들림 (화기 `burst` 2 이상) | 점사 길이가 더 들쭉날쭉 |
+| `VARY.aim` | ± 25% | 당김마다 조준 시간 흔들림 | 사격 간격이 더 들쭉날쭉 |
 | `VARY.hold` | 0.5 | 점사마다 겨눔 자체의 어긋남 = 화기 산포 × 이 값 × 거리 (점사 안 탄이 함께 쏠림) | 점사 전체가 한쪽으로 더 쏠림 |
+
+### 사격량 (`FIRE_VOLUME`, §2c)
+| 상수 | 값 | 하는 일 | 키우면 |
+|---|---|---|---|
+| `FIRE_VOLUME.basePull` | 0.3 s | 기준 당김 시간: 제압사격 기준 발 수 = rof ÷ 60 × 이 값 (K2 3.5, K15 4) | 한 번에 더 길게 당김 |
+| `FIRE_VOLUME.basePause` | 0.25 s | 제압사격 당김 사이 기준 쉼 | 더 드문드문 쏨 |
+| `FIRE_VOLUME.level` | slow 0.5·2 / normal 1·1 / rapid 2·0.4 | 단계별 발 수 계수·쉼 계수 | 단계 차이가 커짐 |
+| `FIRE_VOLUME.trigger` | 0.25 | 방아쇠 조절: 발 수 로그 표준편차 | 발 수가 더 크게 갈림 |
+| `FIRE_VOLUME.pauseSpread` | 0.5 | 쉼 로그 표준편차 | 쉼이 더 들쭉날쭉 |
+| `FIRE_VOLUME.cadence` | 유지 0.7 · 흔들림 0.15 · 0.6 ~ 1.6 | 임무 중 서서히 바뀌는 템포 | 임무가 더 굽이침 |
+| `FIRE_VOLUME.close` / `far` | 50 m 안 1.3·0.8 / 200 m 너머 0.8·1.2 | 거리 계수 (발 수·쉼) | 거리 영향이 커짐 |
+| `FIRE_VOLUME.exposed` / `unclear` | 1.2·0.9 / 0.85·1.15 | 표적 뚜렷함 계수 | 뚜렷함 영향이 커짐 |
+| `FIRE_VOLUME.stress` | 위축·제압 1.3·0.8, 나머지 1 | 심리 계수 | 눌린 병사가 더 몰아 쏨 |
+| `FIRE_VOLUME.lowAmmo` | 30발 · 최소 0.4 | 지닌 탄이 이 아래면 아낌 계수가 0.4 까지 줄고 쉼은 그만큼 늘어남 | 일찍부터 아낌 |
 
 ### 탄도·피탄 (`FIRE`)
 | 상수 | 값 | 하는 일 | 키우면 |

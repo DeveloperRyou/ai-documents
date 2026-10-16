@@ -47,7 +47,7 @@
 | `stop` | `ids` | 행동을 비운다 |
 | `posture` | `ids`, `posture` | 자세 바꾸기 (`stand`·`crouch`·`prone`) |
 | `fire` | `ids`, `target`, `slot?` | 아는 적 한 명을 조준사격 (`FIRE_ORDER.aimed`: 화기 조준 시간을 다 쓰고 한 발씩) |
-| `suppress` | `ids`, `x`, `y`, `slot?` | 지점을 제압사격 (`FIRE_ORDER.suppress`: 조준 1/4, 화기 점사 발 수, 둘레 4m 쓸어 쏨). 곡사 화기는 다 조준해 한 점에 |
+| `suppress` | `ids`, `x`, `y`, `slot?`, `volume?` | 지점을 제압사격 (`FIRE_ORDER.suppress`: 조준 1/4, 사격량 `volume`(slow·normal·rapid 또는 한 번에 당길 발 수, 빼면 normal)에 따라 병사가 발 수·쉼을 정함 — fire.md §2c, 둘레 쓸어 쏨). 곡사 화기는 다 조준해 한 점에 |
 | `reload` | `ids`, `slot?` | 재장전 (더 채울 탄이 없으면 무시) |
 | `rest` | `ids` | 제자리 휴식 (평온하지 않으면 무시) |
 
