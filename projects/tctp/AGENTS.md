@@ -1,7 +1,7 @@
 # AGENTS.md — TCTP (Tactical Command Training Program, 실 개발)
 
 분대 단위 직접 지휘 전술 시뮬. 첫 제품 = **분대**. 소대 지휘는 이후 단계.
-설계는 `docs/DESIGN.md`, 현재 코드 구조는 `docs/ARCHITECTURE.md`, 객체 정의는 `docs/objects/`, 수치 계산 식·난수는 `docs/calc/`.
+설계는 `docs/DESIGN.md`, 현재 코드 구조는 `docs/ARCHITECTURE.md`, 객체 정의는 `docs/objects/`, 수치 계산 식·난수는 `docs/calc/`. 수치·교범 조사 근거는 `docs/research/` (규칙 [`.claude/rules/research.md`](.claude/rules/research.md)).
 `poc/` 는 종료된 POC 보관소다. **import 하지 말 것** — 필요하면 옮겨 와서 다듬는다 (기록은 `docs/POC.md`).
 
 ## 명령어
