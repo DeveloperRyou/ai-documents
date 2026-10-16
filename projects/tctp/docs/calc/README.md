@@ -31,7 +31,8 @@
 
 1. 이번 틱 명령 적용 (`applyCommand`: 반응 시간 굴림) → 때가 된 미뤄 둔 명령 (`applyDueOrders`)
 2. `tick++`, `shots` 비움
-3. 행동 (`updateActions`, 병사 id 순): 이동·사격·재장전. 사격은 그 자리에서 탄착·부상·근탄까지 판정
+3. 행동 (`updateActions`, 병사 id 순): 이동·사격·재장전·수류탄 던지기. 사격은 그 자리에서 탄착·부상·근탄까지 판정
+3a. 신관이 다 탄 수류탄 폭발 (`updateGrenades`, 던진 순서): §5 폭발 굴림
 4. 듣기 (`updateHearing`, 병사 id 순): 이번 틱 탄의 총성·폭발음 → 스트레스 (#35)
 5. 몸 (`updateBody`, 병사 id 순): 출혈 → 휴식 그침 → 지구력 → 상태 → 전우 피격 → 자세 → 스트레스 → 기본 상태 (감시 ↔ 휴식, `stateRng`)
 6. 경계 시선 (`updateScan`, 병사 id 순, 시선 전용 난수)

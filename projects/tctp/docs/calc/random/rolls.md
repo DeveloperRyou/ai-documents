@@ -60,6 +60,15 @@
 | (맞으면) 부상 | 아래 "부상" | |
 | 근탄 스트레스 | 사람마다 `vary(15 × 몰아쏘기, ±30%)` × scale | 제압 반경 안 사람 (id 순) |
 
+### 수류탄 던지기 ([`combat/grenade.ts`](../../../packages/sim/src/combat/grenade.ts))
+| 굴림 | 분포 | 결과 |
+|---|---|---|
+| 준비 시간 (던지기 첫 틱) | `vary(기준 준비 시간 × 계수, ±25%)` → `secToTicks` | 행동의 `until` |
+| 던진 자리 | `gauss` × σ (x), `gauss` × σ (y) — 던지는 틱에 이 순서 | 산포 ([../fire.md](../fire.md) §5a) |
+| 신관 | `int(secToTicks(fuseMin), secToTicks(fuseMax))` — 위 두 굴림 다음 | `LiveGrenade.explodeTick` |
+
+터질 때는 아래 `explode` 굴림.
+
 ### 폭발 (`explode`) — 제압 반경 안 사람마다 (id 순)
 | 굴림 | 분포 | 결과 |
 |---|---|---|

@@ -36,6 +36,19 @@
 | `damage` | 상처 위력 (소총탄 ≈ 50 기준). 클수록 같은 부위도 더 심하게 다친다 (부상 정도 확률을 무거운 쪽으로 민다, [soldier.md](soldier.md) "부상"). 폭발 파편은 살상 반경 끝에서 × 0.4 |
 | `soundRange` | 폭발음이 들리는 거리 (m). 탄착점에서 크기 1, 이 거리에서 0. 폭발하지 않으면 0 (#35). 추정값: 40mm 유탄 1000, PG-7V 1200 |
 
+## 수류탄 `Grenade` (`kind: "grenade"`)
+
+| 필드 | 뜻 |
+|---|---|
+| `id`, `name`, `mass` | 식별자, 표시 이름, 한 발 무게 (kg) |
+| `fuseMin`, `fuseMax` | 신관 지연 범위 (초). 던진 틱에 이 범위에서 정수 틱으로 고른다 |
+| `throwRange` | 평균 병사가 서서 던지는 거리 (m). 자세 `THROW.rangeCoef`·하중에 따라 줄어든다 |
+| `dispersion` | 던진 자리 산포 (mrad, 표준편차): 던지는 거리에 비례 |
+| `basePrepTime` | 기준 투척 준비 시간 (초): 서서 안전핀을 뽑고 던지기까지 |
+| `blastRadius`, `suppressionRadius`, `damage`, `soundRange` | 탄약과 같은 뜻 (폭발 모형 `explode` 를 같이 쓴다) |
+
+지닌 수류탄은 `loadout` 의 `qty` (발 수). `grenadeIn(loadout, catalog, id?)` = 수량이 1 이상인 수류탄. 던질 수 있는 거리·식은 [../calc/fire.md](../calc/fire.md) §5a.
+
 함수: `weaponIn(loadout, catalog, slot)` = 칸에 든 화기, `roundsOf(loadout, ammo)` = 지닌 탄 수(장전 탄 포함), `initialLoaded` = 처음 장전 (장전 수와 지닌 탄 중 작은 값). 사격 판정은 [../calc/fire.md](../calc/fire.md).
 
 ## 장구 `Gear` (`kind: "gear"`)
@@ -83,4 +96,4 @@
 
 ## 추가하는 법
 [`content/equipment.json`](../../content/equipment.json) 의 `items` 에 한 줄 넣는다. 화기는 `slot` 을 정하고, `ammo` 가 가리키는 탄약도 있어야 한다 ([`tools/src/content.test.ts`](../../packages/tools/src/content.test.ts) 가 검사).
-수류탄·박격포처럼 화기 없이 던지거나 다른 성질이 필요하면 `kind` 를 늘리는 쪽으로 (지금은 `weapon`·`ammo`·`gear` 셋).
+화기 없이 던지거나 다른 성질이 필요한 장비(수류탄이 그렇게 들어왔다)는 `kind` 를 늘리는 쪽으로 (지금은 `weapon`·`ammo`·`grenade`·`gear` 넷).

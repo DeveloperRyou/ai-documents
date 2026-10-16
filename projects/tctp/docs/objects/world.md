@@ -15,9 +15,10 @@
 | `known` | 병사(id)별로 아는 적 `Contact[][]` (id 오름차순). 직접 본 것(`visible`)과 남이 외쳐 준 것(`told`, 위치 오차 있음). `knownOf(w, s)` |
 | `reports` | 아직 닿지 않은 접촉 보고 `Report[]` (보낼 때 정한 순서). 받는 병사 `to`·적 `id`·오차 낀 위치·처음 본 틱·닿는 틱 `at`·전해진 단계 `hops` |
 | `log` | `LogEntry { tick, side \| "system", text }` — 시작, 적 발견, 피격·전사 등 |
+| `grenades` | 던져서 터지기를 기다리는 수류탄 `LiveGrenade { by, item, x0, y0, x, y, z, explodeTick }` (던진 순서, 터지면 빠짐. 해시에 들어감 — 비어 있으면 지문에 영향 없음) |
 | `shots` | 이번 틱에 쏜 탄 `Shot { by, x0, y0, x1, y1, hit, explosive, indirect, sound, blastSound }` (indirect = 곡사, 맞는 쪽은 쏜 곳을 모름. sound·blastSound = 총성·폭발음이 들리는 거리 m, 듣기 #35) (화면 효과용, 매 틱 비움, 해시 제외) |
 
-상태는 `step(world, commands)` 안에서만 바뀐다: 명령 적용 → 미뤄 둔 명령(`applyDueOrders`) → `tick++`·`shots` 비움 → 행동(`updateActions`) → 몸 상태(`updateBody`: 출혈·지구력·상태·자세·스트레스) → 경계 시선(`updateScan`) → 탐지(`updateVision`). 순서와 각 단계의 난수는 [../calc/README.md](../calc/README.md) "한 틱 순서".
+상태는 `step(world, commands)` 안에서만 바뀐다: 명령 적용 → 미뤄 둔 명령(`applyDueOrders`) → `tick++`·`shots` 비움 → 행동(`updateActions`) → 신관이 다 탄 수류탄 폭발(`updateGrenades`) → 듣기 → 몸 상태(`updateBody`: 출혈·지구력·상태·자세·스트레스) → 경계 시선(`updateScan`) → 탐지(`updateVision`). 순서와 각 단계의 난수는 [../calc/README.md](../calc/README.md) "한 틱 순서".
 `stateHash` 는 tick·세 RNG 상태(`rng`·`lookRng`·`stateRng`)·병사 위치·몸 방향·시선(`look`·`lookAim`·`lookTick`·돌아볼 틱·`bodyAim`)·자세·상태·행동(종류·필드, 이동의 걸음·이동사격 포함)·스트레스·마지막 위협 틱·근탄 틱들·심리 단계·미뤄 둔 명령 틱·휴식 틱(`restTick`)·지구력·하중·장전 탄·휴대 수량·혈액·부상(부위·정도·출혈·틱)·`known`(병사별 접촉 id·틱·보임·위치)·`reports` 를 섞는다. 새 상태 필드를 넣으면 해시에도 넣는다.
 
 ## 아는 적 `Contact` ([`core/types.ts`](../../packages/sim/src/core/types.ts), 갱신은 [`perception/vision.ts`](../../packages/sim/src/perception/vision.ts))

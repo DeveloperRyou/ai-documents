@@ -133,6 +133,29 @@
 ![파편 부상 확률은 거리에 선형으로 줄고, 엎드리면 절반, 사이가 막히면 0.15 배](img/fire-blast.svg)
 *파편 부상 확률은 거리에 선형으로 줄고, 엎드리면 절반, 사이가 막히면 0.15 배*
 
+## 5a. 수류탄 투척 ([`combat/grenade.ts`](../../packages/sim/src/combat/grenade.ts), #37)
+
+- **거리**: 닿는 거리 = `throwRange × THROW.rangeCoef[자세] × max(minLoadCoef, 1 − loadCoef × max(0, 하중 − baseLoad))`. 목표가 이보다 멀면 명령 거부.
+- **준비 시간**: `basePrepTime × THROW.prepCoef[자세] × FIRE.stressAim[심리] × 팔 조준 계수 (× 약해졌으면 WOUND.weak.aim)`, ± `VARY.aim`.
+- **산포**: 던진 자리 = 목표 + (정규 × σ) 를 x·y 에, σ = `dispersion/1000 × FIRE.stressSpread[심리] × 팔 산포 계수 (× weak.spread) × 던지는 거리`. 어긋난 자리가 닿는 거리 밖이면 그 방향으로 닿는 데까지.
+- **포물선**: 손 높이 `몸 높이 × releaseHeight` 에서 `꼭대기 = apexCoef × 거리` 의 포물선으로 `THROW.step` 간격으로 따라가며, 칸의 지물 밀도가 `THROW.solid` 이상이고 포물선이 지물 높이(`p.height`) 아래이면 막혀 `bounceBack` 앞에 떨어진다. 숲·덤불·울타리는 지나간다.
+- **신관**: `rng.int(secToTicks(fuseMin), secToTicks(fuseMax))` 틱 뒤에 폭발. 폭발은 §5 와 같은 `explode` (살상·제압 반경은 수류탄 제원). 떨어진 높이는 `floorAt + pointAimHeight` — 참호·도랑 바닥에 떨어지면 바닥 높이라 둔덕에 가리지 않고 안의 사람이 파편을 받는다. 아군도 맞는다.
+- **소리**: 던질 때는 소리가 없고(자취만), 터질 때 폭발음 `soundRange` (§ 듣기, 곡사와 같이 쏜 곳을 모른다).
+
+| 상수 | 값 | 하는 일 | 키우면 |
+|---|---|---|---|
+| `THROW.rangeCoef` | 서서 1 · 앉아 0.85 · 엎드려 0.6 | 자세별 투척 거리 계수 (추정) | 낮은 자세도 멀리 던짐 |
+| `THROW.prepCoef` | 서서 1 · 앉아 1.2 · 엎드려 2 | 자세별 투척 준비 시간 계수 (추정) | 낮은 자세의 준비가 오래 걸림 |
+| `THROW.baseLoad` | 20 kg | 이를 넘는 하중부터 투척 거리가 준다 (추정) | |
+| `THROW.loadCoef` | 0.01 | 기준 하중을 넘는 kg 당 투척 거리 감소 비율 (추정) | 무거운 병사가 덜 던짐 |
+| `THROW.minLoadCoef` | 0.6 | 하중에 따른 투척 거리 계수의 하한 (추정) | |
+| `THROW.releaseHeight` | 1 | 손 높이 = 몸 높이 × 이 값 | 낮은 지물을 더 잘 넘김 |
+| `THROW.apexCoef` | 0.12 | 포물선 꼭대기 = 거리 × 이 값 (추정) | 높은 지물을 더 잘 넘김 |
+| `THROW.step` | 0.5 m | 포물선 검사 간격 | |
+| `THROW.solid` | 1 | 이 밀도 이상의 지물이 수류탄을 막는다 (건물·담 10, 생울타리 0.5 는 통과) | 더 성긴 지물도 막음 |
+| `THROW.bounceBack` | 0.5 m | 막힌 곳에서 던진 쪽으로 떨어지는 거리 | |
+| 수류탄 `K413` | 0.4 kg · 4~5 s · 35 m · 60 mrad · 준비 1.5 s · 살상 5 m · 제압 15 m · 피해 60 · 소리 1000 m | M67 값을 K413 대용으로 (출처 [../research/31-explosives.md](../research/31-explosives.md): 살상 5 m·신관 4~5 s·투척 35 m 확인, 제압 15 m 는 "유효 사상 반경 15 m" 를 제압 반경으로 쓴 추정, 산포·준비 시간·피해·무게는 추정) | |
+
 ## 6. 근탄 (직사, 폭발하지 않는 탄)
 
 탄도선 선분(총구 → 탄착점)과의 거리 d 가 탄약 `suppressionRadius` R 안인 산 사람 (쏜 사람·맞은 사람 제외, 아군 포함):
