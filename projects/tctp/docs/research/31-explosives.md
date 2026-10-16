@@ -64,3 +64,4 @@
 ## 반영
 
 - #37 수류탄 투척 (2026-10-16): `content/equipment.json` `k413` 에 M67 `확인` 값(살상 5 m·신관 4~5 s·투척 35 m·무게 14 oz≈0.4 kg)을 넣고, 제압 반경 15 m(사상 반경을 제압으로), 산포 60 mrad, 준비 1.5 s, 자세·하중 계수는 `추정`. 한국 K413 고유 수치는 못 찾아 M67 대용. 커밋은 이 줄 아래에 적는다.
+- #31 (2026-10-16): 사용자 결정 7항 반영. `content/equipment.json` K200 `casualtyRadius` 130·`armingDist` 14, VOG-25 `armingDist` 14, PG-7V `armingDist` 8 (값 선택은 `추정`), `FIRE.blastTail` 0.03 (`추정`), 거리×자세 기준표 `docs/calc/fire.md` §5 (전부 `추정` 표, 시뮬 ±0.02 일치 테스트 `combat/blast.test.ts`). 산포·0.85·엎드림 0.5·차폐 0.15 는 추정 유지. 커밋은 코드 레포 `closes #31`.
